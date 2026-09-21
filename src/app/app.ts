@@ -1,12 +1,25 @@
-import { Component, signal } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CanvasStoryService } from './core/services/canvas-story';
+import { BookingCtaService } from './core/services/booking-cta';
+import { Wordmark } from './shared/components/wordmark/wordmark';
+import { ScrollProgress } from './shared/components/scroll-progress/scroll-progress';
+import { CtaPill } from './shared/components/cta-pill/cta-pill';
 
 @Component({
-  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.scss',
+  imports: [RouterOutlet, Wordmark, ScrollProgress, CtaPill],
   templateUrl: './app.html',
+  styleUrl: './app.scss',
 })
 export class App {
-  protected readonly title = signal('ease-disease-angular');
+  private readonly canvasStory = inject(CanvasStoryService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  protected readonly canvasColor = this.canvasStory.canvasColor;
+  protected readonly bookingCta = inject(BookingCtaService);
+
+  constructor() {
+    this.canvasStory.start(this.destroyRef);
+  }
 }

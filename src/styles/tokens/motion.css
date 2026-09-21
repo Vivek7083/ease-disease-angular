@@ -1,0 +1,22 @@
+:root{
+--dur-micro:160ms; /* @kind other */
+--dur-base:320ms; /* @kind other */
+--dur-scene:720ms; /* @kind other */
+--ease:cubic-bezier(.2,.7,.2,1); /* @kind other */
+--ease-out-soft:cubic-bezier(.16,1,.3,1); /* @kind other */
+--drift-ember:26s; /* @kind other */
+--drift-ease:linear; /* @kind other */
+/* scroll progress 0..1 maps linearly to section progress */
+--scrub-map:linear; /* @kind other */
+/* never pin longer than 2 screen-heights */
+--pin-max:200vh; /* @kind other */
+--reveal-y:24px; /* @kind spacing */
+}
+@keyframes ember-drift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@media (prefers-reduced-motion:reduce){:root{
+--dur-micro:0ms; /* @kind other */
+--dur-base:0ms; /* @kind other */
+--dur-scene:0ms; /* @kind other */
+--reveal-y:0px; /* @kind spacing */
+}
+*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}

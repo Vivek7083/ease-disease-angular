@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ease Disease</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,ital,wght@9..144,0,300;9..144,0,400;9..144,0,500;9..144,1,300;9..144,1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* ─── TOKENS (from Oxblood & Ember design system) ─── */
+:root{
+  --ivory:#FAF7EF; --parchment:#F5EFE4; --ink:#241F1B; --ink-soft:#7A7167;
+  --oxblood:#7B2233; --oxblood-deep:#5A1826; --oxblood-soft:#F4E4E6;
+  --ember-a:#BF3820; --ember-b:#E06F27; --terracotta:#C1622D;
+  --sage:#5C6E4F; --sage-soft:#E7EBE1; --clinical:#0E86C4;
+  --font-display:'Fraunces',Georgia,serif;
+  --font-body:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-mono:'DM Mono',ui-monospace,monospace;
+  --r-pill:999px; --r-card:20px; --r-inner:12px;
+  --ease:cubic-bezier(.16,.84,.44,1);
+  /* canvas journey: hero lives on oxblood-deep */
+  --canvas:#5A1826;
+  --text-on-dark:#FAF7EF;
+  --text-soft-on-dark:rgba(250,247,239,.7);
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-padding-top:env(safe-area-inset-top,0px); }
+body{
+  margin:0; background:var(--canvas); color:var(--text-on-dark);
+  font-family:var(--font-body); font-size:1rem; line-height:1.6;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+  /* canvas will transition as we scroll into next sections */
+  transition:background 1.2s var(--ease);
+}
+h1,h2,h3{ font-family:var(--font-display); font-weight:400; margin:0; text-wrap:balance; letter-spacing:-.02em; }
+p{ margin:0; }
+button{ font-family:inherit; cursor:pointer; border:none; background:none; }
+:focus-visible{ outline:2px solid var(--ember-b); outline-offset:3px; border-radius:6px; }
+::selection{ background:rgba(224,111,39,.3); color:var(--text-on-dark); }
+
+/* ─── FIXED CANVAS LAYER ─── */
+.canvas-bg{
+  position:fixed; inset:0; z-index:-1;
+  background:var(--canvas);
+  transition:background 1.4s var(--ease);
+}
+
+/* ─── WORDMARK / LOGO ─── */
+.wordmark{
+  position:fixed; z-index:50;
+  top:calc(env(safe-area-inset-top,0px) + 20px); left:24px;
+  display:flex; align-items:center; gap:10px;
+  text-decoration:none; color:var(--text-on-dark);
+}
+.wordmark-glyph{
+  width:36px; height:36px; flex:none;
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--ember-a),var(--ember-b));
+  background-size:180% 180%;
+  animation:drift 26s ease-in-out infinite;
+  display:grid; place-items:center;
+}
+.wordmark-glyph svg{ width:18px; height:18px; }
+.wordmark-text{
+  font-family:var(--font-display); font-weight:500; font-size:1.1rem;
+  letter-spacing:.005em; line-height:1;
+}
+.wordmark-text span{ 
+  display:block; font-family:var(--font-mono); font-size:.6rem; 
+  letter-spacing:.08em; color:var(--text-soft-on-dark); margin-top:2px;
+  font-weight:400;
+}
+@keyframes drift{ 0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;} }
+
+/* ─── HERO LAYOUT ─── */
+.hero{
+  min-height:100svh; min-height:100vh;
+  display:grid; grid-template-columns:1fr 1fr;
+  padding-top:calc(env(safe-area-inset-top,0px) + 88px);
+  padding-bottom:60px;
+  max-width:1280px; margin:0 auto;
+  padding-left:clamp(24px,5vw,80px); padding-right:clamp(24px,5vw,80px);
+  gap:clamp(32px,4vw,72px);
+  align-items:center;
+}
+
+/* ─── LEFT: copy ─── */
+.hero-copy{ display:flex; flex-direction:column; gap:28px; }
+.hero-eyebrow{
+  font-family:var(--font-mono); font-size:.72rem; letter-spacing:.1em;
+  color:rgba(250,247,239,.58); display:flex; align-items:center; gap:10px;
+}
+.hero-eyebrow::before{
+  content:''; display:block; width:28px; height:1px; background:var(--ember-b); flex:none;
+}
+.hero-h1{
+  font-size:clamp(2.4rem,1.8rem+2.4vw,4.2rem);
+  line-height:1.03; font-weight:300;
+  color:var(--text-on-dark);
+}
+.hero-h1 em{
+  font-style:italic; font-weight:400;
+  color:var(--ember-b);
+  /* not a single-word accent, the whole emotional beat is in italics */
+}
+.hero-lede{
+  font-size:clamp(1rem,0.9rem+0.4vw,1.18rem);
+  color:var(--text-soft-on-dark); max-width:42ch; line-height:1.65;
+}
+/* subtle trust line */
+.hero-trust{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--font-mono); font-size:.7rem;
+  color:rgba(250,247,239,.48); letter-spacing:.04em;
+}
+.hero-trust .dot{ width:4px; height:4px; border-radius:50%; background:var(--ember-b); flex:none; }
+
+/* ─── RIGHT: illustration panel ─── */
+.hero-visual{
+  display:flex; flex-direction:column; gap:0;
+  position:relative;
+}
+.gut-stage{
+  position:relative; width:100%;
+  aspect-ratio:1/1.12;
+  border-radius:24px;
+  overflow:hidden;
+  background:rgba(90,24,38,.45);
+  border:1px solid rgba(250,247,239,.1);
+  backdrop-filter:blur(2px);
+}
+.gut-stage svg{ width:100%; height:100%; }
+
+/* CTA strip below illustration */
+.hero-cta{
+  display:flex; gap:12px; align-items:center;
+  padding-top:20px; flex-wrap:wrap;
+}
+.btn-book{
+  display:inline-flex; align-items:center; gap:10px;
+  min-height:52px; padding:0 26px;
+  border-radius:var(--r-pill);
+  background:linear-gradient(105deg,var(--ember-a),var(--ember-b));
+  background-size:180% 180%; animation:drift 26s ease-in-out infinite;
+  color:#FFF4EC; font:700 .95rem/1 var(--font-body);
+  text-decoration:none; border:none; cursor:pointer;
+  box-shadow:0 16px 36px -14px rgba(191,56,32,.65);
+  transition:transform .22s var(--ease), box-shadow .22s var(--ease);
+}
+.btn-book:hover{ transform:translateY(-2px); box-shadow:0 20px 40px -14px rgba(191,56,32,.75); }
+.btn-book small{ font-weight:500; font-size:.78rem; opacity:.9; }
+.btn-chat{
+  display:inline-flex; align-items:center; gap:9px;
+  min-height:52px; padding:0 22px;
+  border-radius:var(--r-pill);
+  background:rgba(250,247,239,.09);
+  border:1px solid rgba(250,247,239,.28);
+  color:var(--text-on-dark); font:500 .92rem/1 var(--font-body);
+  text-decoration:none; cursor:pointer;
+  transition:background .22s var(--ease), border-color .22s var(--ease);
+}
+.btn-chat:hover{ background:rgba(250,247,239,.16); border-color:rgba(250,247,239,.45); }
+.btn-chat .chat-icon{ width:20px; height:20px; flex:none; }
+
+/* ─── GUT SVG internals ─── */
+.gut-path{ fill:none; stroke:rgba(250,247,239,.18); stroke-width:1.5; }
+.gut-core{
+  fill:none; stroke:var(--ember-b); stroke-width:2;
+  stroke-dasharray:900; stroke-dashoffset:900;
+  animation:draw-gut 2.8s var(--ease) .4s forwards;
+}
+@keyframes draw-gut{ to{ stroke-dashoffset:0; } }
+
+.gut-glow{
+  fill:none; stroke:var(--ember-b); stroke-width:5; opacity:.12;
+  filter:url(#glow);
+  stroke-dasharray:900; stroke-dashoffset:900;
+  animation:draw-gut 2.8s var(--ease) .4s forwards;
+}
+
+.thread{
+  stroke:var(--ember-b); stroke-width:1.2; fill:none; opacity:0;
+  stroke-dasharray:1; stroke-dashoffset:1; pathLength:1;
+  animation:draw-thread .7s var(--ease) forwards;
+}
+.thread.t0{ animation-delay:2.6s; }
+.thread.t1{ animation-delay:2.9s; }
+.thread.t2{ animation-delay:3.2s; }
+.thread.t3{ animation-delay:3.5s; }
+.thread.t4{ animation-delay:3.8s; }
+.thread.t5{ animation-delay:4.1s; }
+@keyframes draw-thread{
+  0%{ stroke-dashoffset:1; opacity:0; }
+  10%{ opacity:1; }
+  100%{ stroke-dashoffset:0; opacity:.6; }
+}
+
+.node-ring{
+  fill:none; stroke:var(--ember-b); stroke-width:1.4; opacity:0;
+  animation:node-in .5s var(--ease) forwards;
+  transform-origin:center center;
+}
+.node-dot{ fill:var(--ember-b); opacity:0; animation:node-in .5s var(--ease) forwards; }
+.node-label{
+  fill:var(--text-on-dark); font-family:'DM Mono',monospace;
+  font-size:11px; letter-spacing:.06em; opacity:0;
+  animation:node-in .5s var(--ease) forwards;
+}
+.n0 .node-ring,.n0 .node-dot,.n0 .node-label{ animation-delay:3.0s; }
+.n1 .node-ring,.n1 .node-dot,.n1 .node-label{ animation-delay:3.3s; }
+.n2 .node-ring,.n2 .node-dot,.n2 .node-label{ animation-delay:3.6s; }
+.n3 .node-ring,.n3 .node-dot,.n3 .node-label{ animation-delay:3.9s; }
+.n4 .node-ring,.n4 .node-dot,.n4 .node-label{ animation-delay:4.2s; }
+.n5 .node-ring,.n5 .node-dot,.n5 .node-label{ animation-delay:4.5s; }
+@keyframes node-in{ from{opacity:0; transform:scale(.6);} to{opacity:1; transform:scale(1);} }
+
+/* ambient pulse on nodes after they appear */
+.node-pulse{
+  fill:var(--ember-b); opacity:0;
+  animation:pulse-ring 3s ease-out infinite;
+  transform-origin:center center;
+}
+.n0 .node-pulse{ animation-delay:4.2s; }
+.n1 .node-pulse{ animation-delay:4.5s; }
+.n2 .node-pulse{ animation-delay:4.8s; }
+.n3 .node-pulse{ animation-delay:5.1s; }
+.n4 .node-pulse{ animation-delay:5.4s; }
+.n5 .node-pulse{ animation-delay:5.7s; }
+@keyframes pulse-ring{
+  0%{ transform:scale(1); opacity:.35; }
+  60%{ transform:scale(2.2); opacity:0; }
+  100%{ transform:scale(2.2); opacity:0; }
+}
+
+/* ─── CHAT PANEL ─── */
+.chat-overlay{
+  position:fixed; inset:0; z-index:60;
+  display:flex; flex-direction:column;
+  background:var(--oxblood-deep);
+  transform:translateY(100%);
+  transition:transform .5s var(--ease);
+  padding-top:env(safe-area-inset-top,0px);
+}
+.chat-overlay.open{ transform:translateY(0); }
+
+.chat-header{
+  display:flex; align-items:center; gap:14px;
+  padding:18px 20px 14px;
+  border-bottom:1px solid rgba(250,247,239,.12);
+  flex:none;
+}
+.chat-avatar{
+  width:38px; height:38px; border-radius:50%; flex:none;
+  background:linear-gradient(135deg,var(--ember-a),var(--ember-b));
+  display:grid; place-items:center;
+}
+.chat-header-text h3{ font-family:var(--font-display); font-size:1rem; font-weight:500; margin:0; color:var(--text-on-dark); }
+.chat-header-text p{ font-size:.76rem; color:var(--text-soft-on-dark); margin:0; font-family:var(--font-mono); }
+.chat-close{
+  margin-left:auto; width:36px; height:36px; border-radius:50%;
+  background:rgba(250,247,239,.1); color:var(--text-on-dark);
+  display:grid; place-items:center; flex:none;
+}
+
+.chat-messages{ flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px; }
+.msg{ display:flex; gap:10px; max-width:82%; }
+.msg.bot{ align-self:flex-start; }
+.msg.user{ align-self:flex-end; flex-direction:row-reverse; }
+.msg-bubble{
+  padding:12px 16px; border-radius:18px; font-size:.92rem; line-height:1.55;
+  color:var(--text-on-dark);
+}
+.msg.bot .msg-bubble{
+  background:rgba(250,247,239,.1); border:1px solid rgba(250,247,239,.14);
+  border-bottom-left-radius:6px;
+}
+.msg.user .msg-bubble{
+  background:linear-gradient(105deg,var(--ember-a),var(--ember-b));
+  color:#FFF4EC; border-bottom-right-radius:6px;
+}
+.typing{ display:flex; gap:5px; padding:14px 16px; }
+.typing span{ width:7px; height:7px; border-radius:50%; background:rgba(250,247,239,.5); animation:blink 1.4s ease-in-out infinite; }
+.typing span:nth-child(2){ animation-delay:.2s; }
+.typing span:nth-child(3){ animation-delay:.4s; }
+@keyframes blink{ 0%,60%,100%{opacity:.3;} 30%{opacity:1;} }
+
+.chat-chips{
+  padding:0 20px 14px; display:flex; flex-wrap:wrap; gap:9px;
+}
+.chip{
+  display:inline-flex; align-items:center; min-height:38px; padding:0 16px;
+  border-radius:var(--r-pill); border:1px solid rgba(250,247,239,.3);
+  background:rgba(250,247,239,.07); color:var(--text-on-dark);
+  font:500 .84rem/1 var(--font-body); cursor:pointer;
+  transition:background .2s, border-color .2s;
+}
+.chip:hover{ background:rgba(250,247,239,.15); border-color:rgba(250,247,239,.5); }
+
+.chat-input-row{
+  display:flex; gap:10px; padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));
+  border-top:1px solid rgba(250,247,239,.12); flex:none;
+}
+.chat-input{
+  flex:1; min-height:44px; padding:10px 16px;
+  border-radius:var(--r-pill); border:1px solid rgba(250,247,239,.25);
+  background:rgba(250,247,239,.08); color:var(--text-on-dark);
+  font:400 .92rem/1.4 var(--font-body); outline:none;
+  resize:none;
+}
+.chat-input::placeholder{ color:rgba(250,247,239,.38); }
+.chat-input:focus{ border-color:rgba(250,247,239,.45); }
+.chat-send{
+  width:44px; height:44px; border-radius:50%; flex:none;
+  background:linear-gradient(135deg,var(--ember-a),var(--ember-b));
+  color:#FFF4EC; display:grid; place-items:center;
+  transition:transform .2s var(--ease);
+}
+.chat-send:hover{ transform:scale(1.08); }
+
+/* ─── SCROLL INDICATOR ─── */
+.scroll-cue{
+  position:absolute; bottom:32px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:8px;
+  font-family:var(--font-mono); font-size:.66rem; letter-spacing:.08em;
+  color:rgba(250,247,239,.38); pointer-events:none;
+  animation:fade-in 1s var(--ease) 5.5s both;
+}
+.scroll-cue-line{ width:1px; height:48px; overflow:hidden; position:relative; }
+.scroll-cue-line::after{
+  content:''; position:absolute; top:-100%; left:0; width:100%; height:100%;
+  background:linear-gradient(var(--ember-b), transparent);
+  animation:cue-drop 2.2s var(--ease) 5.5s infinite;
+}
+@keyframes cue-drop{ to{ top:200%; } }
+@keyframes fade-in{ from{opacity:0;} to{opacity:1;} }
+
+/* ─── MOBILE ─── */
+@media(max-width:899px){
+  .hero{
+    grid-template-columns:1fr;
+    padding-top:calc(env(safe-area-inset-top,0px) + 72px);
+    padding-bottom:100px;
+    gap:28px; align-items:start;
+  }
+  .hero-copy{ order:2; }
+  .hero-visual{ order:1; }
+  .gut-stage{ aspect-ratio:1/0.88; border-radius:20px; }
+  .hero-h1{ font-size:clamp(2rem,1.5rem+3vw,3rem); }
+  .hero-cta{ padding-top:16px; }
+  .btn-book{ min-height:48px; font-size:.9rem; }
+  .btn-chat{ min-height:48px; font-size:.88rem; }
+  .scroll-cue{ display:none; }
+  /* mobile: chat opens fullscreen from bottom */
+  .chat-overlay{ border-radius:24px 24px 0 0; }
+}
+@media(max-width:460px){
+  .hero-cta{ flex-direction:column; align-items:stretch; }
+  .btn-book,.btn-chat{ justify-content:center; width:100%; }
+}
+
+/* ─── REDUCED MOTION ─── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation:none !important; transition:none !important; }
+  .gut-core,.gut-glow{ stroke-dashoffset:0; }
+  .thread{ stroke-dashoffset:0; opacity:.5; }
+  .node-ring,.node-dot,.node-label{ opacity:1; }
+  .node-pulse{ opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="canvas-bg" id="canvasBg" aria-hidden="true"></div>
+
+<!-- WORDMARK -->
+<a class="wordmark" href="#" aria-label="Ease Disease — home">
+  <div class="wordmark-glyph" aria-hidden="true">
+    <!-- minimal leaf/gut glyph -->
+    <svg viewBox="0 0 18 18" fill="none" stroke="#FFF4EC" stroke-width="1.6" stroke-linecap="round">
+      <path d="M9 3 C5 3 3 6 3 9 S5 15 9 15 S15 12 15 9 S13 3 9 3Z" opacity=".7"/>
+      <path d="M9 6 C7 6 6 8 6 9 S7 13 9 13"/>
+    </svg>
+  </div>
+  <div class="wordmark-text">
+    Ease Disease
+    <span>Functional Medicine</span>
+  </div>
+</a>
+
+<!-- HERO -->
+<main>
+<section class="hero" id="hero" aria-label="Hero">
+
+  <!-- LEFT: copy -->
+  <div class="hero-copy">
+    <p class="hero-eyebrow">Digestion-first functional medicine</p>
+
+    <h1 class="hero-h1">
+      Your body has been<br>
+      <em>speaking in symptoms.</em><br>
+      We find the source.
+    </h1>
+
+    <p class="hero-lede">
+      Skin flares, cycle changes, fatigue that won't lift —
+      they often trace back to one place. Thirty minutes is enough to start finding out.
+    </p>
+
+    <p class="hero-trust">
+      <span class="dot"></span>
+      Not a diagnosis &nbsp;·&nbsp; Not a subscription &nbsp;·&nbsp; A real conversation
+    </p>
+  </div>
+
+  <!-- RIGHT: illustration + CTAs -->
+  <div class="hero-visual">
+    <div class="gut-stage" role="img" aria-label="Gut health illustration showing the digestive system at the centre, with connections to skin, sleep, energy, mood, hormones and immunity">
+
+      <svg viewBox="0 0 460 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="8" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <filter id="glow-soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+          </filter>
+          <radialGradient id="bg-grad" cx="50%" cy="48%" r="52%">
+            <stop offset="0%" stop-color="#7B2233" stop-opacity=".5"/>
+            <stop offset="100%" stop-color="#5A1826" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Background ambient glow -->
+        <ellipse cx="230" cy="260" rx="140" ry="160" fill="url(#bg-grad)"/>
+
+        <!-- Ghost anatomy outline (very faint) -->
+        <g class="gut-path" opacity="0.25">
+          <!-- stomach -->
+          <ellipse cx="200" cy="170" rx="44" ry="36" stroke-dasharray="4 6"/>
+          <!-- small intestine coils -->
+          <path d="M190 206 C170 215 155 235 165 255 C175 275 205 278 215 298 C225 318 218 340 200 350" stroke-dasharray="4 6"/>
+          <path d="M200 206 C220 218 240 238 228 258 C216 278 190 282 185 302 C180 322 192 342 210 350" stroke-dasharray="4 6"/>
+          <!-- large intestine frame -->
+          <path d="M160 340 C145 340 135 320 135 290 C135 220 145 185 165 170" stroke-dasharray="4 6"/>
+          <path d="M210 360 C210 375 220 385 230 385 C250 385 268 370 268 350 C268 330 255 325 250 305 C245 285 262 265 265 245 C268 220 255 200 235 200 C220 200 205 208 200 206" stroke-dasharray="4 6"/>
+        </g>
+
+        <!-- Main gut illustration: the animated line -->
+        <path class="gut-glow"
+          d="M200 115
+             C185 115 165 125 158 142
+             C148 162 158 186 172 198
+             C152 208 136 228 138 255
+             C140 280 158 300 156 325
+             C154 350 142 368 148 385
+             C154 400 174 410 192 406
+             C210 402 224 386 232 368
+             C240 350 238 330 250 316
+             C262 302 278 298 280 278
+             C282 258 268 240 268 220
+             C268 198 278 182 278 162
+             C278 140 264 118 248 112
+             C232 106 216 112 208 118"
+          filter="url(#glow)"/>
+
+        <path class="gut-core"
+          d="M200 115
+             C185 115 165 125 158 142
+             C148 162 158 186 172 198
+             C152 208 136 228 138 255
+             C140 280 158 300 156 325
+             C154 350 142 368 148 385
+             C154 400 174 410 192 406
+             C210 402 224 386 232 368
+             C240 350 238 330 250 316
+             C262 302 278 298 280 278
+             C282 258 268 240 268 220
+             C268 198 278 182 278 162
+             C278 140 264 118 248 112
+             C232 106 216 112 208 118"/>
+
+        <!-- Node threads: lines from gut core to the 6 nodes -->
+        <!-- Skin (top-right) -->
+        <path class="thread t0" pathLength="1"
+          d="M248 130 C290 100 340 80 388 68"/>
+        <!-- Sleep (right-mid-top) -->
+        <path class="thread t1" pathLength="1"
+          d="M278 220 C318 205 355 195 398 188"/>
+        <!-- Energy (bottom-right) -->
+        <path class="thread t2" pathLength="1"
+          d="M260 320 C300 330 340 345 385 358"/>
+        <!-- Mood (bottom-left) -->
+        <path class="thread t3" pathLength="1"
+          d="M148 370 C110 385 78 400 52 418"/>
+        <!-- Hormones (left-mid) -->
+        <path class="thread t4" pathLength="1"
+          d="M138 255 C98 248 65 240 30 235"/>
+        <!-- Immunity (top-left) -->
+        <path class="thread t5" pathLength="1"
+          d="M172 140 C130 118 92 98 58 82"/>
+
+        <!-- 6 NODES -->
+        <!-- n0: Skin, top-right -->
+        <g class="n0">
+          <circle class="node-pulse" cx="395" cy="62" r="8"/>
+          <circle class="node-ring" cx="395" cy="62" r="12" fill="rgba(90,24,38,.7)"/>
+          <circle class="node-dot" cx="395" cy="62" r="5"/>
+          <text class="node-label" x="395" y="50" text-anchor="middle">Skin</text>
+        </g>
+        <!-- n1: Sleep, right-mid-top -->
+        <g class="n1">
+          <circle class="node-pulse" cx="406" cy="183" r="8"/>
+          <circle class="node-ring" cx="406" cy="183" r="12" fill="rgba(90,24,38,.7)"/>
+          <circle class="node-dot" cx="406" cy="183" r="5"/>
+          <text class="node-label" x="406" y="171" text-anchor="middle">Sleep</text>
+        </g>
+        <!-- n2: Energy, bottom-right -->
+        <g class="n2">
+          <circle class="node-pulse" cx="393" cy="364" r="8"/>
+          <circle class="node-ring" cx="393" cy="364" r="12" fill="rgba(90,24,38,.7)"/>
+          <circle class="node-dot" cx="393" cy="364" r="5"/>
+          <text class="node-label" x="393" y="352" text-anchor="middle">Energy</text>
+        </g>
+        <!-- n3: Mood, bottom-left -->
+        <g class="n3">
+          <circle class="node-pulse" cx="42" cy="424" r="8"/>
+          <circle class="node-ring" cx="42" cy="424" r="12" fill="rgba(90,24,38,.7)"/>
+          <circle class="node-dot" cx="42" cy="424" r="5"/>
+          <text class="node-label" x="42" y="448" text-anchor="middle">Mood</text>
+        </g>
+        <!-- n4: Hormones, left-mid -->
+        <g class="n4">
+          <circle class="node-pulse" cx="22" cy="233" r="8"/>
+          <circle class="node-ring" cx="22" cy="233" r="12" fill="rgba(90,24,38,.7)"/>
+          <circle class="node-dot" cx="22" cy="233" r="5"/>
+          <text class="node-label" x="22" y="221" text-anchor="middle">Hormones</text>
+        </g>
+        <!-- n5: Immunity, top-left -->
+        <g class="n5">
+          <circle class="node-pulse" cx="50" cy="76" r="8"/>
+          <circle class="node-ring" cx="50" cy="76" r="12" fill="rgba(90,24,38,.7)"/>
+          <circle class="node-dot" cx="50" cy="76" r="5"/>
+          <text class="node-label" x="50" y="64" text-anchor="middle">Immunity</text>
+        </g>
+
+        <!-- Central label -->
+        <text x="230" y="268" text-anchor="middle"
+          font-family="'DM Mono',monospace" font-size="10" letter-spacing="0.12em"
+          fill="rgba(250,247,239,0.38)">GUT</text>
+        <text x="230" y="282" text-anchor="middle"
+          font-family="'DM Mono',monospace" font-size="9" letter-spacing="0.1em"
+          fill="rgba(250,247,239,0.22)">at the centre</text>
+      </svg>
+    </div>
+
+    <!-- CTAs live under the illustration on desktop, feel attached to it -->
+    <div class="hero-cta">
+      <button class="btn-book" type="button" id="bookBtn">
+        Book a consultation
+        <small>30 min · ₹499</small>
+      </button>
+      <button class="btn-chat" type="button" id="chatBtn" aria-expanded="false" aria-controls="chatOverlay">
+        <svg class="chat-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M17 10.5a6.5 6.5 0 0 1-9.4 5.8L4 17l.8-3.4A6.5 6.5 0 1 1 17 10.5z"/>
+        </svg>
+        Ask the Ease guide
+      </button>
+    </div>
+  </div>
+
+  <!-- scroll cue, absolute to hero section -->
+  <div class="scroll-cue" aria-hidden="true">
+    <div class="scroll-cue-line"></div>
+    <span>scroll</span>
+  </div>
+</section>
+</main>
+
+<!-- ─── CHAT OVERLAY ─── -->
+<div class="chat-overlay" id="chatOverlay" role="dialog" aria-modal="true" aria-label="Ease guide chat" aria-hidden="true">
+  <div class="chat-header">
+    <div class="chat-avatar" aria-hidden="true">
+      <svg viewBox="0 0 18 18" fill="none" stroke="#FFF4EC" stroke-width="1.6" stroke-linecap="round" width="18" height="18">
+        <path d="M9 3 C5 3 3 6 3 9 S5 15 9 15 S15 12 15 9 S13 3 9 3Z" opacity=".7"/>
+        <path d="M9 6 C7 6 6 8 6 9 S7 13 9 13"/>
+      </svg>
+    </div>
+    <div class="chat-header-text">
+      <h3>Ease guide</h3>
+      <p>Not a doctor · Here to help you find direction</p>
+    </div>
+    <button class="chat-close" id="chatClose" type="button" aria-label="Close chat">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M3 3l10 10M13 3L3 13"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="chat-messages" id="chatMessages" aria-live="polite">
+    <div class="msg bot">
+      <div class="msg-bubble">
+        Hi — I'm the Ease guide. I can help you understand what you're feeling and whether it might be connected to your gut. Where would you like to start?
+      </div>
+    </div>
+  </div>
+
+  <div class="chat-chips" id="chatChips" aria-label="Quick replies">
+    <button class="chip" data-reply="I'm dealing with digestive issues">Digestive issues</button>
+    <button class="chip" data-reply="I have persistent fatigue or low energy">Fatigue or low energy</button>
+    <button class="chip" data-reply="My skin keeps flaring up">Skin flare-ups</button>
+    <button class="chip" data-reply="My cycle or hormones feel off">Cycle / hormones</button>
+    <button class="chip" data-reply="I have brain fog or mood swings">Brain fog or mood</button>
+    <button class="chip" data-reply="I'm not sure what's wrong">Not sure where to start</button>
+  </div>
+
+  <div class="chat-input-row">
+    <textarea class="chat-input" id="chatInput" placeholder="Or type your question…" rows="1" aria-label="Type your message"></textarea>
+    <button class="chat-send" id="chatSend" type="button" aria-label="Send message">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M15 3L3 9l5 2M15 3L9 15l-1-6"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* ─── Canvas ambient parallax (desktop only) ─── */
+  if(window.matchMedia('(min-width:900px) and (prefers-reduced-motion:no-preference)').matches){
+    document.addEventListener('mousemove', function(e){
+      var x = (e.clientX/window.innerWidth - .5)*14;
+      var y = (e.clientY/window.innerHeight - .5)*8;
+      var el = document.querySelector('.gut-stage svg');
+      if(el) el.style.transform = 'translate('+x*.4+'px,'+y*.4+'px)';
+    });
+  }
+
+  /* ─── Chat ─── */
+  var chatBtn = document.getElementById('chatBtn');
+  var chatClose = document.getElementById('chatClose');
+  var chatOverlay = document.getElementById('chatOverlay');
+  var chatMessages = document.getElementById('chatMessages');
+  var chatChips = document.getElementById('chatChips');
+  var chatInput = document.getElementById('chatInput');
+  var chatSend = document.getElementById('chatSend');
+
+  var RESPONSES = {
+    'digestive': 'Digestive discomfort is the clearest signal that something is off at the root. Bloating, irregular bowel habits and discomfort after eating are often the first things we look at in a consult. Want to book a 30-min call to go deeper?',
+    'fatigue': "Fatigue that lingers — especially in the mornings or after eating — is often connected to how your gut processes nutrients and regulates blood sugar. It's one of the most common things we hear about in first consultations.",
+    'skin': "Skin is one of the clearest windows into gut health. Eczema, acne and persistent redness frequently improve when what's happening in the gut is addressed. A consult is the place to map that connection for your specific case.",
+    'cycle': "Hormonal balance depends heavily on the gut's ability to process and clear hormones. If your cycle feels irregular or heavy, it's worth exploring gut health as part of the picture.",
+    'brain': "Brain fog and mood swings can trace back to the gut-brain axis — a real, physical connection between your digestive system and your nervous system. We look at this in almost every consult.",
+    'unsure': "That's exactly the right place to start — a first consultation is a 30-minute conversation where you describe everything you're feeling, and we start to find the common thread. No preparation needed.",
+    'default': "That's a good question. The best way to get a precise answer for your situation is a 30-minute consultation with our team. Every pattern is a little different."
+  };
+
+  function key(t){
+    t = t.toLowerCase();
+    if(/digest|bloat|bowel|stomach|gut/.test(t)) return 'digestive';
+    if(/fatigue|tired|energy|exhaust/.test(t)) return 'fatigue';
+    if(/skin|acne|eczema|rash|flush/.test(t)) return 'skin';
+    if(/cycle|hormone|period|pcos/.test(t)) return 'cycle';
+    if(/fog|mood|brain|anxiety|depress/.test(t)) return 'brain';
+    if(/unsure|not sure|don't know|start|wrong/.test(t)) return 'unsure';
+    return 'default';
+  }
+
+  function openChat(){
+    chatOverlay.classList.add('open');
+    chatOverlay.removeAttribute('aria-hidden');
+    chatBtn.setAttribute('aria-expanded','true');
+    document.body.style.overflow = 'hidden';
+    setTimeout(function(){ chatClose.focus(); }, 500);
+  }
+  function closeChat(){
+    chatOverlay.classList.remove('open');
+    chatOverlay.setAttribute('aria-hidden','true');
+    chatBtn.setAttribute('aria-expanded','false');
+    document.body.style.overflow = '';
+    chatBtn.focus();
+  }
+
+  function addMsg(text, who){
+    var div = document.createElement('div');
+    div.className = 'msg ' + who;
+    div.innerHTML = '<div class="msg-bubble">'+text+'</div>';
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function showTyping(){
+    var div = document.createElement('div');
+    div.className = 'msg bot typing-indicator';
+    div.innerHTML = '<div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div>';
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return div;
+  }
+
+  function respond(text){
+    addMsg(text, 'user');
+    chatChips.style.display = 'none';
+    var indicator = showTyping();
+    var delay = 900 + Math.random()*600;
+    setTimeout(function(){
+      chatMessages.removeChild(indicator);
+      addMsg(RESPONSES[key(text)], 'bot');
+      /* show book CTA after first response */
+      if(!document.getElementById('chatBookChip')){
+        var b = document.createElement('button');
+        b.className = 'chip'; b.id = 'chatBookChip';
+        b.textContent = 'Book a consultation — ₹499';
+        b.style.background = 'linear-gradient(105deg,#BF3820,#E06F27)';
+        b.style.borderColor = 'transparent'; b.style.color = '#FFF4EC';
+        b.addEventListener('click', function(){ closeChat(); });
+        chatChips.style.display = 'flex';
+        chatChips.innerHTML = '';
+        chatChips.appendChild(b);
+      }
+    }, delay);
+  }
+
+  chatBtn.addEventListener('click', openChat);
+  chatClose.addEventListener('click', closeChat);
+
+  chatOverlay.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeChat();
+  });
+
+  chatChips.addEventListener('click', function(e){
+    var chip = e.target.closest('.chip[data-reply]');
+    if(chip) respond(chip.dataset.reply);
+  });
+
+  function sendInput(){
+    var v = chatInput.value.trim();
+    if(!v) return;
+    chatInput.value = '';
+    chatInput.style.height = 'auto';
+    respond(v);
+  }
+  chatSend.addEventListener('click', sendInput);
+  chatInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendInput(); }
+  });
+  chatInput.addEventListener('input', function(){
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120)+'px';
+  });
+
+  /* ─── Book button ─── */
+  document.getElementById('bookBtn').addEventListener('click', function(){
+    alert('Booking flow — next prototype.');
+  });
+
+})();
+</script>
+</body>
+</html>

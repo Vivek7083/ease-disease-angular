@@ -1,0 +1,487 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/actions/**",
+              "components/brand/**",
+              "components/chat/**",
+              "components/content/**",
+              "components/navigation/**",
+              "components/story/**",
+              "components/surfaces/**",
+              "ui_kits/root-map/**",
+              "ui_kits/scrollytelling/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Fraunces|DM Sans|DM Mono))/i]",
+        "message": "Font not provided by the design system. Available: Fraunces, DM Sans, DM Mono."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ChatBubble'] > JSXAttribute > JSXIdentifier[name!=/^(?:unread|open|onClick|label|offsetRight|key|ref|className|style|children)$/]",
+        "message": "<ChatBubble> doesn't accept that prop. Declared props: unread, open, onClick, label, offsetRight."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ChatMessage'] > JSXAttribute > JSXIdentifier[name!=/^(?:from|text|key|ref|className|style|children)$/]",
+        "message": "<ChatMessage> doesn't accept that prop. Declared props: from, text."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ChatMessage'] > JSXAttribute[name.name='from'] > Literal[value!=/^(?:guide|user)$/]",
+        "message": "<ChatMessage> from must be one of 'guide' | 'user'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CtaPill'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|variant|compact|meta|disabled|floating|href|onClick|key|ref|className|style|children)$/]",
+        "message": "<CtaPill> doesn't accept that prop. Declared props: label, variant, compact, meta, disabled, floating, href, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='CtaPill'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|ghost)$/]",
+        "message": "<CtaPill> variant must be one of 'primary' | 'ghost'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DisplayBlock'] > JSXAttribute > JSXIdentifier[name!=/^(?:eyebrow|count|headline|body|highlight|tone|size|align|children|key|ref|className|style|children)$/]",
+        "message": "<DisplayBlock> doesn't accept that prop. Declared props: eyebrow, count, headline, body, highlight, tone, size, align, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DisplayBlock'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:dark|light)$/]",
+        "message": "<DisplayBlock> tone must be one of 'dark' | 'light'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DisplayBlock'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:xl|l|m|s)$/]",
+        "message": "<DisplayBlock> size must be one of 'xl' | 'l' | 'm' | 's'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='DisplayBlock'] > JSXAttribute[name.name='align'] > Literal[value!=/^(?:left|center)$/]",
+        "message": "<DisplayBlock> align must be one of 'left' | 'center'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='EvidenceTick'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|tone|source|key|ref|className|style|children)$/]",
+        "message": "<EvidenceTick> doesn't accept that prop. Declared props: children, tone, source."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='EvidenceTick'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:dark|light)$/]",
+        "message": "<EvidenceTick> tone must be one of 'dark' | 'light'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='EyebrowLabel'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|tone|rule|count|key|ref|className|style|children)$/]",
+        "message": "<EyebrowLabel> doesn't accept that prop. Declared props: children, tone, rule, count."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='EyebrowLabel'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:dark|light)$/]",
+        "message": "<EyebrowLabel> tone must be one of 'dark' | 'light'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='FooterClose'] > JSXAttribute > JSXIdentifier[name!=/^(?:eyebrow|headline|body|links|supportEmail|whatsapp|brandName|onBook|key|ref|className|style|children)$/]",
+        "message": "<FooterClose> doesn't accept that prop. Declared props: eyebrow, headline, body, links, supportEmail, whatsapp, brandName, onBook."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LevelCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:index|name|description|state|duration|price|note|bullets|onBook|active|key|ref|className|style|children)$/]",
+        "message": "<LevelCard> doesn't accept that prop. Declared props: index, name, description, state, duration, price, note, bullets, onBook, active."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='LevelCard'] > JSXAttribute[name.name='state'] > Literal[value!=/^(?:bookable|later)$/]",
+        "message": "<LevelCard> state must be one of 'bookable' | 'later'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MenuDot'] > JSXAttribute > JSXIdentifier[name!=/^(?:open|tone|onClick|label|key|ref|className|style|children)$/]",
+        "message": "<MenuDot> doesn't accept that prop. Declared props: open, tone, onClick, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MenuDot'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:dark|light)$/]",
+        "message": "<MenuDot> tone must be one of 'dark' | 'light'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='MenuOverlayItem'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|href|note|key|ref|className|style|children)$/]",
+        "message": "<MenuOverlayItem> doesn't accept that prop. Declared props: label, href, note."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SymptomNode'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|note|tone|size|state|center|selected|onClick|key|ref|className|style|children)$/]",
+        "message": "<SymptomNode> doesn't accept that prop. Declared props: label, note, tone, size, state, center, selected, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SymptomNode'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:light|dark)$/]",
+        "message": "<SymptomNode> tone must be one of 'light' | 'dark'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SymptomNode'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<SymptomNode> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='SymptomNode'] > JSXAttribute[name.name='state'] > Literal[value!=/^(?:default|active|muted)$/]",
+        "message": "<SymptomNode> state must be one of 'default' | 'active' | 'muted'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TeamCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|credential|role|tone|photoRatio|key|ref|className|style|children)$/]",
+        "message": "<TeamCard> doesn't accept that prop. Declared props: name, credential, role, tone, photoRatio."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TeamCard'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:light|dark)$/]",
+        "message": "<TeamCard> tone must be one of 'light' | 'dark'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Thread'] > JSXAttribute > JSXIdentifier[name!=/^(?:orientation|length|progress|tone|curve|label|key|ref|className|style|children)$/]",
+        "message": "<Thread> doesn't accept that prop. Declared props: orientation, length, progress, tone, curve, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Thread'] > JSXAttribute[name.name='orientation'] > Literal[value!=/^(?:vertical|horizontal)$/]",
+        "message": "<Thread> orientation must be one of 'vertical' | 'horizontal'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Thread'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:light|dark)$/]",
+        "message": "<Thread> tone must be one of 'light' | 'dark'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Wordmark'] > JSXAttribute > JSXIdentifier[name!=/^(?:name|text|tone|size|tagline|href|onClick|key|ref|className|style|children)$/]",
+        "message": "<Wordmark> doesn't accept that prop. Declared props: name, text, tone, size, tagline, href, onClick."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Wordmark'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:light|dark)$/]",
+        "message": "<Wordmark> tone must be one of 'light' | 'dark'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Wordmark'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Wordmark> size must be one of 'sm' | 'md' | 'lg'."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "ChatBubble": {
+        "replaces": []
+      },
+      "ChatMessage": {
+        "replaces": []
+      },
+      "CtaPill": {
+        "replaces": []
+      },
+      "DisplayBlock": {
+        "replaces": []
+      },
+      "EvidenceTick": {
+        "replaces": []
+      },
+      "EyebrowLabel": {
+        "replaces": []
+      },
+      "FooterClose": {
+        "replaces": []
+      },
+      "LevelCard": {
+        "replaces": []
+      },
+      "MenuDot": {
+        "replaces": []
+      },
+      "MenuOverlayItem": {
+        "replaces": []
+      },
+      "SymptomNode": {
+        "replaces": []
+      },
+      "TeamCard": {
+        "replaces": []
+      },
+      "Thread": {
+        "replaces": []
+      },
+      "Wordmark": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--blur-panel",
+      "--body-min-size",
+      "--bw-hairline",
+      "--bw-thread",
+      "--canvas-close-body",
+      "--canvas-close-from",
+      "--canvas-close-text",
+      "--canvas-close-to",
+      "--canvas-default",
+      "--canvas-descent-body",
+      "--canvas-descent-from",
+      "--canvas-descent-text",
+      "--canvas-descent-to",
+      "--canvas-hero-body",
+      "--canvas-hero-from",
+      "--canvas-hero-text",
+      "--canvas-hero-to",
+      "--canvas-hook-body",
+      "--canvas-hook-from",
+      "--canvas-hook-text",
+      "--canvas-hook-to",
+      "--canvas-levels-body",
+      "--canvas-levels-from",
+      "--canvas-levels-text",
+      "--canvas-levels-to",
+      "--canvas-team-body",
+      "--canvas-team-from",
+      "--canvas-team-text",
+      "--canvas-team-to",
+      "--canvas-turn-body",
+      "--canvas-turn-from",
+      "--canvas-turn-mid",
+      "--canvas-turn-text",
+      "--canvas-turn-to",
+      "--container-max",
+      "--drift-ease",
+      "--drift-ember",
+      "--dur-base",
+      "--dur-micro",
+      "--dur-scene",
+      "--ease",
+      "--ease-out-soft",
+      "--ember-a",
+      "--ember-b",
+      "--evidence",
+      "--evidence-blue",
+      "--font-body",
+      "--font-display",
+      "--font-mono",
+      "--fs-body-l",
+      "--fs-body-m",
+      "--fs-caption",
+      "--fs-display-l",
+      "--fs-display-m",
+      "--fs-display-s",
+      "--fs-display-xl",
+      "--fs-eyebrow",
+      "--gradient-ember",
+      "--gutter-desktop",
+      "--gutter-mobile",
+      "--highlight-honey",
+      "--honey",
+      "--ink",
+      "--ivory",
+      "--lh-body",
+      "--lh-display",
+      "--lh-display-tight",
+      "--lh-eyebrow",
+      "--ls-body",
+      "--ls-display",
+      "--ls-eyebrow",
+      "--measure-body",
+      "--measure-display",
+      "--oxblood",
+      "--oxblood-deep",
+      "--parchment",
+      "--pin-max",
+      "--r-lg",
+      "--r-md",
+      "--r-pill",
+      "--r-sm",
+      "--r-xl",
+      "--r-xs",
+      "--reveal-y",
+      "--rule-on-dark",
+      "--rule-on-light",
+      "--sage-soft",
+      "--scene-min-height",
+      "--scrub-map",
+      "--shadow-ember",
+      "--shadow-inset-light",
+      "--shadow-lift",
+      "--shadow-soft",
+      "--sp-1",
+      "--sp-10",
+      "--sp-12",
+      "--sp-16",
+      "--sp-2",
+      "--sp-20",
+      "--sp-24",
+      "--sp-3",
+      "--sp-32",
+      "--sp-4",
+      "--sp-40",
+      "--sp-5",
+      "--sp-6",
+      "--sp-8",
+      "--surface-card-dark",
+      "--surface-card-light",
+      "--surface-deep",
+      "--surface-deep-raised",
+      "--surface-deep-soft",
+      "--surface-glass-dark",
+      "--surface-glass-light",
+      "--tap-min",
+      "--terracotta",
+      "--text-on-dark",
+      "--text-on-light",
+      "--text-quiet-dark",
+      "--text-quiet-light",
+      "--wt-body",
+      "--wt-body-strong",
+      "--wt-display",
+      "--wt-display-bold"
+    ],
+    "tokenKinds": {
+      "--font-display": "font",
+      "--font-body": "font",
+      "--font-mono": "font",
+      "--oxblood-deep": "color",
+      "--oxblood": "color",
+      "--ember-a": "color",
+      "--ember-b": "color",
+      "--terracotta": "color",
+      "--parchment": "color",
+      "--ivory": "color",
+      "--ink": "color",
+      "--sage-soft": "color",
+      "--honey": "color",
+      "--evidence-blue": "color",
+      "--text-on-dark": "font",
+      "--text-on-light": "font",
+      "--text-quiet-dark": "font",
+      "--text-quiet-light": "font",
+      "--gradient-ember": "color",
+      "--highlight-honey": "color",
+      "--evidence": "color",
+      "--rule-on-dark": "color",
+      "--rule-on-light": "color",
+      "--surface-deep": "color",
+      "--surface-deep-soft": "color",
+      "--surface-deep-raised": "color",
+      "--surface-card-light": "color",
+      "--surface-card-dark": "color",
+      "--surface-glass-dark": "color",
+      "--surface-glass-light": "color",
+      "--canvas-hero-from": "color",
+      "--canvas-hero-to": "color",
+      "--canvas-hook-from": "color",
+      "--canvas-hook-to": "color",
+      "--canvas-descent-from": "color",
+      "--canvas-descent-to": "color",
+      "--canvas-turn-from": "color",
+      "--canvas-turn-mid": "color",
+      "--canvas-turn-to": "color",
+      "--canvas-levels-from": "color",
+      "--canvas-levels-to": "color",
+      "--canvas-team-from": "color",
+      "--canvas-team-to": "color",
+      "--canvas-close-from": "color",
+      "--canvas-close-to": "color",
+      "--canvas-hero-text": "font",
+      "--canvas-hook-text": "font",
+      "--canvas-descent-text": "font",
+      "--canvas-turn-text": "font",
+      "--canvas-levels-text": "font",
+      "--canvas-team-text": "font",
+      "--canvas-close-text": "font",
+      "--canvas-hero-body": "other",
+      "--canvas-hook-body": "other",
+      "--canvas-descent-body": "other",
+      "--canvas-turn-body": "other",
+      "--canvas-levels-body": "other",
+      "--canvas-team-body": "other",
+      "--canvas-close-body": "other",
+      "--canvas-default": "color",
+      "--fs-display-xl": "font",
+      "--fs-display-l": "font",
+      "--fs-display-m": "font",
+      "--fs-display-s": "font",
+      "--fs-body-l": "font",
+      "--fs-body-m": "font",
+      "--fs-caption": "font",
+      "--fs-eyebrow": "font",
+      "--lh-display": "font",
+      "--lh-display-tight": "font",
+      "--lh-body": "font",
+      "--lh-eyebrow": "font",
+      "--ls-display": "font",
+      "--ls-body": "font",
+      "--ls-eyebrow": "font",
+      "--wt-display": "font",
+      "--wt-display-bold": "font",
+      "--wt-body": "font",
+      "--wt-body-strong": "font",
+      "--measure-body": "other",
+      "--measure-display": "other",
+      "--body-min-size": "other",
+      "--sp-1": "spacing",
+      "--sp-2": "spacing",
+      "--sp-3": "spacing",
+      "--sp-4": "spacing",
+      "--sp-5": "spacing",
+      "--sp-6": "spacing",
+      "--sp-8": "spacing",
+      "--sp-10": "spacing",
+      "--sp-12": "spacing",
+      "--sp-16": "spacing",
+      "--sp-20": "spacing",
+      "--sp-24": "spacing",
+      "--sp-32": "spacing",
+      "--sp-40": "spacing",
+      "--tap-min": "spacing",
+      "--gutter-mobile": "spacing",
+      "--gutter-desktop": "spacing",
+      "--container-max": "spacing",
+      "--scene-min-height": "other",
+      "--r-xs": "spacing",
+      "--r-sm": "spacing",
+      "--r-md": "spacing",
+      "--r-lg": "spacing",
+      "--r-xl": "spacing",
+      "--r-pill": "spacing",
+      "--bw-hairline": "spacing",
+      "--bw-thread": "spacing",
+      "--shadow-soft": "shadow",
+      "--shadow-lift": "shadow",
+      "--shadow-ember": "shadow",
+      "--shadow-inset-light": "shadow",
+      "--blur-panel": "other",
+      "--dur-micro": "other",
+      "--dur-base": "other",
+      "--dur-scene": "other",
+      "--ease": "other",
+      "--ease-out-soft": "other",
+      "--drift-ember": "other",
+      "--drift-ease": "other",
+      "--scrub-map": "other",
+      "--pin-max": "other",
+      "--reveal-y": "spacing"
+    },
+    "fontFamilies": [
+      "DM Mono",
+      "DM Sans",
+      "Fraunces"
+    ]
+  }
+}

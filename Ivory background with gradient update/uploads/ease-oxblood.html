@@ -1,0 +1,730 @@
+<title>Oxblood & Ember</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=DM+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    /* ---- surfaces ---- */
+    --ivory:#FAF7EF;
+    --parchment:#F5EFE4;
+    --card:#FFFDF8;
+    --ink:#241F1B;
+    --ink-soft:#7A7167;
+    --line:#E6DCCB;
+    --line-soft:#EFE8DB;
+
+    /* ---- brand ---- */
+    --oxblood:#7B2233;
+    --oxblood-deep:#5A1826;
+    --oxblood-soft:#F4E4E6;
+    --terracotta:#C1622D;
+    --terracotta-deep:#8E4620;
+    --ember-a:#BF3820;
+    --ember-b:#E06F27;
+    --sage:#5C6E4F;
+    --sage-deep:#3D4A34;
+    --sage-soft:#E7EBE1;
+
+    /* ---- signal ---- */
+    --clinical:#0E86C4;
+    --clinical-text:#0B6E9E;
+    --clinical-soft:#E2F0F8;
+    --honey:#D9A94E;
+    --honey-soft:#F6E7C7;
+
+    /* ---- type ---- */
+    --font-display:'Fraunces', Georgia, 'Times New Roman', serif;
+    --font-body:'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono:'DM Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* ---- shape ---- */
+    --r-pill:999px;
+    --r-card:20px;
+    --r-inner:12px;
+    --shadow-sm:0 1px 2px rgba(36,31,27,.05), 0 6px 16px -10px rgba(36,31,27,.18);
+    --shadow-md:0 2px 4px rgba(36,31,27,.05), 0 16px 32px -18px rgba(36,31,27,.28);
+    --ease:cubic-bezier(.16,.84,.44,1);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--ivory);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4{font-family:var(--font-display); font-weight:600; margin:0; text-wrap:balance; letter-spacing:-.01em;}
+  p{margin:0;}
+  ::selection{background:var(--honey-soft); color:var(--ink);}
+  a{color:var(--oxblood); text-underline-offset:3px;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--oxblood); outline-offset:3px; border-radius:4px;}
+
+  .wrap{max-width:1120px; margin:0 auto; padding-inline:24px;}
+
+  /* ================= header ================= */
+  .topbar{
+    position:sticky; top:env(safe-area-inset-top, 0px); z-index:40;
+    background:var(--oxblood); color:#F7E9EB;
+  }
+  .topbar .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; padding-block:12px;}
+  .brandmark{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:600; font-size:1rem; letter-spacing:.01em;}
+  .brandmark .dot{width:22px; height:22px; border-radius:50%; background:linear-gradient(135deg,var(--ember-a),var(--ember-b)); flex:none;}
+  .status{
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+    background:rgba(255,255,255,.14); padding:6px 12px; border-radius:var(--r-pill); white-space:nowrap;
+  }
+
+  /* ================= bands ================= */
+  .band{padding-block:72px;}
+  .band--parchment{background:var(--parchment);}
+  .band--ivory{background:var(--ivory);}
+  .seam{height:3px; background:linear-gradient(90deg,var(--ember-a),var(--ember-b)); opacity:.85;}
+
+  .eyebrow{
+    font-family:var(--font-mono); font-size:.7rem; letter-spacing:.11em; text-transform:uppercase;
+    color:var(--oxblood); margin-bottom:12px;
+  }
+  .sec-head{max-width:62ch; margin-bottom:36px;}
+  .sec-head h2{font-size:clamp(1.5rem,1.15rem+1.5vw,2.1rem);}
+  .sec-head p{color:var(--ink-soft); margin-top:12px; font-size:1rem;}
+
+  /* ================= hero ================= */
+  .hero{padding-block:76px 64px;}
+  .hero h1{font-size:clamp(2.1rem,1.4rem+3.2vw,3.5rem); line-height:1.05; max-width:20ch;}
+  .hero h1 em{display:block; font-style:italic; font-weight:500; color:var(--oxblood); margin-top:.12em;}
+  .hero .lede{max-width:56ch; margin-top:20px; font-size:1.08rem; color:var(--ink-soft);}
+  .mark{background:linear-gradient(transparent 62%, var(--honey-soft) 62%); padding:0 2px;}
+
+  .decisions{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:var(--r-card); overflow:hidden; margin-top:40px;
+  }
+  .decisions div{background:var(--card); padding:18px 20px;}
+  .decisions dt{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft);}
+  .decisions dd{margin:6px 0 0; font-weight:500; font-size:.95rem;}
+
+  /* ================= swatches ================= */
+  .group-label{
+    font-family:var(--font-mono); font-size:.68rem; letter-spacing:.09em; text-transform:uppercase;
+    color:var(--ink-soft); padding-bottom:10px; border-bottom:1px solid var(--line); margin-bottom:20px;
+  }
+  .group-label + .group-label{margin-top:44px;}
+  .swatches{display:grid; grid-template-columns:repeat(auto-fit,minmax(224px,1fr)); gap:16px; margin-bottom:44px;}
+  .sw{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--r-card); overflow:hidden; box-shadow:var(--shadow-sm);}
+  .sw .chip{height:92px; display:flex; align-items:flex-end; padding:10px;}
+  .sw .chip code{font-family:var(--font-mono); font-size:.7rem; background:rgba(255,255,255,.22); padding:3px 7px; border-radius:5px; color:#fff;}
+  .sw .chip.on-light code{background:rgba(36,31,27,.07); color:var(--ink);}
+  .sw .meta{padding:16px 18px 18px;}
+  .sw .nm{font-weight:700; font-size:.95rem;}
+  .sw .role{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.06em; text-transform:uppercase; color:var(--oxblood); margin-top:5px;}
+  .sw .use{font-size:.85rem; color:var(--ink-soft); margin-top:10px; line-height:1.5;}
+
+  /* ================= gradient ================= */
+  .grad-demo{border-radius:var(--r-card); overflow:hidden; border:1px solid var(--line); box-shadow:var(--shadow-md);}
+  .grad-hero{
+    background:linear-gradient(105deg,var(--ember-a),var(--ember-b));
+    background-size:180% 180%; animation:drift 26s ease-in-out infinite;
+    padding:44px 32px; color:#FFF3EA;
+  }
+  @keyframes drift{0%,100%{background-position:0% 50%;} 50%{background-position:100% 50%;}}
+  .grad-hero h3{color:#FFF6EF; font-size:1.5rem;}
+  .grad-hero p{color:rgba(255,246,239,.86); margin-top:10px; max-width:48ch; font-size:.95rem;}
+  .grad-hero .stops{display:flex; gap:18px; margin-top:22px; font-family:var(--font-mono); font-size:.72rem; color:rgba(255,246,239,.9);}
+  .grad-rules{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-top:20px;}
+  .rule{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--r-inner); padding:18px;}
+  .rule .k{font-family:var(--font-mono); font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; color:var(--terracotta-deep);}
+  .rule h4{font-size:1rem; margin-top:7px; font-family:var(--font-body); font-weight:700;}
+  .rule p{font-size:.85rem; color:var(--ink-soft); margin-top:6px;}
+  .rule.no{border-style:dashed;}
+  .rule.no .k{color:var(--ink-soft);}
+
+  /* ================= type ================= */
+  .type-row{display:grid; grid-template-columns:150px 1fr; gap:24px; padding-block:22px; border-bottom:1px solid var(--line-soft); align-items:baseline;}
+  .type-row:first-of-type{padding-top:0;}
+  .type-meta{font-family:var(--font-mono); font-size:.72rem; color:var(--ink-soft); line-height:1.7;}
+  .type-meta b{display:block; font-family:var(--font-body); font-weight:700; font-size:.8rem; color:var(--ink); margin-bottom:3px;}
+  .sp-display{font-family:var(--font-display);}
+  .sp-mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
+  .swap-note{
+    margin-top:26px; background:var(--clinical-soft); border-left:3px solid var(--clinical);
+    padding:16px 20px; border-radius:0 var(--r-inner) var(--r-inner) 0; font-size:.9rem;
+  }
+  .swap-note b{color:var(--clinical-text);}
+  .swap-note code{font-family:var(--font-mono); font-size:.85em; background:rgba(14,134,196,.1); padding:1px 5px; border-radius:4px;}
+
+  /* ================= components ================= */
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:9px;
+    font-family:var(--font-body); font-weight:700; font-size:.94rem; letter-spacing:.005em;
+    border-radius:var(--r-pill); border:1.5px solid transparent; cursor:pointer;
+    padding:0 30px; height:52px; transition:transform .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease);
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{background:linear-gradient(100deg,var(--ember-a),var(--ember-b)); color:#FFF6EF; box-shadow:0 6px 18px -8px rgba(191,56,32,.6);}
+  .btn-primary:hover{box-shadow:0 10px 24px -8px rgba(191,56,32,.7);}
+  .btn-secondary{background:transparent; border-color:var(--oxblood); color:var(--oxblood);}
+  .btn-secondary:hover{background:var(--oxblood-soft);}
+  .btn-quiet{background:transparent; color:var(--sage-deep); padding-inline:12px; text-decoration:underline; text-decoration-color:var(--sage); text-underline-offset:4px;}
+  .btn-quiet:hover{background:var(--sage-soft);}
+  .btn-sm{height:40px; font-size:.84rem; padding-inline:20px;}
+  .btn-row{display:flex; flex-wrap:wrap; gap:14px; align-items:center;}
+
+  .comp-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:20px; margin-top:28px;}
+  .card{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--r-card); padding:26px; box-shadow:var(--shadow-sm); transition:transform .25s var(--ease), box-shadow .25s var(--ease);}
+  .card.lift:hover{transform:translateY(-4px); box-shadow:var(--shadow-md);}
+  .card .tag{font-family:var(--font-mono); font-size:.64rem; letter-spacing:.07em; text-transform:uppercase; color:var(--sage-deep);}
+  .card h4{font-family:var(--font-body); font-weight:700; font-size:1.02rem; margin-top:8px;}
+  .card > p{font-size:.88rem; color:var(--ink-soft); margin-top:8px;}
+
+  .prog{position:relative; background:var(--card); border-radius:var(--r-card); padding:26px; box-shadow:var(--shadow-md); border:1.5px solid transparent;
+    background-image:linear-gradient(var(--card),var(--card)), linear-gradient(120deg,var(--ember-a),var(--ember-b));
+    background-origin:border-box; background-clip:padding-box, border-box;}
+  .prog .badge{
+    position:absolute; top:-12px; left:22px; background:linear-gradient(100deg,var(--ember-a),var(--ember-b)); color:#FFF6EF;
+    font-family:var(--font-mono); font-size:.62rem; letter-spacing:.07em; text-transform:uppercase; padding:5px 12px; border-radius:var(--r-pill);
+  }
+  .prog .price{font-family:var(--font-display); font-weight:600; font-size:2rem; margin-top:14px; font-variant-numeric:tabular-nums;}
+  .prog .price sub{font-family:var(--font-body); font-size:.58rem; font-weight:500; color:var(--ink-soft); vertical-align:baseline;}
+
+  .checks{list-style:none; margin:18px 0 0; padding:0; display:flex; flex-direction:column; gap:0;}
+  .checks li{display:flex; align-items:center; gap:12px; font-size:.9rem; padding-block:11px; border-top:1px solid var(--line-soft);}
+  .checks li:first-child{border-top:none;}
+  .checks svg{width:17px; height:17px; flex:none;}
+  .checks path{stroke:var(--clinical); stroke-width:2.4; fill:none; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:24; stroke-dashoffset:0;}
+  .checks.replay path{animation:tick .42s var(--ease) both;}
+  .checks.replay li:nth-child(2) path{animation-delay:.09s;}
+  .checks.replay li:nth-child(3) path{animation-delay:.18s;}
+  .checks.replay li:nth-child(4) path{animation-delay:.27s;}
+  @keyframes tick{from{stroke-dashoffset:24;} to{stroke-dashoffset:0;}}
+
+  .labtile{background:var(--card); border:1px solid var(--line-soft); border-left:3px solid var(--clinical); border-radius:var(--r-inner); padding:20px;}
+  .labtile .n{font-family:var(--font-mono); font-size:1.5rem; color:var(--clinical-text); font-variant-numeric:tabular-nums;}
+  .labtile .l{font-size:.82rem; color:var(--ink-soft); margin-top:6px;}
+
+  /* ================= motion ================= */
+  .arc{display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:16px; margin-bottom:36px;}
+  .beat{background:var(--card); border:1px solid var(--line-soft); border-radius:var(--r-card); padding:22px; position:relative; overflow:hidden;}
+  .beat::before{content:""; position:absolute; inset:0 auto 0 0; width:3px; background:var(--beat-c,var(--sage));}
+  .beat .step{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--beat-c,var(--sage-deep));}
+  .beat h4{font-family:var(--font-body); font-weight:700; font-size:1rem; margin-top:8px;}
+  .beat .what{font-size:.85rem; color:var(--ink-soft); margin-top:8px;}
+  .beat .how{font-family:var(--font-mono); font-size:.72rem; color:var(--ink); margin-top:12px; padding-top:12px; border-top:1px solid var(--line-soft); line-height:1.6;}
+
+  .stage{background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); box-shadow:var(--shadow-md); overflow:hidden;}
+  .stage-head{padding:18px 24px; border-bottom:1px solid var(--line-soft); display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;}
+  .stage-head .t{font-family:var(--font-body); font-weight:700; font-size:.95rem;}
+  .stage-head .s{font-family:var(--font-mono); font-size:.68rem; color:var(--ink-soft); letter-spacing:.05em;}
+  .stage-body{padding:8px 16px 20px;}
+  .hub{width:100%; height:auto; display:block; max-width:100%;}
+  .hub-node circle{fill:var(--card); stroke:var(--line); stroke-width:1.5;}
+  .hub-node text{font-family:var(--font-body); font-size:13px; font-weight:500; fill:var(--ink); text-anchor:middle;}
+  .hub-node .sub{font-size:10px; fill:var(--ink-soft); font-family:var(--font-mono);}
+  .hub-line{stroke:var(--sage); stroke-width:2; fill:none; opacity:.75;}
+  .hub-core circle{fill:var(--sage); stroke:none;}
+  .hub-core text{font-family:var(--font-display); font-size:19px; font-weight:600; fill:#F2F5EE; text-anchor:middle;}
+  .hub-core .sub{font-family:var(--font-mono); font-size:10px; fill:#CFDCC9;}
+
+  .scrub{display:flex; align-items:center; gap:14px; padding:0 8px;}
+  .scrub label{font-family:var(--font-mono); font-size:.68rem; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-soft); white-space:nowrap;}
+  .scrub input[type=range]{flex:1; accent-color:var(--terracotta); min-width:0;}
+
+  .mini{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px; margin-top:24px;}
+  .mini .stage-body{padding:22px 24px 24px;}
+  .count{font-family:var(--font-mono); font-size:1.9rem; color:var(--sage-deep); font-variant-numeric:tabular-nums;}
+
+  .principles{list-style:none; margin:32px 0 0; padding:0; display:grid; gap:12px;}
+  .principles li{display:flex; gap:14px; font-size:.92rem; align-items:flex-start;}
+  .principles .i{font-family:var(--font-mono); font-size:.7rem; color:var(--terracotta-deep); padding-top:4px; flex:none; width:22px;}
+
+  /* ================= spacing / shape ================= */
+  .scale{display:flex; flex-direction:column; gap:10px;}
+  .scale-row{display:flex; align-items:center; gap:16px;}
+  .scale-row .nm{font-family:var(--font-mono); font-size:.74rem; color:var(--ink-soft); width:60px; flex:none;}
+  .scale-row .bar{height:12px; border-radius:3px; background:linear-gradient(90deg,var(--ember-a),var(--ember-b));}
+  .scale-row .px{font-family:var(--font-mono); font-size:.72rem; color:var(--ink-soft);}
+
+  .shapes{display:flex; flex-wrap:wrap; gap:18px; margin-top:26px;}
+  .shape{text-align:center;}
+  .shape .box{width:92px; height:68px; background:var(--sage-soft); border:1.5px solid var(--sage); display:block;}
+  .shape .cap{font-family:var(--font-mono); font-size:.66rem; color:var(--ink-soft); margin-top:9px;}
+
+  /* ================= decisions / footer ================= */
+  .call{background:var(--card); border:1px solid var(--line); border-radius:var(--r-card); padding:26px; box-shadow:var(--shadow-sm);}
+  .call + .call{margin-top:16px;}
+  .call .who{font-family:var(--font-mono); font-size:.66rem; letter-spacing:.08em; text-transform:uppercase; color:var(--terracotta-deep);}
+  .call h4{font-family:var(--font-body); font-weight:700; font-size:1.05rem; margin-top:8px;}
+  .call p{font-size:.92rem; color:var(--ink-soft); margin-top:10px; max-width:70ch;}
+
+  footer{background:var(--oxblood); color:#F7E9EB; padding-block:52px;}
+  footer h3{color:#FDF4F5; font-size:1.5rem; max-width:22ch;}
+  footer p{color:rgba(247,233,235,.78); margin-top:12px; max-width:54ch; font-size:.95rem;}
+  footer .next{display:flex; gap:12px; flex-wrap:wrap; margin-top:26px; font-family:var(--font-mono); font-size:.72rem;}
+  footer .next span{background:rgba(255,255,255,.12); padding:8px 14px; border-radius:var(--r-pill);}
+
+  @media (max-width:620px){
+    .type-row{grid-template-columns:1fr; gap:8px;}
+    .band{padding-block:56px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important;}
+    .grad-hero{animation:none;}
+  }
+</style>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brandmark"><span class="dot"></span>E.A.S.E — Design System</div>
+    <span class="status">v2 proposal · awaiting approval</span>
+  </div>
+</header>
+
+<section class="band band--ivory hero">
+  <div class="wrap">
+    <p class="eyebrow">Direction 05 · replaces Sienna &amp; Sage</p>
+    <h1>Oxblood &amp; Ember.<em>Warm enough to open up to.</em></h1>
+    <p class="lede">Sienna &amp; Sage, rebuilt: oxblood takes over the trust anchor from plum, the ember gradient owns transitions and the primary action, and the whole system moves — <span class="mark">quietly, and only where the movement means something.</span></p>
+
+    <dl class="decisions">
+      <div><dt>Trust anchor</dt><dd>Oxblood #7B2233</dd></div>
+      <div><dt>Action</dt><dd>Ember gradient</dd></div>
+      <div><dt>Grounding</dt><dd>Sage #5C6E4F</dd></div>
+      <div><dt>Base</dt><dd>Two-tone ivory</dd></div>
+      <div><dt>Type</dt><dd>Fraunces + DM Sans</dd></div>
+    </dl>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ PALETTE ============ -->
+<section class="band band--parchment">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">01 — Palette</p>
+      <h2>Seven colours, seven jobs, no overlap</h2>
+      <p>Every hue here has exactly one thing it is allowed to do. That constraint is what stops a warm palette from drifting into boutique territory — and it's what makes the ember gradient read as urgent every single time it appears.</p>
+    </div>
+
+    <p class="group-label">Surfaces — the two-tone base</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip on-light" style="background:#FAF7EF"><code>#FAF7EF</code></div>
+        <div class="meta"><div class="nm">Ivory</div><div class="role">Primary surface</div>
+        <p class="use">Hero, conditions grid, programmes. The cleaner of the two — lets ember and oxblood hit hardest.</p></div></div>
+      <div class="sw"><div class="chip on-light" style="background:#F5EFE4"><code>#F5EFE4</code></div>
+        <div class="meta"><div class="nm">Parchment</div><div class="role">Alternating band</div>
+        <p class="use">Every second section. Gives a long scroll a pulse, and creates the seams the gradient lives in.</p></div></div>
+      <div class="sw"><div class="chip" style="background:#241F1B"><code>#241F1B</code></div>
+        <div class="meta"><div class="nm">Ink</div><div class="role">Body text</div>
+        <p class="use">A warm near-black, never pure. Softer over the long reads this site asks for.</p></div></div>
+      <div class="sw"><div class="chip on-light" style="background:#E6DCCB"><code>#E6DCCB</code></div>
+        <div class="meta"><div class="nm">Sand</div><div class="role">Borders &amp; rules</div>
+        <p class="use">Card outlines, dividers, table rules. Never a fill.</p></div></div>
+    </div>
+
+    <p class="group-label">Brand — who speaks, and when</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#7B2233"><code>#7B2233</code></div>
+        <div class="meta"><div class="nm">Oxblood</div><div class="role">Trust &amp; authority</div>
+        <p class="use">Nav bar, section eyebrows, credentials, links, footer. The first colour the eye lands on — deliberately not the CTA, so trust arrives before the ask.</p></div></div>
+      <div class="sw"><div class="chip" style="background:linear-gradient(100deg,#BF3820,#E06F27)"><code>#BF3820 → #E06F27</code></div>
+        <div class="meta"><div class="nm">Ember gradient</div><div class="role">Action &amp; transition</div>
+        <p class="use">Primary CTA fill, band seams, progress, the recommended-tier border. The only gradient in the system.</p></div></div>
+      <div class="sw"><div class="chip" style="background:#C1622D"><code>#C1622D</code></div>
+        <div class="meta"><div class="nm">Terracotta</div><div class="role">Warm accent</div>
+        <p class="use">The gradient's resting form. Icons, underlines, small accents where a full gradient would be noisy.</p></div></div>
+      <div class="sw"><div class="chip" style="background:#5C6E4F"><code>#5C6E4F</code></div>
+        <div class="meta"><div class="nm">Sage</div><div class="role">Grounding</div>
+        <p class="use">Secondary buttons, condition tags, and every line in the digestion diagram — the body's own system, drawn in green.</p></div></div>
+    </div>
+
+    <p class="group-label">Signal — evidence, not decoration</p>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0E86C4"><code>#0E86C4</code></div>
+        <div class="meta"><div class="nm">Clinical blue</div><div class="role">Verification only</div>
+        <p class="use">Checkmarks, lab-marker callouts, "reviewed by Dr. Akshai" badges. Never a button, never a heading, never a background.</p></div></div>
+      <div class="sw"><div class="chip on-light" style="background:#D9A94E"><code>#D9A94E</code></div>
+        <div class="meta"><div class="nm">Honey</div><div class="role">Highlight marker</div>
+        <p class="use">A single job: the soft highlighter behind a key phrase in body copy. One or two per page, maximum.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ GRADIENT ============ -->
+<section class="band band--ivory">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">02 — The ember gradient</p>
+      <h2>One gradient, three sanctioned places</h2>
+      <p>A gradient earns its keep by being rare. This one runs warm-red to warm-orange across a short angle, so it reads as one colour with depth rather than two colours blending — and it drifts almost imperceptibly, on a 26-second loop.</p>
+    </div>
+
+    <div class="grad-demo">
+      <div class="grad-hero">
+        <h3>Book your root-cause consult</h3>
+        <p>This block is the gradient at full strength, drifting live. Watch it for ten seconds and you'll notice it moving; glance at it and you won't.</p>
+        <div class="stops"><span>◖ #BF3820</span><span>#E06F27 ◗</span><span>105° · 26s drift</span></div>
+      </div>
+    </div>
+
+    <div class="grad-rules">
+      <div class="rule"><div class="k">Sanctioned</div><h4>Primary CTA</h4><p>One per section, maximum. Every other button is oxblood outline or sage text.</p></div>
+      <div class="rule"><div class="k">Sanctioned</div><h4>Band seams</h4><p>The 3px rule between ivory and parchment sections — what you've been scrolling past between every section on this page.</p></div>
+      <div class="rule"><div class="k">Sanctioned</div><h4>Recommended tier</h4><p>The E.A.S.E. 3-month card's border, and the scroll-progress indicator.</p></div>
+      <div class="rule no"><div class="k">Never</div><h4>Behind text</h4><p>No gradient headings, no gradient section backgrounds, no gradient card fills. It stops being an action signal the moment it becomes decoration.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ TYPE ============ -->
+<section class="band band--parchment">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">03 — Typography</p>
+      <h2>Fraunces for the claims, DM Sans for everything else</h2>
+      <p>Fraunces carries warmth and just enough contrast to feel considered without tipping into fashion-editorial. DM Sans is plainer than Poppins and more refined at small sizes — which matters when you're setting ferritin values and consult durations.</p>
+    </div>
+
+    <div class="type-row"><div class="type-meta"><b>Display XL</b>Fraunces 600<br>clamp(2.1 → 3.5rem)<br>lh 1.05 · tracking −.01em</div>
+      <div class="sp-display" style="font-size:clamp(1.8rem,1.3rem+2vw,2.8rem); line-height:1.08;">The cause was always findable.</div></div>
+    <div class="type-row"><div class="type-meta"><b>Display L</b>Fraunces 600 italic<br>2.1rem</div>
+      <div class="sp-display" style="font-size:1.9rem; font-style:italic; font-weight:500; color:var(--oxblood);">Let's finally translate it.</div></div>
+    <div class="type-row"><div class="type-meta"><b>Body L</b>DM Sans 400<br>1.05rem · lh 1.6</div>
+      <div style="font-size:1.05rem; max-width:56ch;">Functional nutrition for thyroid, PCOS, gut issues, fatigue and hormonal imbalance — treating the cause, not just the symptom.</div></div>
+    <div class="type-row"><div class="type-meta"><b>Label</b>DM Mono 500<br>.7rem · uppercase<br>tracking .11em</div>
+      <div style="font-family:var(--font-mono); font-size:.72rem; letter-spacing:.11em; text-transform:uppercase; color:var(--oxblood);">Conditions we treat</div></div>
+    <div class="type-row"><div class="type-meta"><b>Data</b>DM Mono 400<br>tabular-nums</div>
+      <div class="sp-mono" style="font-size:1.05rem;">₹15,999 · 3 months · HbA1c −1.2% · ferritin +38 ng/mL</div></div>
+
+    <div class="swap-note"><b>On swapping the body face later —</b> type is tokenised as <code>--font-body</code>, <code>--font-display</code> and <code>--font-mono</code>. Changing DM Sans to Plus Jakarta or anything else is a one-line edit; nothing else in the system references a font by name. The scale, weights and tracking hold regardless.</div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ SHAPE & SPACE ============ -->
+<section class="band band--ivory">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">04 — Shape &amp; spacing</p>
+      <h2>Pill actions, generous cards, one soft shadow</h2>
+      <p>Fully-rounded CTAs read as invitations rather than submissions — the right register for a first consult. Cards sit at 20px so they feel held rather than boxed, and inner elements drop to 12px so density still reads crisp.</p>
+    </div>
+
+    <div class="shapes">
+      <div class="shape"><span class="box" style="border-radius:999px"></span><span class="cap">999px · buttons, pills, badges</span></div>
+      <div class="shape"><span class="box" style="border-radius:20px"></span><span class="cap">20px · cards, panels</span></div>
+      <div class="shape"><span class="box" style="border-radius:12px"></span><span class="cap">12px · inner tiles, inputs</span></div>
+      <div class="shape"><span class="box" style="border-radius:0"></span><span class="cap">0 · full-bleed bands</span></div>
+    </div>
+
+    <div style="margin-top:48px" class="scale">
+      <div class="scale-row"><span class="nm">space-1</span><span class="bar" style="width:4px"></span><span class="px">4px</span></div>
+      <div class="scale-row"><span class="nm">space-2</span><span class="bar" style="width:8px"></span><span class="px">8px — icon gaps</span></div>
+      <div class="scale-row"><span class="nm">space-3</span><span class="bar" style="width:12px"></span><span class="px">12px</span></div>
+      <div class="scale-row"><span class="nm">space-4</span><span class="bar" style="width:16px"></span><span class="px">16px — grid gutters</span></div>
+      <div class="scale-row"><span class="nm">space-5</span><span class="bar" style="width:24px"></span><span class="px">24px</span></div>
+      <div class="scale-row"><span class="nm">space-6</span><span class="bar" style="width:32px"></span><span class="px">32px</span></div>
+      <div class="scale-row"><span class="nm">space-7</span><span class="bar" style="width:48px"></span><span class="px">48px</span></div>
+      <div class="scale-row"><span class="nm">space-8</span><span class="bar" style="width:72px"></span><span class="px">72px — band padding</span></div>
+      <div class="scale-row"><span class="nm">space-9</span><span class="bar" style="width:112px"></span><span class="px">112px — chapter breaks</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ COMPONENTS ============ -->
+<section class="band band--parchment">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">05 — Components</p>
+      <h2>Live, not swatched</h2>
+      <p>Hover anything below. These are the real components, not pictures of them.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary">Book a Consultation <span aria-hidden="true">→</span></button>
+      <button class="btn btn-secondary">Take the Quiz</button>
+      <button class="btn btn-quiet">Join the community</button>
+      <button class="btn btn-secondary btn-sm">Learn more</button>
+    </div>
+
+    <div class="comp-grid">
+      <div class="card lift">
+        <span class="tag">Hormonal</span>
+        <h4>PCOS / PCOD</h4>
+        <p>Irregular cycles, acne, weight shifts — around 1 in 5 young Indian women.</p>
+        <button class="btn btn-quiet btn-sm" style="padding-inline:0; margin-top:6px;">Learn more →</button>
+      </div>
+
+      <div class="prog">
+        <span class="badge">Most recommended</span>
+        <span class="tag" style="color:var(--ink-soft)">E.A.S.E. DIS-EASE</span>
+        <div class="price">₹15,999<sub> / 3 months</sub></div>
+        <p style="font-size:.85rem; color:var(--sage-deep); margin-top:8px; font-weight:500;">≈ ₹5,333/month — lower than the 1-month plan</p>
+        <ul class="checks" id="checkList">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Ongoing consults &amp; check-ins</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Blood report reviews</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Mental &amp; emotional support</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Reviewed by Dr. Akshai</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <span class="tag" style="color:var(--clinical-text)">Evidence tile</span>
+        <h4 style="margin-bottom:14px">Where clinical blue appears</h4>
+        <div class="labtile"><div class="n">HbA1c −1.2%</div><div class="l">Normalised over 3 months — E.A.S.E. client, consented</div></div>
+        <p style="margin-top:12px">Blue marks the things a sceptic checks: ticks, lab figures, credentials.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ MOTION ============ -->
+<section class="band band--ivory">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">06 — Motion</p>
+      <h2>Motion follows the story, not the scroll</h2>
+      <p>You described the scroll as curiosity → answer → solution → trust. So each beat gets its own kind of movement, and the movement means the same thing every time it appears: scattering is confusion, drawing is connection, ticking is verification, counting is proof.</p>
+    </div>
+
+    <div class="arc">
+      <div class="beat" style="--beat-c:var(--terracotta)">
+        <div class="step">Beat 1 · Curiosity</div>
+        <h4>Scatter</h4>
+        <p class="what">Symptom words arrive unaligned and out of rhythm — bloating, hairfall, 3am waking — mirroring how they actually turn up in a life.</p>
+        <p class="how">stagger 90ms · random ±14px offset · 500ms fade-rise</p>
+      </div>
+      <div class="beat" style="--beat-c:var(--sage)">
+        <div class="step">Beat 2 · The answer</div>
+        <h4>Draw</h4>
+        <p class="what">The scattered words snap into a ring and sage lines draw outward from digestion. The signature moment — the thesis, animated.</p>
+        <p class="how">scroll-scrubbed · stroke-dashoffset · reader sets the pace</p>
+      </div>
+      <div class="beat" style="--beat-c:var(--terracotta-deep)">
+        <div class="step">Beat 3 · Solution</div>
+        <h4>Progress</h4>
+        <p class="what">Programme steps reveal in sequence with a connecting line running between them — same drawing grammar as the diagram, so it reads as the same idea continued.</p>
+        <p class="how">sequential reveal · 120ms stagger · gradient rail fills</p>
+      </div>
+      <div class="beat" style="--beat-c:var(--clinical)">
+        <div class="step">Beat 4 · Trust</div>
+        <h4>Verify</h4>
+        <p class="what">Ticks draw themselves, lab numbers count up once. Nothing else on the page counts or ticks — so these movements only ever mean "this is checked."</p>
+        <p class="how">tick 420ms · count 900ms ease-out · fires once</p>
+      </div>
+    </div>
+
+    <!-- signature moment -->
+    <div class="stage">
+      <div class="stage-head">
+        <div>
+          <div class="t">The signature moment — scroll-scrubbed</div>
+          <div class="s">Drag the slider to see what the reader controls with their scroll</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="replayHub">Replay</button>
+      </div>
+      <div class="stage-body">
+        <svg class="hub" id="hub" viewBox="0 0 620 420" role="img" aria-label="Digestion at the centre, connected to thyroid, PCOS, fatigue, skin, sleep and weight">
+          <g id="lines"></g>
+          <g id="nodes"></g>
+          <g class="hub-core" id="core">
+            <circle cx="310" cy="210" r="62"></circle>
+            <text x="310" y="206">Digestion</text>
+            <text x="310" y="226" class="sub">the hub</text>
+          </g>
+        </svg>
+        <div class="scrub">
+          <label for="hubScrub">Scroll</label>
+          <input type="range" id="hubScrub" min="0" max="100" value="100" aria-label="Scroll position through the diagram animation">
+          <span class="s" id="hubPct" style="font-family:var(--font-mono); font-size:.72rem; color:var(--ink-soft); width:42px; text-align:right;">100%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mini">
+      <div class="stage">
+        <div class="stage-head"><div class="t">Verify — ticks</div><button class="btn btn-quiet btn-sm" id="replayTicks">Replay</button></div>
+        <div class="stage-body">
+          <ul class="checks" id="tickDemo">
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>75-minute deep-dive session</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Bloodwork read line by line</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Plan built around your kitchen</li>
+            <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg>Follow-through, not a PDF</li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage">
+        <div class="stage-head"><div class="t">Proof — count up</div><button class="btn btn-quiet btn-sm" id="replayCount">Replay</button></div>
+        <div class="stage-body">
+          <div class="count" id="countA">+38 ng/mL</div>
+          <p style="font-size:.85rem; color:var(--ink-soft); margin-top:8px;">Ferritin, over 3 months. Counting only ever happens on real measured outcomes — never on client counts or years of experience.</p>
+        </div>
+      </div>
+    </div>
+
+    <ul class="principles">
+      <li><span class="i">01</span><span><b>Scroll-scrubbed, never autoplay.</b> The reader sets the pace of the one big moment. Autoplay on a health site reads as a sales video.</span></li>
+      <li><span class="i">02</span><span><b>Nothing moves after it arrives.</b> Once content has landed it stays still — the only permanent motion on the page is the 26-second gradient drift.</span></li>
+      <li><span class="i">03</span><span><b>One signature moment per page.</b> The hub diagram on the homepage; on a condition page, that budget goes to that condition's own branch lighting up instead.</span></li>
+      <li><span class="i">04</span><span><b>Under 16px of travel, 400–700ms, one easing curve.</b> <span class="sp-mono" style="font-size:.85em">cubic-bezier(.16,.84,.44,1)</span> everywhere, so the whole site feels like one hand made it.</span></li>
+      <li><span class="i">05</span><span><b>Everything is readable with motion off.</b> Reduced-motion users get the finished diagram, ticked ticks and final numbers — never an empty page waiting for an observer.</span></li>
+    </ul>
+  </div>
+</section>
+
+<div class="seam"></div>
+
+<!-- ============ CALLS ============ -->
+<section class="band band--parchment">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">07 — Two calls I made for you</p>
+      <h2>Where I used my judgement</h2>
+    </div>
+
+    <div class="call">
+      <div class="who">You left this to me · blue</div>
+      <h4>Blue is in — but only as evidence, never as brand</h4>
+      <p>Your team's board had vivid blue and navy. Dropping #00AEEF into a warm ivory palette at any real size would fight everything around it. But a blue tick next to a claim is doing something no other colour in this system can: it says "this bit is checked" in a language people already read fluently. So blue survives at exactly the size it appears in your reference screenshot — ticks, lab markers, the physician credential — deepened to #0E86C4 so it holds contrast on ivory. It never becomes a button, a heading or a background. If you'd rather stay pure warm, removing it costs one token.</p>
+    </div>
+
+    <div class="call">
+      <div class="who">You left this open · gradient placement</div>
+      <h4>Ember does the CTA and the seams — terracotta stays solid everywhere else</h4>
+      <p>You said use the gradient where a gradient makes sense, like section transitions. It does two jobs here: the 3px seam between every band, which is what turns the two-tone base into a rhythm rather than a colour change, and the primary CTA fill, following your reference. Solid terracotta handles everything smaller — icons, underlines, tags — because a gradient under 40px just reads as a muddy orange. Ochre is gone from Sienna &amp; Sage; honey replaces it with one narrow job as a text highlighter, which is what killed the jewellery read.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <h3>Approve this, and the next step is the design file.</h3>
+    <p>Say the word and I'll build this as a Claude design canvas — artboards for the homepage scroll, the conditions grid, a programme page and the booking flow, all on these tokens, editable by hand.</p>
+    <div class="next">
+      <span>1 · You approve or redirect the palette</span>
+      <span>2 · I build the design canvas</span>
+      <span>3 · Artboards + token sheet for the dev handoff</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- signature hub diagram ---------- */
+  var CX = 310, CY = 210;
+  var NODES = [
+    {x:310, y:62,  r:46, t:'Thyroid',  s:'imbalance', dx: 16, dy:-20},
+    {x:500, y:126, r:46, t:'PCOS',     s:'cycles',    dx: 24, dy: 12},
+    {x:516, y:298, r:46, t:'Fatigue',  s:'energy',    dx: 14, dy: 22},
+    {x:310, y:358, r:44, t:'Skin',     s:'flare-ups', dx:-18, dy: 16},
+    {x:118, y:300, r:46, t:'Sleep',    s:'3am waking',dx:-24, dy: 10},
+    {x:104, y:126, r:46, t:'Weight',   s:'plateaus',  dx:-14, dy:-18}
+  ];
+  var linesG = document.getElementById('lines');
+  var nodesG = document.getElementById('nodes');
+  var core   = document.getElementById('core');
+  var NS = 'http://www.w3.org/2000/svg';
+  var built = [];
+
+  NODES.forEach(function(n){
+    var line = document.createElementNS(NS,'line');
+    line.setAttribute('x1',CX); line.setAttribute('y1',CY);
+    line.setAttribute('x2',n.x); line.setAttribute('y2',n.y);
+    line.setAttribute('class','hub-line');
+    var len = Math.hypot(n.x-CX, n.y-CY);
+    line.setAttribute('stroke-dasharray', len);
+    linesG.appendChild(line);
+
+    var g = document.createElementNS(NS,'g');
+    g.setAttribute('class','hub-node');
+    var c = document.createElementNS(NS,'circle');
+    c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r',n.r);
+    var t1 = document.createElementNS(NS,'text');
+    t1.setAttribute('x',n.x); t1.setAttribute('y',n.y-2); t1.textContent = n.t;
+    var t2 = document.createElementNS(NS,'text');
+    t2.setAttribute('x',n.x); t2.setAttribute('y',n.y+14); t2.setAttribute('class','sub'); t2.textContent = n.s;
+    g.appendChild(c); g.appendChild(t1); g.appendChild(t2);
+    nodesG.appendChild(g);
+
+    built.push({line:line, len:len, g:g, n:n});
+  });
+
+  function clamp(v){ return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+  function renderHub(p){
+    // core settles first
+    var cp = clamp(p / 0.14);
+    core.setAttribute('opacity', cp);
+    core.setAttribute('transform','translate('+CX+' '+CY+') scale('+(0.88 + 0.12*cp)+') translate('+(-CX)+' '+(-CY)+')');
+
+    built.forEach(function(b, i){
+      var start = 0.14 + i * 0.125;
+      var local = clamp((p - start) / 0.30);
+      b.line.setAttribute('stroke-dashoffset', b.len * (1 - local));
+      var appear = clamp((local - 0.45) / 0.55);
+      b.g.setAttribute('opacity', appear);
+      var ox = b.n.dx * (1 - appear), oy = b.n.dy * (1 - appear);
+      b.g.setAttribute('transform','translate('+ox+' '+oy+')');
+    });
+  }
+
+  var scrub = document.getElementById('hubScrub');
+  var pct = document.getElementById('hubPct');
+  function fromScrub(){
+    var v = scrub.value / 100;
+    renderHub(v);
+    pct.textContent = scrub.value + '%';
+  }
+  scrub.addEventListener('input', fromScrub);
+  renderHub(1);
+
+  var raf = null;
+  document.getElementById('replayHub').addEventListener('click', function(){
+    if (reduce){ scrub.value = 100; fromScrub(); return; }
+    if (raf) cancelAnimationFrame(raf);
+    var t0 = performance.now(), dur = 2600;
+    (function step(now){
+      var p = clamp((now - t0) / dur);
+      scrub.value = Math.round(p * 100);
+      fromScrub();
+      if (p < 1) raf = requestAnimationFrame(step);
+    })(t0);
+  });
+
+  /* ---------- tick replay ---------- */
+  function replayTicks(el){
+    el.classList.remove('replay');
+    void el.offsetWidth;
+    el.classList.add('replay');
+  }
+  document.getElementById('replayTicks').addEventListener('click', function(){
+    replayTicks(document.getElementById('tickDemo'));
+  });
+
+  /* ---------- count up ---------- */
+  var countEl = document.getElementById('countA');
+  document.getElementById('replayCount').addEventListener('click', function(){
+    if (reduce){ countEl.textContent = '+38 ng/mL'; return; }
+    var t0 = performance.now(), dur = 900;
+    (function step(now){
+      var p = clamp((now - t0) / dur);
+      var eased = 1 - Math.pow(1 - p, 3);
+      countEl.textContent = '+' + Math.round(38 * eased) + ' ng/mL';
+      if (p < 1) requestAnimationFrame(step);
+    })(t0);
+  });
+})();
+</script>

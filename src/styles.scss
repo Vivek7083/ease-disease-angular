@@ -1,1 +1,99 @@
-/* You can add global styles to this file, and also import other style files */
+/* Design tokens — Oxblood & Ember, ivory-first canvas. See design system readme. */
+@use 'styles/tokens/fonts.css';
+@use 'styles/tokens/colors.css';
+@use 'styles/tokens/canvas.css';
+@use 'styles/tokens/typography.css';
+@use 'styles/tokens/spacing.css';
+@use 'styles/tokens/elevation.css';
+@use 'styles/tokens/motion.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* The scroll-progress rail (right-middle chrome) replaces the browser's
+     own scrollbar as the scroll affordance. */
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  margin: 0;
+  background: var(--ivory);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body-m);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: var(--wt-display);
+  margin: 0;
+  text-wrap: balance;
+  letter-spacing: var(--ls-display);
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--honey);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Scroll-reveal utility — paired with ScrollRevealDirective, which toggles
+   .is-visible the first time an element crosses into the viewport. Keeps
+   the scroll feeling continuous: content arrives, nothing pops in whole. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity var(--dur-scene) var(--ease-out-soft),
+    transform var(--dur-scene) var(--ease-out-soft);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

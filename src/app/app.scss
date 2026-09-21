@@ -1,0 +1,114 @@
+:host {
+  display: block;
+}
+
+.canvas-root {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  transition: background var(--dur-scene) var(--ease);
+}
+
+/* One continuous "living" texture behind the whole scroll — the same soft,
+   drifting brand-color field runs from the hero straight through to the
+   close, so no single section reads as visually separate from the rest. */
+.ambient-field {
+  position: fixed;
+  inset: -15%;
+  z-index: -1;
+  opacity: 0.3;
+  background:
+    radial-gradient(circle at 16% 22%, color-mix(in oklab, var(--terracotta) 34%, transparent) 0%, transparent 56%),
+    radial-gradient(circle at 84% 14%, color-mix(in oklab, var(--honey) 38%, transparent) 0%, transparent 52%),
+    radial-gradient(circle at 74% 82%, color-mix(in oklab, var(--oxblood) 20%, transparent) 0%, transparent 52%),
+    radial-gradient(circle at 20% 86%, color-mix(in oklab, var(--sage-soft) 50%, transparent) 0%, transparent 52%);
+  filter: blur(64px);
+  animation: ambient-field-drift 34s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-field-drift {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-2.5%, 1.5%, 0) scale(1.06);
+  }
+  100% {
+    transform: translate3d(2.5%, -1.5%, 0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-field {
+    animation: none;
+  }
+}
+
+.chrome {
+  position: fixed;
+  z-index: 40;
+}
+
+.chrome-wordmark {
+  top: max(env(safe-area-inset-top, 0px), var(--sp-5));
+  left: var(--sp-6);
+}
+
+/* The booking CTA and the scroll rail now live in different corners
+   entirely (top-right vs. right-middle) — they can't overlap or fight for
+   space, so neither needs to guess the other's geometry. */
+.chrome-cta {
+  top: max(env(safe-area-inset-top, 0px), var(--sp-6));
+  right: var(--sp-6);
+  display: block;
+  max-width: 200px;
+  overflow: hidden;
+  pointer-events: none;
+  transition:
+    max-width var(--dur-base) var(--ease),
+    opacity var(--dur-micro) linear;
+}
+
+.chrome-cta.visible {
+  /* Roomier than the collapsed-state cap so the price/time can expand out
+     on hover (see CtaPill's revealMetaOnHover) without being clipped. */
+  max-width: 340px;
+  pointer-events: auto;
+}
+
+.chrome-cta:not(.visible) {
+  max-width: 0;
+}
+
+/* The scroll rail replaces the browser's own scrollbar (hidden globally —
+   see styles.scss) and sits centered on the right edge instead, out of the
+   way of both the wordmark and the booking CTA up top. */
+.chrome-progress {
+  top: 50%;
+  right: var(--sp-4);
+  transform: translateY(-50%);
+}
+
+@media (max-width: 640px) {
+  .chrome-wordmark {
+    left: var(--sp-4);
+  }
+
+  .chrome-cta {
+    right: var(--sp-4);
+  }
+
+  /* Smaller screens: the CTA is always available, not scroll-gated — there
+     is less room to "arrive" gracefully, so it just stays put; only its
+     label changes as the reader moves through the story. It also sits
+     directly over body copy at this width, so keep it translucent —
+     glassy rather than a solid block — so it doesn't look odd overlapping
+     text while scrolling. */
+  .chrome-cta {
+    opacity: 0.88 !important;
+    max-width: none !important;
+    pointer-events: auto !important;
+    backdrop-filter: blur(6px);
+    border-radius: var(--r-pill);
+  }
+}

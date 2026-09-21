@@ -1,0 +1,28 @@
+:root{
+--fs-display-xl:clamp(40px,calc(16px + 6.1vw),104px); /* @kind font */
+--fs-display-l:clamp(32px,calc(17px + 3.8vw),72px); /* @kind font */
+--fs-display-m:clamp(26px,calc(18px + 2.1vw),48px); /* @kind font */
+--fs-display-s:clamp(22px,calc(18px + 1vw),32px); /* @kind font */
+--fs-body-l:clamp(18px,calc(16.5px + .38vw),22px); /* @kind font */
+--fs-body-m:clamp(16px,calc(15.3px + .19vw),18px); /* @kind font */
+--fs-caption:14px; /* @kind font */
+--fs-eyebrow:clamp(12px,calc(11.6px + .1vw),13px); /* @kind font */
+--lh-display:1.04; /* @kind font */
+--lh-display-tight:0.98; /* @kind font */
+--lh-body:1.55; /* @kind font */
+--lh-eyebrow:1.2; /* @kind font */
+--ls-display:-0.02em; /* @kind font */
+--ls-body:0; /* @kind font */
+--ls-eyebrow:0.18em; /* @kind font */
+--wt-display:400; /* @kind font */
+--wt-display-bold:600; /* @kind font */
+--wt-body:400; /* @kind font */
+--wt-body-strong:500; /* @kind font */
+--measure-body:62ch; /* @kind other */
+--measure-display:18ch; /* @kind other */
+/* threshold: below this size, text must clear 4.5:1 */
+--body-min-size:24px; /* @kind other */
+}
+.t-eyebrow{font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;line-height:var(--lh-eyebrow)}
+.t-display{font-family:var(--font-display);font-size:var(--fs-display-l);line-height:var(--lh-display);letter-spacing:var(--ls-display);font-weight:var(--wt-display);text-wrap:balance}
+.t-body{font-family:var(--font-body);font-size:var(--fs-body-m);line-height:var(--lh-body);max-width:var(--measure-body);text-wrap:pretty}

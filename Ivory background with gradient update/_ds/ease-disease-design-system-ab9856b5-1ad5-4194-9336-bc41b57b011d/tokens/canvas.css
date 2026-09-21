@@ -1,0 +1,54 @@
+:root{
+/* ONE fixed background canvas. Sections are transparent. Interpolate in oklab.
+   IVORY-FIRST: the canvas lives in a narrow warm-light range (okL 0.89–0.98) for the
+   whole scroll, so the blend is felt rather than seen and every stop takes ink body
+   copy at 12.5:1 or better. Darkness is a SURFACE, not a background — see
+   --surface-deep in colors.css. Stops are chained: each --to is the next --from. */
+
+/* hero — #FBF7F0 → #F9F2E8 */
+--canvas-hero-from:var(--ivory);
+--canvas-hero-to:color-mix(in oklab,var(--ivory) 78%,var(--parchment));
+/* hook — #F9F2E8 → #F4E9DA */
+--canvas-hook-from:color-mix(in oklab,var(--ivory) 78%,var(--parchment));
+--canvas-hook-to:color-mix(in oklab,var(--ivory) 34%,var(--parchment));
+/* descent — #F4E9DA → parchment. The dark beat is a deep panel ON this canvas. */
+--canvas-descent-from:color-mix(in oklab,var(--ivory) 34%,var(--parchment));
+--canvas-descent-to:var(--parchment);
+/* turn — parchment → #F0D5BB. The ember dawn as warmth, not as brightness. */
+--canvas-turn-from:var(--parchment);
+--canvas-turn-mid:color-mix(in oklab,var(--parchment) 90%,var(--terracotta));
+--canvas-turn-to:color-mix(in oklab,var(--parchment) 86%,var(--ember-b));
+/* levels — #F0D5BB → #F6EEE1 */
+--canvas-levels-from:color-mix(in oklab,var(--parchment) 86%,var(--ember-b));
+--canvas-levels-to:color-mix(in oklab,var(--parchment) 45%,var(--ivory));
+/* team — #F6EEE1 → #FAF5ED */
+--canvas-team-from:color-mix(in oklab,var(--parchment) 45%,var(--ivory));
+--canvas-team-to:color-mix(in oklab,var(--ivory) 90%,var(--parchment));
+/* close — #FAF5ED → ivory with a faint sage tint */
+--canvas-close-from:color-mix(in oklab,var(--ivory) 90%,var(--parchment));
+--canvas-close-to:color-mix(in oklab,var(--ivory) 90%,var(--sage-soft));
+
+/* Text color per stop — ink at every stop. There is no text flip and no
+   breathing zone: the lowest ratio anywhere on the canvas is ink 12.58:1. */
+--canvas-hero-text:var(--ink);
+--canvas-hook-text:var(--ink);
+--canvas-descent-text:var(--ink);
+--canvas-turn-text:var(--ink);
+--canvas-levels-text:var(--ink);
+--canvas-team-text:var(--ink);
+--canvas-close-text:var(--ink);
+
+/* Body copy permission: 1 = allowed. Allowed everywhere on an ivory-first canvas. */
+--canvas-hero-body:1; /* @kind other */
+--canvas-hook-body:1; /* @kind other */
+--canvas-descent-body:1; /* @kind other */
+--canvas-turn-body:1; /* @kind other */
+--canvas-levels-body:1; /* @kind other */
+--canvas-team-body:1; /* @kind other */
+--canvas-close-body:1; /* @kind other */
+
+/* Scroll intent: hero=arrival, hook=hold, descent=warm dim under the deep panel,
+   turn=warmth rising, levels=lift back to light, team=rest, close=exit */
+--canvas-default:var(--ivory)}
+
+.canvas-root{position:fixed;inset:0;z-index:-1;background:var(--canvas-default);transition:background-color var(--dur-scene) var(--ease)}

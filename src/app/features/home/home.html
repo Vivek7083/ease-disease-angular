@@ -1,0 +1,189 @@
+<main id="top">
+  <!-- ============ HERO ============ -->
+  <section class="scene hero" #heroSection appCanvasStop from="var(--canvas-hero-from)" to="var(--canvas-hero-to)" aria-labelledby="hero-heading">
+    <div class="hero-frame">
+      <div class="scene-inner hero-grid">
+        <div class="hero-copy">
+          <h1 id="hero-heading" class="hero-headline">
+            Your body has been<br />
+            <em>speaking in symptoms.</em><br />
+            <span class="mark">We find the source.</span>
+          </h1>
+          <p class="lede">
+            Skin flares, cycle changes, fatigue that won't lift — they often trace back to one place.
+            Thirty minutes is enough to start finding out.
+          </p>
+          <a class="source-link" href="#hook">
+            <span>Find your source</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
+          </a>
+        </div>
+        <div class="hero-visual">
+          <app-gut-hub [style.opacity]="heroGutOpacity()" />
+          <div class="cta-row" [style.opacity]="heroCtaOpacity()" [style.visibility]="heroCtaOpacity() < 0.03 ? 'hidden' : 'visible'">
+            <app-cta-pill label="Book a consultation" meta="30 min · ₹499" variant="primary" (pressed)="bookConsultation()" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE HOOK ============ -->
+  <section class="scene hook" id="hook" appCanvasStop from="var(--canvas-hook-from)" to="var(--canvas-hook-to)" aria-labelledby="hook-heading">
+    <div
+      class="hook-pin"
+      #hookPin
+      [class.is-horizontal]="hookHorizontal()"
+      [style.height.vh]="hookPoints.length * (hookHorizontal() ? 72 : 52)"
+    >
+      <div class="hook-viewport">
+        <!-- The headline reveals once, then stays put for the whole pinned
+             scroll — it does not scroll away while the cards cycle beneath
+             it, since it's part of the same sticky viewport as the track. -->
+        <div class="hook-heading-row reveal" [appScrollReveal]="0">
+          <app-eyebrow-label text="Root-cause, not symptoms" />
+          <h2 id="hook-heading" class="hook-heading">Why root-cause healing?</h2>
+        </div>
+
+        <div class="hook-track" [style.--hook-count]="hookPoints.length" [style.transform]="hookHorizontal() ? 'translateX(' + hookTrackOffset() + 'px)' : null">
+          @for (point of hookPoints; track point.title; let i = $index) {
+            <div class="hook-slide" [class.active]="hookActiveIndex() === i">
+              <div class="hook-card" [class]="'icon-' + point.icon">
+                <div class="hook-image-placeholder">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="9" cy="9" r="1.6" />
+                    <path d="M21 15l-5.5-5.5L5 21" />
+                  </svg>
+                  <span>Paste image here</span>
+                </div>
+                <div class="hook-copy">
+                  <span class="hook-index" aria-hidden="true">{{ '0' + (i + 1) }}</span>
+                  <h3>{{ point.title }}</h3>
+                  <p>{{ point.body }}</p>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="scene-inner">
+      <p class="hook-close" #closeQuote>
+        @for (word of hookCloseWords; track $index; let i = $index) {
+          <span class="hook-close-word" [style.--fill]="closeWordFill(i)">{{ word }}</span
+          >{{ ' ' }}
+        }
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
+       symptom → condition → root-cause trace. Stays on the same ivory
+       canvas as every other section — oxblood/ink carry the "seriousness"
+       here, not an inverted dark panel. ============ -->
+  <section class="scene root-map-scene" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
+    <div class="scene-inner">
+      <app-root-map (bookRequested)="bookConsultation()" />
+    </div>
+  </section>
+
+  @if (showRemainingSections) {
+  <!-- ============ THE DESCENT — root causes, the deepest beat ============ -->
+  <section class="scene descent" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="descent-heading">
+    <div class="scene-inner">
+      <div class="deep-panel">
+        <app-eyebrow-label text="Where it often starts" />
+        <h2 id="descent-heading" class="t-display on-dark">Different symptoms often grow from the same roots.</h2>
+        <p class="t-body on-dark panel-lede">
+          Most people treat each symptom on its own — a cream for the skin, an antacid for the bloating.
+          Underneath, fewer things are actually going on.
+        </p>
+        <div class="hub-frame">
+          <app-gut-hub />
+        </div>
+        <div class="root-grid">
+          @for (cause of rootCauses; track cause.name) {
+            <article class="root-card">
+              <h3>{{ cause.name }}</h3>
+              <p class="symptoms">{{ cause.symptoms }}</p>
+              <p class="description">{{ cause.description }}</p>
+            </article>
+          }
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ THE TURN — ember dawn, the path out ============ -->
+  <section class="scene turn" appCanvasStop from="var(--canvas-turn-from)" to="var(--canvas-turn-to)" aria-labelledby="turn-heading">
+    <div class="scene-inner turn-grid">
+      <div>
+        <app-eyebrow-label text="The turn · why this works" />
+        <h2 id="turn-heading" class="t-display">Root-cause healing vs. symptom management.</h2>
+        <p class="t-body lede">
+          Conventional care treats what is in front of it. Root-cause care asks why it is there — and builds
+          a plan around your bloodwork, your history and your life, not a standard protocol.
+        </p>
+      </div>
+      <ul class="compare">
+        <li>
+          <app-evidence-tick />
+          <span><strong>Root-cause plan</strong> built from your own bloodwork and history</span>
+        </li>
+        <li>
+          <app-evidence-tick />
+          <span><strong>Ongoing check-ins</strong> as your body responds, not a one-time prescription</span>
+        </li>
+        <li>
+          <app-evidence-tick />
+          <span><strong>One practitioner</strong> who reads your whole picture, not just today's symptom</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ LEVELS — packages ============ -->
+  <section class="scene levels" appCanvasStop from="var(--canvas-levels-from)" to="var(--canvas-levels-to)" aria-labelledby="levels-heading">
+    <div class="scene-inner">
+      <app-eyebrow-label text="The path out" />
+      <h2 id="levels-heading" class="t-display">Start with a conversation. Go as deep as you need.</h2>
+      <div class="levels-grid">
+        @for (level of levels; track level.name) {
+          <app-level-card [level]="level" />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEAM — clinical rigor ============ -->
+  <section class="scene team" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
+    <div class="scene-inner">
+      <app-eyebrow-label text="Clinical rigor" />
+      <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
+      <div class="team-grid">
+        @for (member of team; track member.name) {
+          <app-team-card [member]="member" />
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE — booking ============ -->
+  <section class="scene close" id="book" appCanvasStop from="var(--canvas-close-from)" to="var(--canvas-close-to)" aria-labelledby="close-heading">
+    <div class="scene-inner close-inner">
+      <app-wordmark class="close-wordmark" />
+      <h2 id="close-heading" class="t-display">Since you're here, start now.</h2>
+      <p class="t-body lede">
+        In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
+      </p>
+      <div class="cta-row">
+        <app-cta-pill label="Book a consultation" meta="30 min · ₹499" variant="primary" />
+        <app-cta-pill label="Ask the Ease guide first" variant="ghostDark" />
+      </div>
+      <p class="fine">This page describes common patterns, not a diagnosis. Please speak with a qualified practitioner about your own health.</p>
+    </div>
+  </section>
+  }
+</main>

@@ -1,0 +1,475 @@
+:host {
+  display: block;
+}
+
+.scene {
+  position: relative;
+  padding-block: clamp(var(--sp-16), 10vw, var(--sp-32));
+}
+
+.scene-inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-mobile);
+}
+
+@media (min-width: 900px) {
+  .scene-inner {
+    padding-inline: var(--gutter-desktop);
+  }
+}
+
+/* ---------- hero ---------- */
+.hero {
+  padding-block: 0;
+}
+
+.hero-frame {
+  /* No local background here — the hero sits on the single shared scroll
+     canvas (CanvasStoryService via appCanvasStop) like every other section.
+     A local gradient here would paint over the canvas and create a visible
+     seam the moment the hero scrolls away and the canvas shows through. */
+  position: relative;
+  overflow: hidden;
+  min-height: 100svh;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-12);
+  align-items: center;
+  padding-block: clamp(var(--sp-20), 14vh, var(--sp-32));
+}
+
+@media (min-width: 900px) {
+  .hero-grid {
+    /* Equal columns — symmetric visual weight left and right. */
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(var(--sp-12), 6vw, var(--sp-20));
+    align-items: center;
+  }
+}
+
+.hero-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 900px) {
+  .hero-copy {
+    padding-right: clamp(var(--sp-4), 4vw, var(--sp-10));
+  }
+}
+
+.hero-headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(2.3rem, 1.6rem + 3vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: var(--ls-display);
+  color: var(--ink);
+}
+
+.hero-headline em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--oxblood);
+}
+
+.hero-headline .mark {
+  font-style: normal;
+  background: linear-gradient(transparent 62%, var(--honey) 62%);
+  padding: 0 2px;
+}
+
+.lede {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 0.9rem + 0.3vw, 1.18rem);
+  line-height: 1.65;
+  color: var(--text-quiet-light);
+  max-width: 42ch;
+}
+
+.source-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.94rem;
+  color: var(--oxblood);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
+  padding-bottom: 2px;
+  width: fit-content;
+  transition:
+    gap var(--dur-micro) var(--ease),
+    border-color var(--dur-base) var(--ease);
+}
+
+.source-link svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-micro) var(--ease);
+}
+
+.source-link:hover {
+  gap: var(--sp-3);
+  border-color: var(--oxblood);
+}
+
+.source-link:hover svg {
+  transform: translateX(2px);
+}
+
+.hero-visual {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-8);
+  max-width: 480px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+@media (min-width: 900px) {
+  .hero-visual {
+    margin-inline: 0;
+  }
+}
+
+.hero-visual app-gut-hub {
+  width: 100%;
+}
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-4);
+  max-width: 100%;
+}
+
+@media (max-width: 460px) {
+  .hero-visual .cta-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ---------- the hook ---------- */
+.hook {
+  background: transparent;
+  /* The pin already carries 100vh of its own visual weight — a full section
+     padding on top of that is what read as "too much space" between hero
+     and hook. Keep just enough to separate the hook from the hero. */
+  padding-block: clamp(var(--sp-8), 4vw, var(--sp-14));
+}
+
+.hook-heading-row {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-mobile);
+  flex: 0 0 auto;
+}
+
+@media (min-width: 900px) {
+  .hook-heading-row {
+    padding-inline: var(--gutter-desktop);
+  }
+}
+
+.hook-heading {
+  margin-top: var(--sp-3);
+  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  font-weight: 400;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+/* ---------- the hook · story track ---------- */
+/* One pinned scrollytelling track at every breakpoint. The pin's own
+   height IS the scroll budget: `position: sticky` on the viewport holds the
+   section in place while the headline reveals once and stays, and the
+   cards cycle underneath it. `position: sticky` releases itself once the
+   pin scrolls past — so normal scroll resumes after the last card, with no
+   extra bookkeeping.
+   Mobile: cards crossfade in place, one per scroll segment.
+   Desktop (>=900px, HOOK_HORIZONTAL_BREAKPOINT): a continuous translateX
+   drag across the track — each card a two-pane slide, image one side,
+   info the other, alternating for rhythm. */
+.hook-pin {
+  position: relative;
+}
+
+.hook-viewport {
+  position: sticky;
+  top: 0;
+  /* svh (stable viewport height) over plain vh — on mobile, vh tracks the
+     browser chrome showing/hiding, which drifted out of sync with the
+     `document.documentElement.clientHeight` reading the pin's scroll math
+     uses, releasing the sticky pin before the JS thought the last card's
+     hold was over. Falls back to vh where svh isn't supported. */
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  padding-block: var(--sp-10);
+}
+
+.hook-track {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.hook-pin.is-horizontal .hook-viewport {
+  /* Cross-axis fix: the track's explicit width (4x viewport) is far wider
+     than this column's own width, and `align-items: center` (the base
+     rule) centers oversized flex items — hanging half the track off each
+     side *before* our own translateX ever applies. That pre-shift is what
+     made every scroll position show the wrong, misaligned slice of the
+     track (partial/blank views, "missing" card text). flex-start removes
+     that hidden offset so translateX(0) truly means "card one, no shift". */
+  align-items: flex-start;
+}
+
+.hook-pin.is-horizontal .hook-track {
+  display: flex;
+  flex-wrap: nowrap;
+  width: calc(var(--hook-count) * 100vw);
+  height: auto;
+  will-change: transform;
+}
+
+.hook-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-inline: var(--gutter-mobile);
+  opacity: 0;
+  transform: translateY(18px);
+  pointer-events: none;
+  transition:
+    opacity var(--dur-scene) var(--ease-out-soft),
+    transform var(--dur-scene) var(--ease-out-soft);
+}
+
+.hook-slide.active {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.hook-pin.is-horizontal .hook-slide {
+  position: relative;
+  inset: auto;
+  flex: 0 0 100vw;
+  width: 100vw;
+  padding-inline: var(--gutter-desktop);
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition: none;
+}
+
+/* No card chrome — no border, no shadow, no background box. Content sits
+   straight on the shared canvas like the hero does, so the story reads as
+   one continuous scene rather than a stack of UI containers. */
+.hook-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--sp-5);
+  width: 100%;
+  max-width: 420px;
+}
+
+.hook-index {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--terracotta);
+}
+
+.hook-image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  width: 100%;
+  min-height: 160px;
+  border: 1px dashed color-mix(in oklab, var(--terracotta) 40%, transparent);
+  border-radius: var(--r-md, 10px);
+  color: color-mix(in oklab, var(--ink) 55%, var(--terracotta));
+}
+
+.hook-card.icon-root .hook-image-placeholder {
+  border-color: color-mix(in oklab, var(--oxblood) 35%, transparent);
+  color: color-mix(in oklab, var(--ink) 55%, var(--oxblood));
+}
+
+.hook-card.icon-ai .hook-image-placeholder {
+  border-color: color-mix(in oklab, var(--ink) 26%, transparent);
+  color: color-mix(in oklab, var(--ink) 60%, var(--ivory));
+}
+
+.hook-card.icon-balance .hook-image-placeholder {
+  border-color: color-mix(in oklab, var(--sage-soft) 65%, transparent);
+  color: color-mix(in oklab, var(--ink) 50%, var(--sage-soft));
+}
+
+.hook-image-placeholder svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.7;
+}
+
+.hook-image-placeholder span {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: var(--ls-eyebrow);
+  opacity: 0.8;
+}
+
+.hook-copy h3 {
+  margin-top: var(--sp-2);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.2rem, 1.05rem + 0.6vw, 1.4rem);
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.hook-copy p {
+  margin-top: var(--sp-3);
+  color: var(--text-quiet-light);
+  font-size: clamp(0.92rem, 0.86rem + 0.2vw, 1rem);
+  line-height: var(--lh-body);
+}
+
+/* Desktop horizontal slides: a wide two-column beat — image one side, type
+   the other — filling the slide the way an open magazine spread would.
+   Typography scales with viewport width via clamp() rather than snapping
+   to one fixed size, so very wide screens keep proportion instead of
+   plateauing early. */
+@media (min-width: 900px) {
+  .hook-pin.is-horizontal .hook-card {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    gap: clamp(var(--sp-8), 5vw, var(--sp-12));
+    width: 100%;
+    max-width: 1040px;
+  }
+
+  .hook-pin.is-horizontal .hook-slide:nth-child(even) .hook-card {
+    flex-direction: row-reverse;
+  }
+
+  .hook-pin.is-horizontal .hook-image-placeholder {
+    flex: 0 1 420px;
+    max-width: 420px;
+    aspect-ratio: 4 / 3;
+    min-height: 0;
+  }
+
+  .hook-pin.is-horizontal .hook-image-placeholder svg {
+    width: 44px;
+    height: 44px;
+  }
+
+  .hook-pin.is-horizontal .hook-image-placeholder span {
+    font-size: 0.85rem;
+  }
+
+  .hook-pin.is-horizontal .hook-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .hook-pin.is-horizontal .hook-copy h3 {
+    font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem);
+    max-width: 16ch;
+  }
+
+  .hook-pin.is-horizontal .hook-copy p {
+    margin-top: var(--sp-5);
+    font-size: clamp(1rem, 0.9rem + 0.4vw, 1.15rem);
+    max-width: 42ch;
+  }
+}
+
+.hook-close {
+  margin-top: 16px;
+  margin-bottom: clamp(var(--sp-10), 6vw, var(--sp-16));
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.3rem);
+  line-height: 1.35;
+}
+
+/* Words fill in with ink as the line scrolls through the middle of the
+   viewport — muted brightening to full oxblood — rather than a plain
+   fade-in. --fill is a continuous 0..1 value recomputed every scroll
+   frame (see closeWordFill in home.ts), so the color genuinely sweeps
+   across the sentence instead of each word snapping between two states;
+   the short transition below just smooths between animation frames. */
+.hook-close-word {
+  --fill: 0;
+  color: color-mix(in oklab, var(--oxblood) calc(var(--fill) * 100%), color-mix(in oklab, var(--oxblood) 22%, var(--parchment)));
+  transition: color var(--dur-micro) linear;
+}
+
+/* ---------- root map · diseases & categories ---------- */
+/* Same ivory canvas as every other section (--canvas-descent-*) — no dark
+   panel inversion. Oxblood/ink carry the tone here instead. */
+.root-map-scene {
+  /* Tighter at the top than the bottom — the hook already trails off with
+     its own spacing, so stacking a full section padding on top of that
+     read as excess dead space at the boundary. +20px on top of that base
+     gap, per feedback that the quote and this section still ran together. */
+  padding-block: calc(clamp(var(--sp-4), 2vw, var(--sp-8)) + 20px) clamp(var(--sp-10), 6vw, var(--sp-16));
+}
+
+/* The heading now lives inside app-root-map itself, as a sticky "lead" card
+   in the steps column — see root-map.ts. */
