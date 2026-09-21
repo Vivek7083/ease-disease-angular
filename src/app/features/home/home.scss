@@ -170,10 +170,13 @@
   max-width: 100%;
 }
 
-@media (max-width: 460px) {
+/* Below 900px the chrome's own "Book now" pill is always on screen (see
+   app.scss's .chrome-cta mobile override), so the hero's inline copy of
+   the same button is redundant from the start — not just once scrolled
+   past, which is all heroCtaOpacity() otherwise handles. */
+@media (max-width: 899px) {
   .hero-visual .cta-row {
-    flex-direction: column;
-    align-items: stretch;
+    display: none;
   }
 }
 
@@ -466,10 +469,151 @@
 .root-map-scene {
   /* Tighter at the top than the bottom — the hook already trails off with
      its own spacing, so stacking a full section padding on top of that
-     read as excess dead space at the boundary. +20px on top of that base
-     gap, per feedback that the quote and this section still ran together. */
-  padding-block: calc(clamp(var(--sp-4), 2vw, var(--sp-8)) + 20px) clamp(var(--sp-10), 6vw, var(--sp-16));
+     read as excess dead space at the boundary. */
+  padding-block: clamp(var(--sp-2), 1vw, var(--sp-4)) clamp(var(--sp-10), 6vw, var(--sp-16));
 }
 
 /* The heading now lives inside app-root-map itself, as a sticky "lead" card
    in the steps column — see root-map.ts. */
+
+/* ---------- programme · what step 1 covers ---------- */
+.programme {
+  padding-block: clamp(var(--sp-10), 6vw, var(--sp-20));
+}
+
+.programme-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-10);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .programme-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(var(--sp-10), 6vw, var(--sp-16));
+  }
+}
+
+.programme-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.programme-intro .t-display {
+  margin-top: var(--sp-3);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.programme-intro .lede {
+  margin: 0;
+  color: var(--text-quiet-light);
+}
+
+.programme-intro .cta-row {
+  justify-content: flex-start;
+  margin-top: var(--sp-3);
+}
+
+.programme-card {
+  position: relative;
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+  border-radius: var(--r-lg);
+  padding: var(--sp-8);
+  box-shadow: var(--shadow-soft);
+}
+
+.programme-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--oxblood);
+  background: color-mix(in oklab, var(--terracotta) 12%, transparent);
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+}
+
+.programme-card h3 {
+  margin-top: var(--sp-4);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 1.2rem + 0.9vw, 1.7rem);
+  color: var(--ink);
+}
+
+.programme-price {
+  margin-top: var(--sp-3);
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  font-family: var(--font-mono);
+  font-size: 1.7rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.programme-price .note {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-variant-numeric: normal;
+  color: var(--text-quiet-light);
+}
+
+.programme-objective {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--rule-on-light);
+  font-size: 0.94rem;
+  line-height: var(--lh-body);
+  color: var(--text-quiet-light);
+}
+
+.programme-objective strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.programme-list {
+  list-style: none;
+  margin: var(--sp-5) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.programme-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-3);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  padding-block: var(--sp-3);
+  border-top: 1px solid var(--rule-on-light);
+  color: var(--text-quiet-light);
+}
+
+.programme-list li:first-child {
+  border-top: none;
+}
+
+.programme-list app-evidence-tick {
+  margin-top: 2px;
+}
+
+.programme-quote {
+  margin: var(--sp-6) 0 0;
+  padding-top: var(--sp-5);
+  border-top: 1px solid var(--rule-on-light);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.2rem);
+  line-height: 1.45;
+  color: var(--oxblood);
+}

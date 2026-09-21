@@ -232,6 +232,15 @@ export class Home implements AfterViewInit {
     },
   ];
 
+  protected readonly programmeIncludes: readonly string[] = [
+    'Your complaints, concerns, medical history and health goals',
+    'What could be driving it — your likely underlying cause(s)',
+    'Recommended tests and supplements to start with',
+    'A basic anti-inflammatory diet, and where your diet or lifestyle is going wrong',
+    'Simple supplement guidance — magnesium, vitamin D3',
+    'Why healing begins with improving digestion',
+  ];
+
   protected readonly rootCauses: readonly RootCause[] = [
     {
       name: 'Gut imbalance',

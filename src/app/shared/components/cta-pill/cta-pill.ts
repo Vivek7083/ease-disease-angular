@@ -86,8 +86,10 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       opacity: 0.85;
     }
     @media (hover: none) {
-      /* Touch devices have no hover — don't hide content a tap can't reveal. */
-      .cta.reveal-on-hover .meta {
+      /* Touch devices have no hover, so the reveal happens on press instead
+         — hold the button down (a long-press reads clearest) and the
+         price/time appears for as long as the finger stays down. */
+      .cta.reveal-on-hover:active .meta {
         max-width: 140px;
         padding-left: var(--sp-3);
         border-left-width: 1px;

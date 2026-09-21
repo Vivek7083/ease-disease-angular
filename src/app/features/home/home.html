@@ -89,6 +89,42 @@
     </div>
   </section>
 
+  <!-- ============ PROGRAMME — what Step 1 actually covers ============ -->
+  <section class="scene programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-turn-mid)" aria-labelledby="programme-heading">
+    <div class="scene-inner programme-grid">
+      <div class="programme-intro">
+        <app-eyebrow-label text="How it starts" />
+        <h2 id="programme-heading" class="t-display">One conversation is where your plan begins.</h2>
+        <p class="t-body lede">
+          Step 1 is a single, one-time consultation — no programme to commit to yet. Just thirty minutes to
+          understand what's going on and leave with a clear, personal starting point.
+        </p>
+        <div class="cta-row">
+          <app-cta-pill label="Book your first consultation" meta="30 min · ₹499" variant="primary" (pressed)="bookConsultation()" />
+        </div>
+      </div>
+
+      <article class="programme-card">
+        <span class="programme-tag">Step 1</span>
+        <h3>One-time consultation</h3>
+        <p class="programme-price">
+          ₹499
+          <span class="note">₹599 to be confirmed · 30 minutes</span>
+        </p>
+        <p class="programme-objective"><strong>Objective —</strong> understand your current condition and give you initial guidance to act on.</p>
+        <ul class="programme-list">
+          @for (item of programmeIncludes; track item) {
+            <li>
+              <app-evidence-tick />
+              <span>{{ item }}</span>
+            </li>
+          }
+        </ul>
+        <p class="programme-quote">"You are what you think, what you eat, and how well you digest it."</p>
+      </article>
+    </div>
+  </section>
+
   @if (showRemainingSections) {
   <!-- ============ THE DESCENT — root causes, the deepest beat ============ -->
   <section class="scene descent" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="descent-heading">

@@ -492,7 +492,7 @@ const BEAT_COUNT = 6;
 
     @media (min-width: 900px) {
       .root-map-step--last {
-        min-height: 90vh;
+        min-height: 120vh;
       }
     }
 
@@ -627,12 +627,15 @@ export class RootMap implements AfterViewInit {
   protected readonly selected = signal<ReadonlySet<string>>(new Set());
   protected readonly activeStep = signal(0);
 
-  // The map is only synced to scroll on desktop, where it's beside the
-  // narration in its own sticky column. On mobile it's a plain block that
-  // sits after the narration — a fixed-height sticky box there kept
-  // overflowing no matter how compact the layers got, so it just shows
-  // fully revealed the moment it's reached instead.
+  // Desktop syncs the reveal to the narration scrolling past the sticky
+  // map. Mobile has no sticky map to sync against any more (a fixed-height
+  // sticky box there kept overflowing no matter how compact the layers
+  // got), but the reveal-as-you-scroll effect still matters on its own —
+  // so on mobile it's driven by the map's own position as it scrolls
+  // through the viewport instead, via mobileConditionsVisible/RootsVisible.
   protected readonly isDesktop = signal(false);
+  private readonly mobileConditionsVisible = signal(false);
+  private readonly mobileRootsVisible = signal(false);
 
   protected readonly focusSet = computed<ReadonlySet<string>>(() => {
     if (this.selected().size > 0) {
@@ -665,9 +668,14 @@ export class RootMap implements AfterViewInit {
 
   // Desktop reveals conditions/roots in step with the narration scrolling
   // past the sticky map (beats: 0 heading, 1-4 narration, 5 closing).
-  // Mobile just shows the map fully revealed the moment it's reached.
-  protected readonly showConditions = computed(() => this.selected().size > 0 || !this.isDesktop() || this.activeStep() >= 2);
-  protected readonly showRoots = computed(() => this.selected().size > 0 || !this.isDesktop() || this.activeStep() >= 3);
+  // Mobile reveals them as the map itself scrolls through the viewport —
+  // see updateMobileMapReveal.
+  protected readonly showConditions = computed(
+    () => this.selected().size > 0 || (this.isDesktop() ? this.activeStep() >= 2 : this.mobileConditionsVisible()),
+  );
+  protected readonly showRoots = computed(
+    () => this.selected().size > 0 || (this.isDesktop() ? this.activeStep() >= 3 : this.mobileRootsVisible()),
+  );
 
   protected readonly summaryText = computed(() => {
     const n = this.selected().size;
@@ -724,10 +732,12 @@ export class RootMap implements AfterViewInit {
       this.scrollRaf = requestAnimationFrame(() => {
         this.scrollRaf = 0;
         this.updateActiveStep();
+        this.updateMobileMapReveal();
       });
     };
     const onResize = () => {
       this.updateActiveStep();
+      this.updateMobileMapReveal();
       this.queueLayout();
     };
 
@@ -742,6 +752,7 @@ export class RootMap implements AfterViewInit {
     }
 
     this.updateActiveStep();
+    this.updateMobileMapReveal();
     this.queueLayout();
 
     this.destroyRef.onDestroy(() => {
@@ -751,6 +762,37 @@ export class RootMap implements AfterViewInit {
       cancelAnimationFrame(this.layoutRaf);
       resizeObserver?.disconnect();
     });
+  }
+
+  /**
+   * On mobile, the map has no sticky column to sync its reveal against —
+   * it's a plain block, so instead the reveal is driven by how far the map
+   * itself has scrolled through the viewport: conditions unlock once its
+   * top third has passed the activation line, roots once two-thirds have.
+   * A one-time "did this flip" check (not a plain re-set every frame) is
+   * what gates queueLayout — the link paths only need recomputing when a
+   * layer's hidden/shown state actually changes, not on every scroll pixel.
+   */
+  private updateMobileMapReveal(): void {
+    if (this.isDesktop()) {
+      return;
+    }
+    const mapEl = this.mapBox()?.nativeElement;
+    if (!mapEl) {
+      return;
+    }
+    const rect = mapEl.getBoundingClientRect();
+    const line = window.innerHeight * STEP_ACTIVATION_LINE_MOBILE;
+    const progress = Math.max(0, Math.min(1, (line - rect.top) / rect.height));
+
+    const conditionsVisible = progress >= 0.3;
+    const rootsVisible = progress >= 0.65;
+
+    if (conditionsVisible !== this.mobileConditionsVisible() || rootsVisible !== this.mobileRootsVisible()) {
+      this.mobileConditionsVisible.set(conditionsVisible);
+      this.mobileRootsVisible.set(rootsVisible);
+      this.queueLayout();
+    }
   }
 
   private queueLayout(): void {
