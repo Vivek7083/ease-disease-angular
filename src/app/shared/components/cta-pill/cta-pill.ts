@@ -98,7 +98,11 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
     }
     .primary {
       color: var(--ivory);
-      background-image: linear-gradient(100deg, var(--terracotta) 0%, color-mix(in oklab, var(--terracotta) 55%, var(--honey)) 100%);
+      /* The design system's one sanctioned gradient (colors.css) — terracotta
+         easing through ember, kept to this single token so every primary CTA
+         on the site shares the exact same gradient rather than each button
+         rolling its own. */
+      background-image: var(--gradient-ember);
       box-shadow: 0 10px 24px -12px color-mix(in oklab, var(--terracotta) 70%, transparent);
     }
     .primary:hover {
@@ -125,6 +129,26 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       right: var(--sp-6);
       bottom: var(--sp-6);
       z-index: 40;
+    }
+    /* Narrow phones: label + meta together at nowrap width (eg. "Book your
+       first consultation" · "30 min · ₹499") run wider than a 320-375px
+       container with its 20px gutters, forcing the page to scroll
+       horizontally. Below 400px the button wraps onto two centered lines
+       instead of holding one unbroken row. */
+    @media (max-width: 400px) {
+      .cta {
+        flex-wrap: wrap;
+        justify-content: center;
+        white-space: normal;
+        text-align: center;
+        row-gap: 2px;
+        padding-block: var(--sp-3);
+      }
+      .meta {
+        flex-basis: 100%;
+        padding-left: 0;
+        border-left: none;
+      }
     }
   `,
 })

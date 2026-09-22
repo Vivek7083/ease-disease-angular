@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
 
 interface HubNodeSpec {
   readonly key: string;
@@ -59,17 +59,19 @@ const LABEL_GAP = 22;
       class="stage"
       role="img"
       aria-label="Illustration of the gut at the centre, connected by flowing lines to Skin, Sleep, Energy, Mood, Hormones and Immunity, with food moving through digestion"
+      (pointerdown)="dismissHint()"
     >
       <div class="stage-glow" aria-hidden="true"></div>
       <svg [attr.viewBox]="'0 0 400 ' + viewHeight()" class="hub" aria-hidden="true">
         @for (node of nodes(); track node.key; let i = $index) {
-          <path class="thread-base" [attr.d]="pathFor(node)" />
+          <path class="thread-base" [class.pending]="i >= visibleCount()" [attr.d]="pathFor(node)" />
           <path
             class="thread-flow"
+            [class.pending]="i >= visibleCount()"
             [attr.d]="pathFor(node)"
-            [style.opacity]="hovered() === i ? 1 : 0.42"
-            [style.stroke-width]="hovered() === i ? 2.6 : 1.2"
-            [style.animation-duration]="hovered() === i ? '0.85s' : '2.8s'"
+            [style.opacity]="i >= visibleCount() ? 0 : effectiveHighlight() === i ? 1 : 0.42"
+            [style.stroke-width]="effectiveHighlight() === i ? 2.6 : 1.2"
+            [style.animation-duration]="effectiveHighlight() === i ? '0.85s' : '2.8s'"
           />
         }
 
@@ -88,13 +90,15 @@ const LABEL_GAP = 22;
         @for (node of nodes(); track node.key; let i = $index) {
           <g
             class="node"
-            [class.hovered]="hovered() === i"
+            [class.hovered]="effectiveHighlight() === i"
+            [class.pending]="i >= visibleCount()"
             [style.transform-origin]="node.x + 'px ' + node.y + 'px'"
-            (mouseenter)="hovered.set(i)"
+            (mouseenter)="hovered.set(i); dismissHint()"
             (mouseleave)="hovered.set(null)"
-            (focus)="hovered.set(i)"
+            (focus)="hovered.set(i); dismissHint()"
             (blur)="hovered.set(null)"
-            tabindex="0"
+            (click)="dismissHint()"
+            [attr.tabindex]="i < visibleCount() ? 0 : -1"
             [attr.aria-label]="node.label"
           >
             <circle class="node-glow" [attr.cx]="node.x" [attr.cy]="node.y" r="19" />
@@ -103,10 +107,22 @@ const LABEL_GAP = 22;
           </g>
         }
 
-        @for (node of nodes(); track node.key) {
-          <text class="node-label" [attr.x]="labelX(node)" [attr.y]="labelY(node)" [attr.text-anchor]="labelAnchor(node)">
+        @for (node of nodes(); track node.key; let i = $index) {
+          <text class="node-label" [class.pending]="i >= visibleCount()" [attr.x]="labelX(node)" [attr.y]="labelY(node)" [attr.text-anchor]="labelAnchor(node)">
             {{ node.label }}
           </text>
+        }
+
+        <!-- A one-time simulated click on the top node — a small cursor that
+             approaches, presses down (a ripple confirms the "click") and
+             fades — the only hint that the nodes are interactive at all.
+             Dismisses itself once its animation finishes, or the instant the
+             reader actually touches/hovers/clicks anything in the hub. -->
+        @if (showClickHint() && !reducedMotion()) {
+          <g class="click-hint" [attr.transform]="'translate(' + topNode().x + ',' + topNode().y + ')'" aria-hidden="true">
+            <circle class="click-hint-ripple" r="6" />
+            <circle class="click-hint-dot" r="5" (animationend)="dismissHint()" />
+          </g>
         }
       </svg>
     </div>
@@ -250,6 +266,26 @@ const LABEL_GAP = 22;
       font-weight: 500;
       fill: var(--ink);
       pointer-events: none;
+      transition: opacity var(--dur-base) var(--ease);
+    }
+
+    /* Progressive reveal (descentActiveIndex/revealCount) — a node not yet
+       "unlocked" sits invisible and slightly shrunk rather than being
+       removed from the DOM outright, so it can grow into place with a
+       transition once its turn comes instead of popping in instantly. */
+    .thread-base.pending,
+    .thread-flow.pending,
+    .node.pending,
+    .node-label.pending {
+      opacity: 0;
+    }
+    .thread-base.pending,
+    .thread-flow.pending {
+      transition: opacity var(--dur-base) var(--ease);
+    }
+    .node.pending {
+      transform: scale(0.5);
+      pointer-events: none;
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -261,14 +297,87 @@ const LABEL_GAP = 22;
         animation: none;
       }
     }
+
+    /* One-shot simulated click on the top node — approaches from above,
+       presses down, releases with a ripple, then fades for good. */
+    .click-hint {
+      pointer-events: none;
+    }
+    .click-hint-dot {
+      fill: var(--ink);
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: click-hint-approach 2.6s var(--ease-out-soft) both;
+    }
+    .click-hint-ripple {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 1.4;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: click-hint-ripple 2.6s var(--ease-out-soft) both;
+    }
+    @keyframes click-hint-approach {
+      0% {
+        transform: translateY(-34px) scale(1);
+        opacity: 0;
+      }
+      22% {
+        opacity: 0.85;
+      }
+      45% {
+        transform: translateY(-34px) scale(1);
+        opacity: 0.85;
+      }
+      62% {
+        transform: translateY(0) scale(1);
+        opacity: 0.85;
+      }
+      72% {
+        transform: translateY(0) scale(0.6);
+        opacity: 0.85;
+      }
+      84% {
+        transform: translateY(0) scale(1);
+        opacity: 0.85;
+      }
+      100% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+      }
+    }
+    @keyframes click-hint-ripple {
+      0%,
+      58% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      68% {
+        opacity: 0.55;
+      }
+      100% {
+        transform: scale(3.2);
+        opacity: 0;
+      }
+    }
   `,
 })
 export class GutHub {
   private readonly destroyRef = inject(DestroyRef);
 
+  readonly activeIndex = input<number | null>(null);
+  /** How many nodes (in declaration order) are "unlocked" so far — null shows all of them, as in the hero. */
+  readonly revealCount = input<number | null>(null);
+
   readonly hovered = signal<number | null>(null);
   private readonly isMobile = signal(this.readMobile());
   readonly reducedMotion = signal(this.readReducedMotion());
+
+  /** Real hover/focus wins over an externally-driven active index. */
+  readonly effectiveHighlight = computed(() => this.hovered() ?? this.activeIndex());
+  protected readonly visibleCount = computed(() => this.revealCount() ?? this.nodes().length);
+
+  protected readonly showClickHint = signal(true);
 
   readonly nodes = computed<readonly HubNodeSpec[]>(() => (this.isMobile() ? SHORT : TALL));
   readonly viewHeight = computed(() => (this.isMobile() ? 352 : 448));
@@ -282,6 +391,23 @@ export class GutHub {
 
   readonly coilTransform = computed(() => `translate(${this.cx()} ${this.cy()}) scale(${GUT_SCALE})`);
 
+  /** Whichever node sits highest (smallest y) — the target for the click-simulation hint. */
+  protected readonly topNodeIndex = computed(() => {
+    const list = this.nodes();
+    let best = 0;
+    for (let i = 1; i < list.length; i++) {
+      if (list[i].y < list[best].y) {
+        best = i;
+      }
+    }
+    return best;
+  });
+  protected readonly topNode = computed(() => this.nodes()[this.topNodeIndex()]);
+
+  protected dismissHint(): void {
+    this.showClickHint.set(false);
+  }
+
   constructor() {
     if (typeof window === 'undefined') {
       return;
@@ -294,6 +420,12 @@ export class GutHub {
     const onMotionChange = () => this.reducedMotion.set(motionQuery.matches);
     motionQuery.addEventListener('change', onMotionChange);
     this.destroyRef.onDestroy(() => motionQuery.removeEventListener('change', onMotionChange));
+
+    // Fallback in case `animationend` never fires (element removed from the
+    // DOM mid-animation, browser quirks, etc.) — the hint is a one-time
+    // nudge, not something that should linger indefinitely either way.
+    const dismissTimer = window.setTimeout(() => this.dismissHint(), 2800);
+    this.destroyRef.onDestroy(() => window.clearTimeout(dismissTimer));
   }
 
   private readMobile(): boolean {

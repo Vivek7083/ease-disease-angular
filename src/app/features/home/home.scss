@@ -2,9 +2,14 @@
   display: block;
 }
 
+/* One fixed vertical rhythm for every section boundary on the page — every
+   section uses this same padding-block unless explicitly overridden below
+   (hero and hook are, so the hero's visual can hand off to the hook's
+   heading with no gap between them; every other boundary gets this same
+   compact, consistent margin). */
 .scene {
   position: relative;
-  padding-block: clamp(var(--sp-16), 10vw, var(--sp-32));
+  padding-block: clamp(var(--sp-8), 4vw, var(--sp-12));
 }
 
 .scene-inner {
@@ -31,10 +36,21 @@
      seam the moment the hero scrolls away and the canvas shows through. */
   position: relative;
   overflow: hidden;
-  min-height: 100svh;
-  min-height: 100vh;
   display: flex;
   align-items: center;
+}
+
+@media (min-width: 900px) {
+  .hero-frame {
+    /* Full-bleed only where the two-column grid needs the room — on mobile
+       a forced min-height taller than the (now compact) stacked content
+       just becomes extra blank scroll distance between the gut fading out
+       and the hook heading appearing, since the section still has to fully
+       scroll past before the hook's pin can take over. Letting the section
+       size to its own content on mobile removes that dead scroll entirely. */
+    min-height: 100svh;
+    min-height: 100vh;
+  }
 }
 
 .hero-grid {
@@ -42,9 +58,14 @@
   z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--sp-12);
+  gap: var(--sp-6);
   align-items: center;
-  padding-block: clamp(var(--sp-20), 14vh, var(--sp-32));
+  /* Kept close to one viewport tall on mobile — the stacked copy+visual
+     column used to run well past 100svh, forcing a long scroll of blank
+     canvas just to finish exiting the hero before the hook's pin could
+     take over (see heroGutOpacity in home.ts for the other half of that
+     fix). */
+  padding-block: clamp(var(--sp-6), 6vh, var(--sp-10));
 }
 
 @media (min-width: 900px) {
@@ -52,6 +73,7 @@
     /* Equal columns — symmetric visual weight left and right. */
     grid-template-columns: 1fr 1fr;
     gap: clamp(var(--sp-12), 6vw, var(--sp-20));
+    padding-block: clamp(var(--sp-20), 14vh, var(--sp-32));
     align-items: center;
   }
 }
@@ -88,7 +110,7 @@
 
 .hero-headline .mark {
   font-style: normal;
-  background: linear-gradient(transparent 62%, var(--honey) 62%);
+  background: linear-gradient(transparent 62%, color-mix(in oklab, var(--evidence-blue) 55%, transparent) 62%);
   padding: 0 2px;
 }
 
@@ -183,10 +205,12 @@
 /* ---------- the hook ---------- */
 .hook {
   background: transparent;
-  /* The pin already carries 100vh of its own visual weight — a full section
-     padding on top of that is what read as "too much space" between hero
-     and hook. Keep just enough to separate the hook from the hero. */
-  padding-block: clamp(var(--sp-8), 4vw, var(--sp-14));
+  /* Zero top padding — the hero's own visual hands off directly into the
+     hook's heading with no gap, reading as one continuous scroll rather
+     than a new section starting. The bottom keeps the same fixed margin
+     every other section boundary uses (.scene), so the hook-to-root-map
+     gap stays consistent with the rest of the page. */
+  padding-block: 0 clamp(var(--sp-8), 4vw, var(--sp-12));
 }
 
 .hook-heading-row {
@@ -195,6 +219,9 @@
   margin-inline: auto;
   padding-inline: var(--gutter-mobile);
   flex: 0 0 auto;
+  /* Left-to-right typewriter-style reveal (headingRevealProgress in
+     home.ts) — same frame-smoothing transition as .hook-track's opacity. */
+  transition: clip-path 60ms linear;
 }
 
 @media (min-width: 900px) {
@@ -245,11 +272,215 @@
   padding-block: var(--sp-10);
 }
 
+/* Declared here — BEFORE the mobile media query below — on purpose: a
+   `display` declared inside the media query needs to be the LAST word on
+   `.hook-scrubber`'s display for mobile to actually show it. Equal-
+   specificity rules resolve by source order regardless of which one is
+   behind a media query, so a `display: none` written after that query
+   would silently win and hide it again on mobile too (the exact bug that
+   made .hook-track ignore its own mobile override earlier in this file). */
+.hook-scrubber {
+  display: none;
+}
+
+/* Dissolves on desktop (default) so .hook-heading-row and .hook-track stay
+   direct flex items of .hook-viewport exactly as before — same
+   display:contents trick app-root-map uses for its own wrapper. On mobile
+   it becomes a real flex box so the heading/track pair can keep their own
+   gap while .hook-viewport gives the pair-plus-scrubber a much smaller one. */
+.hook-stack {
+  display: contents;
+}
+
+/* Mobile: heading and card as one true centered flex group (justify-content
+   + align-items + a single deliberate gap) rather than either "centered in
+   the full leftover height" (reads as lost in space) or "pinned to the top"
+   (reads as stranded). The track needs a real, non-flex height for this —
+   flex:1 always eats 100% of whatever's left over regardless of
+   justify-content, which is what kept forcing a big gap no matter how the
+   alignment was set. A fixed, content-sized height is what actually lets
+   the group sit close together. */
+@media (max-width: 899px) {
+  .hook-viewport {
+    justify-content: center;
+    align-items: center;
+    /* The gap between the stack and the scrubber below it — kept separate
+       from .hook-stack's own (larger) internal heading↔track gap. */
+    gap: 4px;
+    padding-block: calc(env(safe-area-inset-top, 0px) + 64px) var(--sp-6);
+  }
+
+  .hook-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    width: 100%;
+  }
+
+  .hook-heading-row {
+    min-height: 0;
+    padding-top: 0;
+  }
+
+  .hook-heading-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hook-heading {
+    text-align: center;
+  }
+
+  /* Extra specificity (not just `.hook-track`/`.hook-slide`) is deliberate:
+     later, unconditional rules further down this file for both selectors
+     have equal specificity to a plain version here, and being later in
+     source order they were winning and silently overriding these —
+     .hook-track kept expanding to fill all leftover space regardless of
+     what this media query said (the gap never actually closed), and
+     .hook-slide kept the desktop-tuned 720ms crossfade and lost its
+     scroll-rail clearance, which is what let two cards' text visibly
+     overlap on a normal fast scroll. */
+  .hook-viewport .hook-track {
+    flex: none;
+    width: 100%;
+    height: clamp(380px, 58vh, 480px);
+  }
+
+  .hook-viewport .hook-slide {
+    /* Bottom-aligned rather than centered — this is what makes the active
+       card's own bottom edge land exactly at the track's bottom edge
+       (translateY(0) for the top card), so the scrubber below can sit a
+       fixed, exact distance from the actual card regardless of how tall
+       the track box itself is. Padding stays the plain, SYMMETRIC
+       var(--gutter-mobile) from the base rule (not overridden here) —
+       an earlier version padded the right side further to dodge the fixed
+       scroll-progress rail, which visibly skewed the whole card left
+       instead of keeping it centered. Rail clearance is handled by
+       shrinking .hook-card itself below, evenly on both sides, so it stays
+       centered AND clear of the rail. */
+    align-items: flex-end;
+    /* --dur-scene (720ms) is tuned for the desktop drag, which moves in
+       lockstep with the scroll gesture. On mobile a normal flick can cross
+       an entire card's ~half-viewport scroll segment in under 300ms, so the
+       active index changes again before the previous crossfade finishes —
+       that's what was showing two cards' text overlapping mid-scroll.
+       Short enough here to reliably finish between segment changes. */
+    transition:
+      opacity 180ms var(--ease-out-soft),
+      transform 180ms var(--ease-out-soft);
+  }
+
+  /* Specificity bump (not plain `.hook-card`) is deliberate, same reason as
+     .hook-track/.hook-slide above: an unconditional `.hook-card { width:
+     100%; ... }` further down this file is equal-specificity and later in
+     source, so a plain `.hook-card` here would have its width silently
+     overridden right back to 100% — which is exactly what was skewing the
+     card left again despite the padding fix. */
+  .hook-viewport .hook-card {
+    /* Was width: 100% (fills the slide's full padded box) — shrunk evenly
+       on both sides instead, so the card clears the fixed scroll-progress
+       rail (right: var(--sp-4), ~46px of total footprint from the screen
+       edge) without breaking its own horizontal centering the way padding
+       only the right side of the slide did. */
+    width: calc(100% - 52px);
+    /* A fixed height (not min-height) — every card is the exact same size
+       regardless of how much text it holds. The stacked-card look is the
+       translateY/scale offsets in home.ts on an always-opaque, always
+       same-size box; it was never meant to rely on opacity to hide a
+       shorter card's gaps, and a card that quietly resized itself per
+       point.body's length is what let a taller card behind it peek out
+       around/through a shorter one on top. overflow: hidden is a safety
+       net for the longest body copy, not a load-bearing crop. */
+    height: clamp(360px, 50vh, 420px);
+    overflow: hidden;
+    background: var(--surface-card-light);
+    border: 1px solid var(--rule-on-light);
+    border-radius: var(--r-lg);
+    padding: var(--sp-6) var(--sp-5);
+    box-shadow: var(--shadow-soft);
+    /* pan-y (not none/auto) — the browser keeps handling vertical scroll
+       natively so scrolling the page still works everywhere on the card,
+       but leaves horizontal gestures free for onCardSwipeMove in home.ts
+       instead of trying to pan the page sideways too. */
+    touch-action: pan-y;
+    cursor: grab;
+  }
+
+  .hook-card:active {
+    cursor: grabbing;
+  }
+
+  /* Specificity bump for the same reason as .hook-card above — the base
+     rule's min-height: 160px doesn't get silently overridden the way a
+     plain property would, but resetting it to 0 here removes any ambiguity
+     about which value actually governs the box. */
+  .hook-viewport .hook-image-placeholder {
+    height: clamp(130px, 20vh, 170px);
+    min-height: 0;
+  }
+
+  /* A normal flow item now (not absolutely positioned) — that's what lets
+     the 4px gap above be an exact, guaranteed distance from the stack
+     rather than a guess at the viewport's bottom edge. Not a prominent
+     progress control — no thumb-on-a-rail — just a small, quiet drag
+     handle with its own small fill: an "you can swipe this" easter egg
+     rather than something meant to announce itself. A little extra margin
+     on top of the stack's own 4px gap so it doesn't read as glued to the
+     card underneath it. */
+  .hook-scrubber {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    width: 28px;
+    margin-top: var(--sp-2);
+    /* Fades in/out with the cards themselves (scrubberVisibility in
+       home.ts) — there's nothing to scrub through before they've arrived
+       or once the last one has finished exiting. */
+    transition: opacity 120ms linear;
+    /* A drag/tap target around the thin visible bar — height lives here,
+       not on the bar itself, so the project's global box-sizing: border-box
+       reset can't collapse the visible bar the way it did when height and
+       padding fought over the same box. */
+    height: 24px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .hook-scrubber:active {
+    cursor: grabbing;
+  }
+}
+
+.hook-scrubber-bar {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--ink) 14%, transparent);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hook-scrubber-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--oxblood);
+  border-radius: inherit;
+  transition: width 120ms linear;
+}
+
 .hook-track {
   position: relative;
   width: 100%;
   flex: 1;
   min-height: 0;
+  /* Fades in once the heading finishes typing (cardsOpacity in home.ts) —
+     same frame-smoothing trick as the heading's clip-path transition. */
+  transition: opacity 60ms linear;
 }
 
 .hook-pin.is-horizontal .hook-viewport {
@@ -426,6 +657,10 @@
   .hook-pin.is-horizontal .hook-copy {
     flex: 1;
     min-width: 0;
+    /* Same frame-smoothing as the heading's own clip-path reveal — the
+       wipe itself is driven every scroll frame by cardInfoClipPath, this
+       just keeps it from stepping between rAF ticks. */
+    transition: clip-path 60ms linear;
   }
 
   .hook-pin.is-horizontal .hook-copy h3 {
@@ -466,20 +701,15 @@
 /* ---------- root map · diseases & categories ---------- */
 /* Same ivory canvas as every other section (--canvas-descent-*) — no dark
    panel inversion. Oxblood/ink carry the tone here instead. */
-.root-map-scene {
-  /* Tighter at the top than the bottom — the hook already trails off with
-     its own spacing, so stacking a full section padding on top of that
-     read as excess dead space at the boundary. */
-  padding-block: clamp(var(--sp-2), 1vw, var(--sp-4)) clamp(var(--sp-10), 6vw, var(--sp-16));
-}
+/* No override — uses .scene's fixed padding-block, same as every other
+   section, so the hook-to-root-map gap matches every other section gap. */
 
 /* The heading now lives inside app-root-map itself, as a sticky "lead" card
    in the steps column — see root-map.ts. */
 
 /* ---------- programme · what step 1 covers ---------- */
-.programme {
-  padding-block: clamp(var(--sp-10), 6vw, var(--sp-20));
-}
+/* No override here either, for the same reason — one consistent margin
+   between every section on the page (see .scene). */
 
 .programme-grid {
   display: grid;
@@ -617,3 +847,63 @@
   line-height: 1.45;
   color: var(--oxblood);
 }
+
+/* Mobile: this section has no scroll-linked reveal to fill space for it —
+   it's a plain stacked block, so every bit of top/bottom padding and
+   inter-block gap reads as literal dead air while scrolling past it on a
+   small screen. Tightened throughout rather than inheriting the desktop
+   two-column rhythm at 1x width. */
+@media (max-width: 899px) {
+  .programme {
+    padding-block: clamp(var(--sp-8), 10vw, var(--sp-12));
+  }
+
+  .programme-grid {
+    gap: var(--sp-6);
+  }
+
+  .programme-intro {
+    gap: var(--sp-3);
+  }
+
+  .programme-intro .t-display {
+    margin-top: var(--sp-1);
+  }
+
+  .programme-intro .cta-row {
+    margin-top: var(--sp-1);
+  }
+
+  .programme-card {
+    padding: var(--sp-6);
+  }
+
+  .programme-card h3 {
+    margin-top: var(--sp-3);
+  }
+
+  .programme-price {
+    margin-top: var(--sp-2);
+    font-size: 1.5rem;
+  }
+
+  .programme-objective {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-4);
+  }
+
+  .programme-list {
+    margin-top: var(--sp-4);
+  }
+
+  .programme-list li {
+    padding-block: var(--sp-2);
+    font-size: 0.88rem;
+  }
+
+  .programme-quote {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-4);
+  }
+}
+

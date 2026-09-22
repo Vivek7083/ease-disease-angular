@@ -82,6 +82,31 @@ const DESKTOP_BREAKPOINT = 900;
  */
 const BEAT_COUNT = 6;
 
+/** Beats 1-4's own headings, in order — used to build the lead heading's growing "answered" trail, and (desktop) the single active card's own heading. */
+const STEP_HEADINGS: readonly string[] = [
+  'It starts with what you feel.',
+  'Underneath, fewer things are going on.',
+  'One level deeper, the lines converge.',
+  'Bloating and skin flare-ups seem unrelated.',
+];
+
+/** Beats 1-4's own body copy, same order as STEP_HEADINGS. */
+const STEP_BODIES: readonly string[] = [
+  'Seven everyday complaints. Most people treat each one on its own — a cream for the skin, an antacid for the bloating, coffee for the fatigue.',
+  'Many symptoms share the same handful of processes. Inflammation, for one, can surface in the skin, the mood and the gut at once.',
+  'Seven symptoms trace back to four places where problems often begin — and most of those paths pass through the gut.',
+  "Follow both down and they meet at gut imbalance. That shared root is why treating the skin on its own so often doesn't last.",
+];
+
+/**
+ * Desktop only: the scroll budget (in vh) for the pinned heading+active-card
+ * unit — five "beats" (the master heading settling in, then each of the
+ * four narration cards taking its turn) at a comfortable ~70vh of dwell
+ * time apiece, enough room to actually read a card before it crossfades
+ * into the next one.
+ */
+const NARRATION_PIN_VH = 340;
+
 /**
  * The interactive root map — symptoms trace down through underlying
  * patterns to the handful of root causes the rest of the page argues for.
@@ -94,41 +119,94 @@ const BEAT_COUNT = 6;
   template: `
     <div class="root-map-grid">
       <div class="root-map-scroll-group">
-      <div class="root-map-narration" #narrationContainer>
-        <div class="root-map-step root-map-step--lead" [class.active]="activeStep() === 0">
-          <app-eyebrow-label text="Where it often starts" />
-          <h2 id="root-map-heading" class="root-map-heading">Different symptoms often grow from the same roots.</h2>
+      @if (isDesktop()) {
+        <!-- Desktop: ONE pinned viewport owns the whole heading+active-card
+             unit — the same proven pin technique the hook section already
+             uses, and the same one .root-map-wrap (the mind-map column)
+             already uses successfully right next to this. Earlier attempts
+             kept the heading sticky/fixed while separate sibling cards
+             scrolled past it in normal flow underneath — that's the "one
+             sticky element plus a later normal-flow sibling competing for
+             the same reserved space" pattern that kept overlapping no
+             matter how it was tuned. With only ONE sticky element and no
+             siblings inside its own pin, there's nothing left to compete
+             with — which card is showing is just conditional content
+             switching inside that one box, not separate boxes taking
+             each other's place. -->
+        <div class="root-map-narration-pin" #narrationPin [style.height.vh]="narrationPinVh">
+          <div class="root-map-narration-viewport">
+            <div class="root-map-step root-map-step--lead">
+              <app-eyebrow-label text="Where it often starts" />
+              <h2 id="root-map-heading" class="root-map-heading">Different symptoms often grow from the same roots.</h2>
+              <ul class="root-map-done-trail">
+                @for (heading of stepHeadings; track heading; let i = $index) {
+                  <li [class.is-shown]="i < activeStep() - 1">{{ heading }}</li>
+                }
+              </ul>
+            </div>
+            <!-- All four cards are always in the DOM, stacked in the same
+                 CSS grid cell (so the container auto-sizes to whichever is
+                 tallest) and crossfaded via opacity/transform — swapping
+                 which one is active used to unmount/remount the h3+p
+                 outright (@if), which is what made the transition read as
+                 an abrupt jump-cut instead of a scroll-driven reveal. -->
+            <div class="root-map-active-card">
+              @for (heading of stepHeadings; track heading; let i = $index) {
+                <div class="root-map-active-card-item" [class.is-active]="activeStep() === i + 1">
+                  <h3>{{ heading }}</h3>
+                  <p>{{ stepBodies[i] }}</p>
+                </div>
+              }
+            </div>
+          </div>
         </div>
-        <article class="root-map-step" [class.active]="activeStep() === 1">
-          <h3>It starts with what you feel.</h3>
-          <p>Seven everyday complaints. Most people treat each one on its own — a cream for the skin, an antacid for the bloating, coffee for the fatigue.</p>
-        </article>
-        <article class="root-map-step" [class.active]="activeStep() === 2">
-          <h3>Underneath, fewer things are going on.</h3>
-          <p>Many symptoms share the same handful of processes. Inflammation, for one, can surface in the skin, the mood and the gut at once.</p>
-        </article>
-        <article class="root-map-step" [class.active]="activeStep() === 3">
-          <h3>One level deeper, the lines converge.</h3>
-          <p>Seven symptoms trace back to four places where problems often begin — and most of those paths pass through the gut.</p>
-        </article>
-        <article class="root-map-step root-map-step--raise" [class.active]="activeStep() === 4">
-          <h3>Bloating and skin flare-ups seem unrelated.</h3>
-          <p>Follow both down and they meet at gut imbalance. That shared root is why treating the skin on its own so often doesn't last.</p>
-        </article>
-      </div>
+      } @else {
+        <!-- Mobile: plain normal-flow column, no pin — a fixed-height
+             sticky/pinned box here has a long history in this component of
+             overflowing or fighting the narration around it (see the
+             .root-map-wrap comments below), and a phone screen has no
+             spare width for a heading to sit beside anything anyway. -->
+        <div class="root-map-narration" #narrationContainer>
+          <div class="root-map-step root-map-step--lead">
+            <app-eyebrow-label text="Where it often starts" />
+            <h2 id="root-map-heading" class="root-map-heading">Different symptoms often grow from the same roots.</h2>
+            <ul class="root-map-done-trail">
+              @for (heading of stepHeadings; track heading; let i = $index) {
+                <li [class.is-shown]="i < activeStep() - 1">{{ heading }}</li>
+              }
+            </ul>
+          </div>
+          @for (heading of stepHeadings; track heading; let i = $index) {
+            <!-- Content always rendered (not @if-gated) so the existing
+                 opacity transition below actually gets to fade the text in
+                 and out, instead of it popping in the instant the fade
+                 finishes. -->
+            <article class="root-map-step root-map-narration-card" [class.active]="activeStep() === i + 1">
+              <h3>{{ heading }}</h3>
+              <p>{{ stepBodies[i] }}</p>
+            </article>
+          }
+        </div>
+      }
 
       <div class="root-map-wrap">
         <div class="root-map" [class.focus]="focusSet().size > 0" #mapBox>
           <svg class="root-map-links" #linksSvg aria-hidden="true">
             @for (link of links; track link.from + '>' + link.to; let i = $index) {
-              <path pathLength="1" [attr.d]="pathData()[i] ?? ''" [class.visible]="isLinkVisible(link)" [class.lit]="isLinkLit(link)" />
+              <path
+                pathLength="1"
+                [attr.d]="pathData()[i] ?? ''"
+                [class.visible]="isLinkVisible(link)"
+                [class.lit]="isLinkLit(link)"
+                [class.kind-rt]="link.kind === 'rt'"
+              />
             }
           </svg>
 
           <div class="root-map-layer">
             <p class="root-map-layer-label">What you feel</p>
-            <div class="root-map-nodes">
-              @for (node of symptoms; track node.id) {
+            <div class="root-map-nodes" (pointerdown)="dismissHint()">
+              @for (node of symptoms; track node.id; let i = $index) {
                 <button
                   type="button"
                   class="root-map-node"
@@ -139,13 +217,23 @@ const BEAT_COUNT = 6;
                   (click)="toggleSymptom(node.id)"
                 >
                   {{ node.label }}
+                  <!-- A one-time simulated tap on the first pill — the only
+                       hint that these are tappable at all. Dismisses itself
+                       once its animation finishes, or the instant the reader
+                       actually touches/clicks anything in this row. -->
+                  @if (i === 0 && showClickHint() && !reducedMotion()) {
+                    <span class="click-hint" aria-hidden="true">
+                      <span class="click-hint-ripple"></span>
+                      <span class="click-hint-dot" (animationend)="dismissHint()"></span>
+                    </span>
+                  }
                 </button>
               }
             </div>
           </div>
 
           <div class="root-map-layer" [class.layer-hidden]="!showConditions()">
-            <p class="root-map-layer-label">What's really going on</p>
+            <p class="root-map-layer-label root-map-layer-label--conditions">What's really going on</p>
             <div class="root-map-nodes">
               @for (node of conditions; track node.id) {
                 <span class="root-map-node root-map-node--static" [attr.data-id]="node.id" [class.lit]="isLit(node.id)">{{ node.label }}</span>
@@ -154,7 +242,7 @@ const BEAT_COUNT = 6;
           </div>
 
           <div class="root-map-layer" [class.layer-hidden]="!showRoots()">
-            <p class="root-map-layer-label">Where it often starts</p>
+            <p class="root-map-layer-label root-map-layer-label--roots">Where it often starts</p>
             <div class="root-map-nodes">
               @for (node of roots; track node.id) {
                 <span class="root-map-node root-map-node--root" [attr.data-id]="node.id" [class.lit]="isLit(node.id)">{{ node.label }}</span>
@@ -231,7 +319,7 @@ const BEAT_COUNT = 6;
         gap: var(--sp-12);
         align-items: start;
       }
-      .root-map-narration {
+      .root-map-narration-pin {
         grid-column: 1;
         grid-row: 1;
       }
@@ -305,9 +393,17 @@ const BEAT_COUNT = 6;
       stroke-dashoffset: 0;
     }
 
+    /* Colored by which layer the link is arriving at, not which it leaves —
+       symptom→condition traces end in olive, condition→root traces end in
+       burgundy, echoing the same terracotta/olive/oxblood layering the
+       nodes themselves use below. */
     .root-map-links path.lit {
-      stroke: var(--terracotta);
+      stroke: var(--olive);
       stroke-width: 2.2;
+    }
+
+    .root-map-links path.lit.kind-rt {
+      stroke: var(--oxblood);
     }
 
     .root-map.focus .root-map-links path.visible:not(.lit) {
@@ -341,6 +437,17 @@ const BEAT_COUNT = 6;
       color: var(--text-quiet-light);
     }
 
+    /* Each layer caption picks up a whisper of its own layer's color
+       (olive/burgundy), matching the nodes and links beneath it — just
+       enough to read as a hint of that layer's identity, not a loud label. */
+    .root-map-layer-label--conditions {
+      color: color-mix(in oklab, var(--olive) 55%, var(--text-quiet-light));
+    }
+
+    .root-map-layer-label--roots {
+      color: color-mix(in oklab, var(--oxblood) 55%, var(--text-quiet-light));
+    }
+
     .root-map-nodes {
       display: flex;
       flex-wrap: wrap;
@@ -349,6 +456,7 @@ const BEAT_COUNT = 6;
     }
 
     .root-map-node {
+      position: relative;
       display: inline-flex;
       align-items: center;
       min-height: 38px;
@@ -367,6 +475,77 @@ const BEAT_COUNT = 6;
         opacity var(--dur-base) var(--ease);
     }
 
+    /* One-time simulated tap on the first pill — approaches, presses down
+       (a ripple confirms the "click"), then fades for good. Dismissed on
+       animation end or the instant the reader touches/clicks anything in
+       the row (see dismissHint in root-map.ts). */
+    .click-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .click-hint-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--oxblood);
+      animation: click-hint-press 2.4s var(--ease-out-soft) both;
+    }
+    .click-hint-ripple {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1.5px solid var(--oxblood);
+      animation: click-hint-ripple 2.4s var(--ease-out-soft) both;
+    }
+    @keyframes click-hint-press {
+      0% {
+        transform: translateY(-16px) scale(1);
+        opacity: 0;
+      }
+      20% {
+        opacity: 0.9;
+      }
+      40% {
+        transform: translateY(-16px) scale(1);
+        opacity: 0.9;
+      }
+      55% {
+        transform: translateY(0) scale(1);
+        opacity: 0.9;
+      }
+      65% {
+        transform: translateY(0) scale(0.6);
+        opacity: 0.9;
+      }
+      78% {
+        transform: translateY(0) scale(1);
+        opacity: 0.9;
+      }
+      100% {
+        transform: translateY(0) scale(1);
+        opacity: 0;
+      }
+    }
+    @keyframes click-hint-ripple {
+      0%,
+      58% {
+        opacity: 0;
+        transform: scale(0.6);
+      }
+      65% {
+        opacity: 0.5;
+      }
+      100% {
+        opacity: 0;
+        transform: scale(3.2);
+      }
+    }
+
     button.root-map-node {
       cursor: pointer;
       min-height: 44px;
@@ -374,6 +553,13 @@ const BEAT_COUNT = 6;
 
     button.root-map-node:hover {
       border-color: var(--oxblood);
+    }
+
+    /* Conditions layer — the middle "what's really going on" row — carries
+       its own olive tint even at rest, so the three layers read as three
+       distinct depths rather than one repeated style. */
+    .root-map-node--static {
+      border-color: color-mix(in oklab, var(--olive) 40%, transparent);
     }
 
     .root-map-node--root {
@@ -384,10 +570,26 @@ const BEAT_COUNT = 6;
       border-color: color-mix(in oklab, var(--oxblood) 45%, transparent);
     }
 
+    /* Default (symptoms layer, the buttons) lights up terracotta — the
+       warmest, most immediate tone, for the layer the reader interacts
+       with directly. */
     .root-map-node.lit {
       background: var(--terracotta);
       border-color: var(--terracotta);
       color: var(--ivory);
+    }
+
+    /* Conditions and roots each light up in their own layer color instead
+       of all three converging on the same terracotta — olive for the
+       processes underneath, burgundy for the roots underneath that. */
+    .root-map-node--static.lit {
+      background: var(--olive);
+      border-color: var(--olive);
+    }
+
+    .root-map-node--root.lit {
+      background: var(--oxblood);
+      border-color: var(--oxblood);
     }
 
     .root-map-node.selected {
@@ -416,28 +618,166 @@ const BEAT_COUNT = 6;
       }
     }
 
+    /* Mobile only (the un-pinned plain column — see the template's
+       @if (isDesktop())). */
     .root-map-narration {
       position: relative;
       z-index: 1;
     }
 
-    /* The heading is just the first card in the same scrolling sequence as
-       the narration below it — no sticky pin, no background card behind
-       it — it fades in and out with scroll exactly like every other step. */
-    .root-map-step--lead {
-      max-width: 46ch;
+    /* Desktop only — the pinned heading+active-card unit. Same shape as
+       .hook-pin/.hook-viewport in home.scss and .root-map-wrap right next
+       to this: a tall pin whose own height is nothing but scroll budget,
+       holding ONE sticky viewport. That's the whole fix over the earlier
+       version — there is nothing else inside .root-map-narration-pin for
+       the sticky viewport to conflict with, so there's no "later sibling"
+       for it to lose a stacking fight against. */
+    .root-map-narration-pin {
+      position: relative;
+      z-index: 1;
     }
 
-    .root-map-heading {
-      margin-top: var(--sp-3);
+    .root-map-narration-viewport {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-block: var(--sp-8);
+    }
+
+    /* The card currently taking its turn — deliberately NOT reusing
+       .root-map-step here: that class's min-height/opacity dimming exists
+       for mobile's stack of separate, individually-scrolling cards, which
+       has no equivalent concept here (this is the only card on screen,
+       vertically centered by .root-map-narration-viewport itself).
+       display:grid with every item placed in the same cell (below) stacks
+       all four on top of each other and auto-sizes the container to
+       whichever is tallest — no fixed/guessed height needed for the
+       crossfade to work. */
+    .root-map-active-card {
+      display: grid;
+      margin-top: var(--sp-10);
+    }
+
+    .root-map-active-card-item {
+      grid-area: 1 / 1;
+      opacity: 0;
+      transform: translateY(16px);
+      pointer-events: none;
+      transition:
+        opacity var(--dur-scene) var(--ease-out-soft),
+        transform var(--dur-scene) var(--ease-out-soft);
+    }
+
+    .root-map-active-card-item.is-active {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
+
+    .root-map-active-card-item h3 {
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(1.9rem, 1.4rem + 2vw, 2.6rem);
+      font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.1rem);
       line-height: 1.15;
       color: var(--ink);
-      max-width: 16ch;
+      max-width: 18ch;
     }
 
+    .root-map-active-card-item p {
+      margin-top: var(--sp-4);
+      color: var(--text-quiet-light);
+      line-height: var(--lh-body);
+      max-width: 42ch;
+    }
+
+    /* .root-map-step (below) gives .root-map-step--lead a 70vh min-height
+       at >=900px too, sized for when it was one of several full-height
+       siblings taking turns in normal flow. Inside the new pinned viewport
+       it's sharing a single 100vh box with the active card, so that same
+       70vh would force the two to fight over — and likely overflow — the
+       box's real height. Cancelled specifically for this context only;
+       mobile's .root-map-step--lead (inside plain .root-map-narration) is
+       untouched. */
+    .root-map-narration-viewport .root-map-step--lead {
+      min-height: 0;
+    }
+
+    /* A plain, normal-flow block — always fully legible (never fades like
+       the narration cards below it), but no longer pinned/sticky in any
+       way. Both CSS position:sticky and a hand-rolled JS position:fixed pin
+       were tried here and both still let this heading's text visibly
+       overlap the active narration card below it in this particular grid +
+       display:contents layout, so the "stays in place while scrolling"
+       behaviour was dropped entirely — a plain block-flow sibling can never
+       overlap another one, which is what actually guarantees this can't
+       recur. */
+    .root-map-step--lead {
+      opacity: 1;
+      padding-bottom: var(--sp-6);
+    }
+
+    /* Noticeably smaller than before, and no longer force-wrapped onto
+       three lines (that max-width was most of why this heading dominated
+       the whole screen) — it still reads as the section's title, just
+       without eating the space the active card underneath needs. */
+    .root-map-heading {
+      margin-top: var(--sp-2);
+      font-family: var(--font-display);
+      font-weight: 400;
+      font-size: clamp(1.4rem, 1.1rem + 1.2vw, 1.9rem);
+      line-height: 1.2;
+      color: var(--ink);
+      max-width: 30ch;
+    }
+
+    /* The "answered" trail lives INSIDE the sticky lead box itself (a
+       sticky element simply growing its own content as more lines are
+       added is ordinary, safe behaviour in theory) — but ALL FOUR slots
+       are always present, reserving their final space from the very first
+       frame, and only fade in as each beat is passed. A sticky box that
+       changes its OWN height while it's already stuck does not reliably
+       push the following siblings down in every layout — this one has a
+       CSS grid ancestor with a display:contents wrapper in between, which
+       is exactly the combination that can silently fail to do that — so
+       the box's total height simply never changes at all, sidestepping
+       the whole class of bug rather than depending on that recalculation.
+       Putting this same text in a *sibling* that shrinks down next to the
+       sticky box (an earlier version of this) hit the same failure from
+       the other direction. */
+    .root-map-done-trail {
+      margin: var(--sp-3) 0 0;
+      padding: var(--sp-3) 0 0;
+      border-top: 1px solid var(--rule-on-light);
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-2);
+    }
+
+    .root-map-done-trail li {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: color-mix(in oklab, var(--ink) 60%, transparent);
+      opacity: 0;
+      transform: translateY(-4px);
+      transition:
+        opacity var(--dur-base) var(--ease),
+        transform var(--dur-base) var(--ease);
+    }
+
+    .root-map-done-trail li.is-shown {
+      opacity: 1;
+      transform: none;
+    }
+
+    /* Each narration "slot" reserves the same fixed scroll distance
+       regardless of state (mobile: this is a plain block, not pinned — see
+       .root-map-narration above), so there's nothing here that can
+       grow/shrink/overlap. */
     .root-map-step {
       min-height: 56vh;
       display: flex;
@@ -445,6 +785,22 @@ const BEAT_COUNT = 6;
       justify-content: center;
       opacity: 0.4;
       transition: opacity var(--dur-base) var(--ease);
+    }
+
+    /* Mobile only — a touch of rise alongside the existing opacity fade, so
+       the card reads as scrolling/settling into place rather than just
+       dimming up in position. Scoped to a dedicated class (not the base
+       .root-map-step rule) so it doesn't also apply to the lead heading or
+       the closing card, neither of which should ever sit offset. */
+    .root-map-narration-card {
+      transform: translateY(14px);
+      transition:
+        opacity var(--dur-base) var(--ease),
+        transform var(--dur-base) var(--ease);
+    }
+
+    .root-map-narration-card.active {
+      transform: none;
     }
 
     @media (min-width: 900px) {
@@ -604,7 +960,10 @@ const BEAT_COUNT = 6;
       .root-map-links path,
       .root-map-layer,
       .root-map-node,
-      .root-map-step {
+      .root-map-step,
+      .root-map-narration-card,
+      .root-map-active-card-item,
+      .root-map-done-trail li {
         transition: none;
       }
     }
@@ -617,6 +976,32 @@ export class RootMap implements AfterViewInit {
   protected readonly conditions = CONDITIONS;
   protected readonly roots = ROOTS;
 
+  protected readonly showClickHint = signal(true);
+  protected readonly reducedMotion = signal(this.readReducedMotion());
+
+  protected dismissHint(): void {
+    this.showClickHint.set(false);
+  }
+
+  private readReducedMotion(): boolean {
+    return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  constructor() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onMotionChange = () => this.reducedMotion.set(motionQuery.matches);
+    motionQuery.addEventListener('change', onMotionChange);
+    this.destroyRef.onDestroy(() => motionQuery.removeEventListener('change', onMotionChange));
+
+    // Fallback in case `animationend` never fires — the hint is a one-time
+    // nudge, not something that should linger indefinitely either way.
+    const dismissTimer = window.setTimeout(() => this.dismissHint(), 2600);
+    this.destroyRef.onDestroy(() => window.clearTimeout(dismissTimer));
+  }
+
   protected readonly links: readonly MapLink[] = [
     ...Object.entries(SYMPTOM_TO_CONDITION).flatMap(([from, tos]) => tos.map((to) => ({ from, to, kind: 'sr' as const }))),
     ...Object.entries(CONDITION_TO_ROOT).flatMap(([from, tos]) => tos.map((to) => ({ from, to, kind: 'rt' as const }))),
@@ -626,6 +1011,11 @@ export class RootMap implements AfterViewInit {
 
   protected readonly selected = signal<ReadonlySet<string>>(new Set());
   protected readonly activeStep = signal(0);
+
+  /** The four narration beats' own headings — rendered inside the lead heading's trail, each revealed once its beat is passed. */
+  protected readonly stepHeadings = STEP_HEADINGS;
+  protected readonly stepBodies = STEP_BODIES;
+  protected readonly narrationPinVh = NARRATION_PIN_VH;
 
   // Desktop syncs the reveal to the narration scrolling past the sticky
   // map. Mobile has no sticky map to sync against any more (a fixed-height
@@ -688,7 +1078,10 @@ export class RootMap implements AfterViewInit {
 
   private readonly mapBox = viewChild<ElementRef<HTMLElement>>('mapBox');
   private readonly linksSvg = viewChild<ElementRef<SVGSVGElement>>('linksSvg');
+  /** Mobile only — the plain, un-pinned narration column. */
   private readonly narrationContainer = viewChild<ElementRef<HTMLElement>>('narrationContainer');
+  /** Desktop only — the pinned heading+active-card unit (see updateActiveStep). */
+  private readonly narrationPin = viewChild<ElementRef<HTMLElement>>('narrationPin');
   private readonly lastContainer = viewChild<ElementRef<HTMLElement>>('lastContainer');
 
   protected readonly pathData = signal<readonly string[]>([]);
@@ -709,6 +1102,7 @@ export class RootMap implements AfterViewInit {
   }
 
   protected toggleSymptom(id: string): void {
+    this.dismissHint();
     const next = new Set(this.selected());
     if (next.has(id)) {
       next.delete(id);
@@ -834,40 +1228,75 @@ export class RootMap implements AfterViewInit {
   }
 
   /**
-   * Which "beat" is active is driven by how far the activation line has
-   * moved through narration + the closing card *combined, as a whole*
-   * (a single measurement spanning both), rather than by testing each
-   * card's own top individually — if any one card renders shorter than its
-   * neighbours, per-card testing can jump straight past several activation
-   * thresholds in one scroll frame, which reads like everything happening
-   * at once. Dividing one continuous progress value evenly across all six
-   * beats (heading, four narration cards, closing card) can't skip one
-   * regardless of any individual card's size. This still drives the
-   * narration cards' own active/inactive fade at every breakpoint — only
-   * the map's reveal (see showConditions/showRoots) is desktop-only.
+   * Which "beat" is active — computed completely differently per
+   * breakpoint, because the two use genuinely different DOM structures now
+   * (see the template's @if (isDesktop())).
+   *
+   * Desktop: the heading+active-card unit lives inside ONE pinned viewport
+   * (.root-map-narration-pin), the same technique as the hook section's own
+   * pin — so "which beat" is just that pin's own scroll progress (0..1)
+   * split into 5 equal shares (the lead settling in, then each of the 4
+   * cards), plus a beat 5 once the pin has fully released and the separate
+   * closing card comes into view. This replaced an earlier version that
+   * measured each narration card's own live position individually while
+   * they scrolled past a sticky heading as separate siblings — that
+   * approach could never reliably keep the heading stacked above them (see
+   * the git history for this file if curious), so there's no per-card
+   * measurement left to get wrong.
+   *
+   * Mobile: unchanged from before — narration is a plain, un-pinned column,
+   * so a single progress fraction spanning narration+closing, divided
+   * evenly across all six beats, tracks the activation line crossing each
+   * card accurately (mobile's cards are all the same height, so an even
+   * 1/6th split lines up with reality).
    */
   private updateActiveStep(): void {
-    const narrationEl = this.narrationContainer()?.nativeElement;
-    if (!narrationEl || narrationEl.clientHeight === 0) {
-      return;
-    }
     const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
     if (isDesktop !== this.isDesktop()) {
       this.isDesktop.set(isDesktop);
     }
-    const line = window.innerHeight * (isDesktop ? STEP_ACTIVATION_LINE_DESKTOP : STEP_ACTIVATION_LINE_MOBILE);
 
-    const narrationRect = narrationEl.getBoundingClientRect();
-    const top = narrationRect.top;
-    const lastRect = this.lastContainer()?.nativeElement.getBoundingClientRect();
-    const bottom = lastRect ? lastRect.bottom : narrationRect.bottom;
+    let active: number;
+    if (isDesktop) {
+      const pinEl = this.narrationPin()?.nativeElement;
+      if (!pinEl) {
+        return;
+      }
+      const viewportHeight = window.innerHeight;
+      const rect = pinEl.getBoundingClientRect();
 
-    const progress = Math.max(0, Math.min(1, (line - top) / (bottom - top)));
-    const active = Math.min(BEAT_COUNT - 1, Math.floor(progress * BEAT_COUNT));
+      if (rect.top > 0) {
+        active = 0;
+      } else if (rect.bottom <= viewportHeight) {
+        const line = viewportHeight * STEP_ACTIVATION_LINE_DESKTOP;
+        const lastRect = this.lastContainer()?.nativeElement.getBoundingClientRect();
+        active = lastRect && lastRect.top <= line ? BEAT_COUNT - 1 : BEAT_COUNT - 2;
+      } else {
+        const scrollable = rect.height - viewportHeight;
+        const progress = scrollable > 0 ? clamp01(-rect.top / scrollable) : 0;
+        active = Math.min(BEAT_COUNT - 2, Math.floor(progress * (BEAT_COUNT - 1)));
+      }
+    } else {
+      const narrationEl = this.narrationContainer()?.nativeElement;
+      if (!narrationEl || narrationEl.clientHeight === 0) {
+        return;
+      }
+      const line = window.innerHeight * STEP_ACTIVATION_LINE_MOBILE;
+      const narrationRect = narrationEl.getBoundingClientRect();
+      const top = narrationRect.top;
+      const lastRect = this.lastContainer()?.nativeElement.getBoundingClientRect();
+      const bottom = lastRect ? lastRect.bottom : narrationRect.bottom;
+      const progress = Math.max(0, Math.min(1, (line - top) / (bottom - top)));
+      active = Math.min(BEAT_COUNT - 1, Math.floor(progress * BEAT_COUNT));
+    }
 
     if (active !== this.activeStep()) {
       this.activeStep.set(active);
       this.queueLayout();
     }
   }
+}
+
+function clamp01(value: number): number {
+  return Math.max(0, Math.min(1, value));
 }
