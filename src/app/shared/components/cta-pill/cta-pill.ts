@@ -332,7 +332,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
         flex-wrap: nowrap;
         justify-content: center;
         gap: 0;
-        padding: var(--sp-2) 2px;
+        padding: var(--sp-2);
         text-align: center;
         transition: padding-inline 260ms var(--ease-out-soft);
       }

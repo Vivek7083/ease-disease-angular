@@ -556,24 +556,24 @@ export class Home implements AfterViewInit {
 
   protected readonly hookPoints: readonly HookPoint[] = [
     {
-      title: 'What your doctors will not tell you',
-      body: "A 10-minute visit is built to treat what's in front of them, not to ask why it's there in the first place. That question is where root-cause work starts.",
-      icon: 'doctor',
-    },
-    {
-      title: 'Conventional care vs. root-cause care',
-      body: 'Conventional care quiets the symptom. Root-cause care asks what is producing it — and treats that instead.',
+      title: 'What is functional medicine?',
+      body: 'We nourish the roots, not the leaves. Food as medicine first, supplements only when truly needed.',
       icon: 'root',
     },
     {
       title: 'What you will not get from an AI chat',
-      body: 'A generic chatbot can describe a condition. It cannot read your bloodwork, your history and your life against each other the way a trained practitioner can.',
+      body: "AI gives generic answers. It can't read your history, labs and symptoms like a clinician actually looking at you can.",
       icon: 'ai',
     },
     {
-      title: 'Root-cause treatment vs. symptom management',
-      body: 'Root-cause treatment goes after what is driving the pattern. Symptom management just quiets it down. Once you see the difference, the rest of this page will make a lot more sense.',
+      title: 'Why root-cause healing?',
+      body: 'Conventional care asks "what stops this now?" Root-cause care asks "why did this start?" That\'s why it doesn\'t come back.',
       icon: 'balance',
+    },
+    {
+      title: 'Why not just another consultation?',
+      body: "A 10–15 minute appointment treats the symptom, with no time to ask why it showed up. That's the gap root-cause care closes.",
+      icon: 'doctor',
     },
   ];
 

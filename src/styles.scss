@@ -18,13 +18,16 @@ html {
   /* The scroll-progress rail (right-middle chrome) replaces the browser's
      own scrollbar as the scroll affordance. */
   scrollbar-width: none;
-  /* Decorative fixed layers (.ambient-field in app.scss) are deliberately
-     oversized via negative inset + a drift animation so their blur edges
-     never show. Some mobile browser engines still count an oversized fixed
-     element toward the page's scrollable area, producing a horizontal
-     scrollbar nothing on this page is meant to have — block it at the root
-     rather than chase it per element. */
-  overflow-x: hidden;
+  /* Horizontal-scroll guard lives on `body` only (below), not here — setting
+     overflow-x on BOTH html and body turns each into its own independent
+     scroll container (the UA auto-pairs the unset overflow-y to `auto` on
+     each), which breaks every `position: sticky` element on the page (the
+     Hook section's pinned scrollytelling track among them): sticky then
+     resolves against body's box, which never itself fires a scroll event,
+     instead of the real viewport. Leaving html's overflow at its default
+     `visible` lets body's own overflow-x propagate up to the viewport
+     instead, which still blocks horizontal scroll without creating that
+     second scroll container. */
 }
 
 html::-webkit-scrollbar {
@@ -39,6 +42,13 @@ body {
   font-size: var(--fs-body-m);
   line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
+  /* Decorative fixed layers (.ambient-field in app.scss) are deliberately
+     oversized via negative inset + a drift animation so their blur edges
+     never show. Some mobile browser engines still count an oversized fixed
+     element toward the page's scrollable area, producing a horizontal
+     scrollbar nothing on this page is meant to have — block it here, where
+     it propagates to the viewport, rather than on `html` directly (see the
+     comment there) or chasing it per element. */
   overflow-x: hidden;
 }
 
