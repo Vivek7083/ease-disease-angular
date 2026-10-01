@@ -1,0 +1,28 @@
+<div class="results-intro reveal" [appScrollReveal]="0">
+  <app-eyebrow-label text="After the work" />
+  <h2 id="results-heading" class="t-display">What changes when the cause is found.</h2>
+  <p class="t-body lede">
+    Not just a quieter symptom. A body that is getting what it needs, and a person who knows how to keep it that way.
+  </p>
+</div>
+
+<ul class="results-list">
+  @for (outcome of outcomes; track outcome.title; let i = $index) {
+    <li class="results-item reveal" [appScrollReveal]="(i % 2) * 90">
+      <span class="results-num" aria-hidden="true">{{ '0' + (i + 1) }}</span>
+      <h3 class="results-title">{{ outcome.title }}</h3>
+      <p class="results-body">{{ outcome.body }}</p>
+    </li>
+  }
+</ul>
+
+<figure class="results-quote reveal" [appScrollReveal]="0" [attr.data-placeholder]="testimonial.isPlaceholder ? 'true' : null">
+  <span class="results-quote-mark" aria-hidden="true">&ldquo;</span>
+  <blockquote>
+    <p>{{ testimonial.quote }}</p>
+  </blockquote>
+  <figcaption>
+    <span class="results-quote-name">{{ testimonial.name }}</span>
+    <span class="results-quote-context">{{ testimonial.context }}</span>
+  </figcaption>
+</figure>

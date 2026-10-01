@@ -14,8 +14,12 @@
 /* treat — #F4E9DA → a touch warmer, a quiet step toward descent */
 --canvas-treat-from:var(--canvas-hook-to);
 --canvas-treat-to:color-mix(in oklab,var(--ivory) 20%,var(--parchment));
-/* descent — treat-to → parchment. The dark beat is a deep panel ON this canvas. */
---canvas-descent-from:var(--canvas-treat-to);
+/* results — treat-to → a step closer to parchment. Threaded between treat and
+   the root map so the crossfade doesn't jump. */
+--canvas-results-from:var(--canvas-treat-to);
+--canvas-results-to:color-mix(in oklab,var(--ivory) 10%,var(--parchment));
+/* descent — results-to → parchment. The dark beat is a deep panel ON this canvas. */
+--canvas-descent-from:var(--canvas-results-to);
 --canvas-descent-to:var(--parchment);
 /* turn — parchment → #F0D5BB. The ember dawn as warmth, not as brightness. */
 --canvas-turn-from:var(--parchment);
@@ -36,6 +40,7 @@
 --canvas-hero-text:var(--ink);
 --canvas-hook-text:var(--ink);
 --canvas-treat-text:var(--ink);
+--canvas-results-text:var(--ink);
 --canvas-descent-text:var(--ink);
 --canvas-turn-text:var(--ink);
 --canvas-levels-text:var(--ink);
@@ -46,6 +51,7 @@
 --canvas-hero-body:1; /* @kind other */
 --canvas-hook-body:1; /* @kind other */
 --canvas-treat-body:1; /* @kind other */
+--canvas-results-body:1; /* @kind other */
 --canvas-descent-body:1; /* @kind other */
 --canvas-turn-body:1; /* @kind other */
 --canvas-levels-body:1; /* @kind other */

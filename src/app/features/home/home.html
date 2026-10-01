@@ -379,11 +379,21 @@
     }
   </section>
 
+  <!-- ============ RESULTS — how you feel after the work, plus the large
+       client quote (PRD §4 + §5). Plain stacked flow with a light
+       appScrollReveal, deliberately NOT pinned: it follows two pinned
+       sections and should read as a calmer beat. ============ -->
+  <section class="scene results" id="results" appCanvasStop from="var(--canvas-results-from)" to="var(--canvas-results-to)" aria-labelledby="results-heading">
+    <div class="scene-inner">
+      <app-results />
+    </div>
+  </section>
+
   <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
        symptom → condition → root-cause trace. Stays on the same ivory
        canvas as every other section — oxblood/ink carry the "seriousness"
        here, not an inverted dark panel. ============ -->
-  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
+  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
     <div class="scene-inner">
       <app-root-map (bookRequested)="bookConsultation()" />
     </div>

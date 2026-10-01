@@ -11,6 +11,7 @@ import { GutHub } from '../../shared/components/gut-hub/gut-hub';
 import { LevelCard, type Level } from '../../shared/components/level-card/level-card';
 import { TeamCard, type TeamMember } from '../../shared/components/team-card/team-card';
 import { RootMap } from '../../shared/components/root-map/root-map';
+import { Results } from '../../shared/components/results/results';
 
 interface RootCause {
   readonly name: string;
@@ -48,6 +49,7 @@ interface TreatStep {
     LevelCard,
     TeamCard,
     RootMap,
+    Results,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
