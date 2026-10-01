@@ -170,6 +170,11 @@
        once via appScrollReveal as it enters view (same primitive the rest
        of the site uses). ============ -->
   <section class="scene treat" id="treat" appCanvasStop from="var(--canvas-hook-to)" to="var(--canvas-treat-to)" aria-labelledby="treat-heading">
+    <!-- Both ng-templates below are declared once here but used by either
+         branch further down, including the desktop one that sits OUTSIDE
+         .scene-inner (see the comment on .treat-pin-desktop) — a template
+         reference variable is visible anywhere in this component's
+         template, not just inside the div it's declared in. -->
     <div class="scene-inner treat-inner">
       <!-- Shared between mobile (sits above the pin, in normal flow) and
            desktop (sits inside the sticky viewport, alongside the nodes —
@@ -257,59 +262,7 @@
         }
       </ng-template>
 
-      @if (treatHorizontal()) {
-        <!-- Desktop — all four steps laid out left to right. Each one
-             reveals in place (fades/rises up) as its turn in the scroll
-             comes around, and a line grows from its badge toward the
-             next one. Nothing fades back out: by the time the pin
-             releases, the whole 01→02→03→04 chain sits on screen as one
-             finished timeline. -->
-        <div class="treat-pin-desktop" #treatPinDesktop [style.height.vh]="treatSteps.length * treatDesktopVhPerStep">
-          <div class="treat-viewport-desktop">
-            <ng-container *ngTemplateOutlet="treatHeading" />
-            <div class="treat-timeline">
-              @for (step of treatSteps; track step.title; let i = $index) {
-                <div
-                  class="treat-node"
-                  [style.opacity]="treatNodeVisibility(i)"
-                  [style.transform]="treatNodeTransform(i)"
-                >
-                  <div class="treat-node-rail" aria-hidden="true">
-                    <span class="treat-node-badge">{{ '0' + (i + 1) }}</span>
-                    @if (i < treatSteps.length - 1) {
-                      <span class="treat-node-line" [style.transform]="'scaleX(' + treatNodeLineProgress(i) + ')'"></span>
-                    }
-                  </div>
-                  <div class="treat-node-copy">
-                    <h3 class="treat-node-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
-                    @let ctaSplit = i === 0 ? splitBodyAroundCta(step.bodyShort, '30-minute call') : null;
-                    <p class="treat-node-body">
-                      @if (ctaSplit) {
-                        {{ ctaSplit.before
-                        }}<button type="button" class="inline-cta" (click)="bookConsultation()">{{ ctaSplit.link }}</button
-                        >{{ ctaSplit.after }}
-                      } @else {
-                        {{ step.bodyShort }}
-                      }
-                    </p>
-                  </div>
-                  <div class="treat-node-visual">
-                    <!-- No extra frame drawn here — step 1's image already
-                         has its own window chrome (macOS traffic lights,
-                         call controls) baked in, and steps 2-4 carry a
-                         thin border already, so wrapping them in another
-                         frame would double up. -->
-                    <div class="treat-node-image" aria-hidden="true">
-                      <img [ngSrc]="treatDesktopImages[i].src" fill alt="" class="treat-node-img" />
-                    </div>
-                    <p class="sr-only">{{ treatDesktopImages[i].alt }}</p>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-      } @else {
+      @if (!treatHorizontal()) {
         <ng-container *ngTemplateOutlet="treatHeading" />
         <!-- Mobile — a pinned, scroll-scrubbed deck. Each step's content
              and illustration share one spot and cross-dissolve into the
@@ -361,6 +314,69 @@
         </div>
       }
     </div>
+
+    @if (treatHorizontal()) {
+      <!-- Desktop — sits directly under .scene, NOT inside .scene-inner,
+           same as .hook-pin.is-horizontal: it needs to own the full
+           section width and do its own single-level max-width/gutter
+           centering (.treat-viewport-desktop .treat-heading-row,
+           .treat-timeline). Nesting it inside .scene-inner.treat-inner
+           (which already applies max-width/padding-inline) double-applied
+           that constraint and shifted this section's content ~64px to
+           the right of Hook's, despite both having identical padding-top/
+           heading markup — the vertical position always matched, it was
+           the horizontal centering that was off.
+           All four steps lay out left to right. Each one reveals in
+           place (fades/rises up) as its turn in the scroll comes around,
+           and a line grows from its badge toward the next one. Nothing
+           fades back out: by the time the pin releases, the whole
+           01→02→03→04 chain sits on screen as one finished timeline. -->
+      <div class="treat-pin-desktop" #treatPinDesktop [style.height.vh]="treatSteps.length * treatDesktopVhPerStep">
+        <div class="treat-viewport-desktop">
+          <ng-container *ngTemplateOutlet="treatHeading" />
+          <div class="treat-timeline">
+            @for (step of treatSteps; track step.title; let i = $index) {
+              <div
+                class="treat-node"
+                [style.opacity]="treatNodeVisibility(i)"
+                [style.transform]="treatNodeTransform(i)"
+              >
+                <div class="treat-node-rail" aria-hidden="true">
+                  <span class="treat-node-badge">{{ '0' + (i + 1) }}</span>
+                  @if (i < treatSteps.length - 1) {
+                    <span class="treat-node-line" [style.transform]="'scaleX(' + treatNodeLineProgress(i) + ')'"></span>
+                  }
+                </div>
+                <div class="treat-node-copy">
+                  <h3 class="treat-node-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
+                  @let ctaSplit = i === 0 ? splitBodyAroundCta(step.bodyShort, '30-minute call') : null;
+                  <p class="treat-node-body">
+                    @if (ctaSplit) {
+                      {{ ctaSplit.before
+                      }}<button type="button" class="inline-cta" (click)="bookConsultation()">{{ ctaSplit.link }}</button
+                      >{{ ctaSplit.after }}
+                    } @else {
+                      {{ step.bodyShort }}
+                    }
+                  </p>
+                </div>
+                <div class="treat-node-visual">
+                  <!-- No extra frame drawn here — step 1's image already
+                       has its own window chrome (macOS traffic lights,
+                       call controls) baked in, and steps 2-4 carry a
+                       thin border already, so wrapping them in another
+                       frame would double up. -->
+                  <div class="treat-node-image" aria-hidden="true">
+                    <img [ngSrc]="treatDesktopImages[i].src" fill alt="" class="treat-node-img" />
+                  </div>
+                  <p class="sr-only">{{ treatDesktopImages[i].alt }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
   </section>
 
   <!-- ============ THE ROOT MAP — diseases & categories, as an interactive

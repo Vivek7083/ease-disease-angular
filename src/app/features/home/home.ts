@@ -120,27 +120,28 @@ export class Home implements AfterViewInit {
    * connect forward, not watching two steps smear through each other.
    */
   /**
-   * bodyShort is deliberately staged shorter from step 1 to step 4, not
-   * just independently trimmed — a visible decrescendo across the row,
-   * with each column's own image sitting a little higher as its text
-   * shrinks, is what reads as "a sequence of steps" on the desktop
-   * timeline, on top of the numbered badges. The title-to-body and
-   * body-to-image gaps stay fixed either way (.treat-node's own gap,
-   * .treat-node-title's reserved height) — it's only each column's overall
-   * height, not its internal spacing, that's meant to vary.
+   * bodyShort is deliberately staged to render as exactly one line fewer
+   * per step — 4 lines, 3, 2, 1 at the desktop column width — not just
+   * trimmed by feel. That's what reads as "a sequence of steps" on the
+   * desktop timeline: each node starts at the same line (title/content/
+   * image share the same .treat-node-copy gap in every column, see
+   * .treat-node-copy), and the row-to-row step-down comes purely from one
+   * fewer line of text each time, not from forcing images to different
+   * rows. Re-tune with treat-text-fit.js (temporary Playwright script, see
+   * the project's verification workflow) if the copy or column width
+   * changes and the line counts drift off the 4/3/2/1 staircase.
    */
   protected readonly treatSteps: readonly TreatStep[] = [
     {
       title: 'We start by listening',
       body: "Before anything else, we want your side of the story — your symptoms, your days, what's already been tried. We'll go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
       bodyShort:
-        "Your symptoms, your days, what's already been tried — we go through all of it together in your first 30-minute call, nothing rushed.",
+        "Your symptoms, your days, what's already been tried — we go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
     },
     {
       title: 'Then we look for proof',
       body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
-      bodyShort:
-        "Blood tests chosen for you get to why it's happening, not just what's showing up, so healing can start before results come back.",
+      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up, so healing starts right away.",
     },
     {
       title: 'Food first, then supplements',
@@ -150,7 +151,7 @@ export class Home implements AfterViewInit {
     {
       title: 'What makes it last',
       body: 'Sleep, stress and mindset shape recovery as much as food does. Regular check-ins keep the plan working as your life changes.',
-      bodyShort: 'Sleep, stress and mindset matter too.',
+      bodyShort: 'Sleep and stress matter too.',
     },
   ];
 
