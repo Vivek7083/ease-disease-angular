@@ -1406,199 +1406,82 @@
 /* No override here either, for the same reason — one consistent margin
    between every section on the page (see .scene). */
 
-.programme-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--sp-10);
-  align-items: start;
-}
-
-@media (min-width: 900px) {
-  .programme-grid {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(var(--sp-10), 6vw, var(--sp-16));
-  }
-}
-
-.programme-intro {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-5);
-}
-
-.programme-intro .t-display {
+.programme .t-display {
   margin-top: var(--sp-3);
   font-weight: 400;
   color: var(--ink);
 }
 
-.programme-intro .lede {
-  margin: 0;
-  color: var(--text-quiet-light);
-}
-
-.programme-intro .cta-row {
-  justify-content: flex-start;
-  margin-top: var(--sp-3);
-}
-
-.programme-card {
-  position: relative;
-  background: var(--surface-card-light);
-  border: 1px solid var(--rule-on-light);
-  border-radius: var(--r-lg);
-  padding: var(--sp-8);
-  box-shadow: var(--shadow-soft);
-}
-
-.programme-tag {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--oxblood);
-  background: color-mix(in oklab, var(--terracotta) 12%, transparent);
-  padding: 4px 10px;
-  border-radius: var(--r-pill);
-}
-
-.programme-card h3 {
+.programme .lede {
   margin-top: var(--sp-4);
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(1.4rem, 1.2rem + 0.9vw, 1.7rem);
-  color: var(--ink);
-}
-
-.programme-price {
-  margin-top: var(--sp-3);
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: var(--sp-3);
-  font-family: var(--font-mono);
-  font-size: 1.7rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink);
-}
-
-.programme-price .note {
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  font-variant-numeric: normal;
   color: var(--text-quiet-light);
-}
-
-.programme-objective {
-  margin-top: var(--sp-5);
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--rule-on-light);
-  font-size: 0.94rem;
-  line-height: var(--lh-body);
-  color: var(--text-quiet-light);
-}
-
-.programme-objective strong {
-  color: var(--ink);
-  font-weight: 500;
-}
-
-.programme-list {
-  list-style: none;
-  margin: var(--sp-5) 0 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.programme-list li {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--sp-3);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  padding-block: var(--sp-3);
-  border-top: 1px solid var(--rule-on-light);
-  color: var(--text-quiet-light);
-}
-
-.programme-list li:first-child {
-  border-top: none;
-}
-
-.programme-list app-evidence-tick {
-  margin-top: 2px;
-}
-
-.programme-quote {
-  margin: var(--sp-6) 0 0;
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--rule-on-light);
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  font-size: clamp(1.05rem, 0.95rem + 0.4vw, 1.2rem);
-  line-height: 1.45;
-  color: var(--oxblood);
 }
 
 /* Mobile: this section has no scroll-linked reveal to fill space for it —
-   it's a plain stacked block, so every bit of top/bottom padding and
-   inter-block gap reads as literal dead air while scrolling past it on a
-   small screen. Tightened throughout rather than inheriting the desktop
-   two-column rhythm at 1x width. */
+   it's a plain stacked block, so every bit of top/bottom padding reads as
+   literal dead air while scrolling past it on a small screen. */
 @media (max-width: 899px) {
   .programme {
     padding-block: clamp(var(--sp-8), 10vw, var(--sp-12));
   }
+}
 
-  .programme-grid {
-    gap: var(--sp-6);
+.team-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-6);
+  margin-top: var(--sp-8);
+}
+
+.team-trust-note {
+  margin-top: var(--sp-6);
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-quiet-light);
+}
+
+.levels-fallback {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: var(--sp-2);
+  row-gap: var(--sp-1);
+  margin-top: var(--sp-6);
+  font-size: 0.9rem;
+  color: var(--text-quiet-light);
+}
+
+/* Three full cards stacked and scrolled past one at a time read as a wall of
+   near-identical boxes on a phone. A horizontal snap row — one card per
+   "page", the next peeking at the edge as a hint there's more — reads as a
+   deliberate choice instead of just a cramped grid. */
+@media (max-width: 899px) {
+  .team-grid {
+    display: flex;
+    gap: var(--sp-4);
+    margin-inline: calc(var(--gutter-mobile) * -1);
+    padding-inline: var(--gutter-mobile);
+    padding-bottom: var(--sp-2);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter-mobile);
+    scrollbar-width: none;
   }
 
-  .programme-intro {
-    gap: var(--sp-3);
+  .team-grid::-webkit-scrollbar {
+    display: none;
   }
 
-  .programme-intro .t-display {
-    margin-top: var(--sp-1);
+  .team-grid app-team-card {
+    flex: 0 0 82%;
+    scroll-snap-align: start;
   }
+}
 
-  .programme-intro .cta-row {
-    margin-top: var(--sp-1);
-  }
-
-  .programme-card {
-    padding: var(--sp-6);
-  }
-
-  .programme-card h3 {
-    margin-top: var(--sp-3);
-  }
-
-  .programme-price {
-    margin-top: var(--sp-2);
-    font-size: 1.5rem;
-  }
-
-  .programme-objective {
-    margin-top: var(--sp-4);
-    padding-top: var(--sp-4);
-  }
-
-  .programme-list {
-    margin-top: var(--sp-4);
-  }
-
-  .programme-list li {
-    padding-block: var(--sp-2);
-    font-size: 0.88rem;
-  }
-
-  .programme-quote {
-    margin-top: var(--sp-4);
-    padding-top: var(--sp-4);
+@media (min-width: 900px) {
+  .team-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 

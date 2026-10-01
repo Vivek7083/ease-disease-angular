@@ -8,7 +8,8 @@ import { CtaPill } from '../../shared/components/cta-pill/cta-pill';
 import { EyebrowLabel } from '../../shared/components/eyebrow-label/eyebrow-label';
 import { EvidenceTick } from '../../shared/components/evidence-tick/evidence-tick';
 import { GutHub } from '../../shared/components/gut-hub/gut-hub';
-import { LevelCard, type Level } from '../../shared/components/level-card/level-card';
+import { type Level } from '../../shared/components/level-card/level-card';
+import { LevelSelector } from '../../shared/components/level-selector/level-selector';
 import { TeamCard, type TeamMember } from '../../shared/components/team-card/team-card';
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
@@ -46,7 +47,7 @@ interface TreatStep {
     EyebrowLabel,
     EvidenceTick,
     GutHub,
-    LevelCard,
+    LevelSelector,
     TeamCard,
     RootMap,
     Results,
@@ -58,7 +59,7 @@ export class Home implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly bookingCta = inject(BookingCtaService);
 
-  /** Descent, levels, team and close are being redesigned next — hero and the hook are live. */
+  /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
   protected readonly showRemainingSections = false;
 
   constructor() {
@@ -932,14 +933,6 @@ export class Home implements AfterViewInit {
     },
   ];
 
-  protected readonly programmeIncludes: readonly string[] = [
-    'Your complaints, concerns, medical history and health goals',
-    'What could be driving it — your likely underlying cause(s)',
-    'Recommended tests and supplements to start with',
-    'A basic anti-inflammatory diet, and where your diet or lifestyle is going wrong',
-    'Why healing begins with improving digestion',
-  ];
-
   protected readonly rootCauses: readonly RootCause[] = [
     {
       name: 'Gut imbalance',
@@ -994,8 +987,29 @@ export class Home implements AfterViewInit {
   ];
 
   protected readonly team: readonly TeamMember[] = [
-    { name: 'Carol', role: 'Co-founder', initials: 'C', bio: 'Leads the practice side of Ease Disease — how the programme actually runs, week to week.' },
-    { name: 'Deepa', role: 'Co-founder', initials: 'D', bio: 'Brings the functional-nutrition framework the practice is built on.' },
-    { name: 'Dr. Akshai Kolagani', role: 'Clinical reviewer', initials: 'AK', bio: 'Reviews every programme for clinical soundness before it reaches a client.' },
+    {
+      name: 'Dr. Akshai Kolagani',
+      role: 'Clinical Expert',
+      credential: 'Bio and credentials pending founder confirmation',
+      initials: 'AK',
+      bio: 'Reviews every programme for clinical soundness before it reaches a client.',
+      ctaLabel: 'Talk to Dr. Akshai',
+    },
+    {
+      name: 'Carol',
+      role: 'Founding Expert',
+      credential: 'Credentials pending founder confirmation',
+      initials: 'C',
+      bio: 'Leads the practice side of Ease Disease — how the programme actually runs, week to week.',
+      ctaLabel: 'Connect with Carol',
+    },
+    {
+      name: 'Deepa',
+      role: 'Founding Expert',
+      credential: 'Credentials pending founder confirmation',
+      initials: 'D',
+      bio: 'Brings the functional-nutrition framework the practice is built on.',
+      ctaLabel: 'Connect with Deepa',
+    },
   ];
 }
