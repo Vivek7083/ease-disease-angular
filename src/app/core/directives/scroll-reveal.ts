@@ -17,7 +17,12 @@ export class ScrollRevealDirective implements AfterViewInit {
 
   readonly revealDelay = input(0, { alias: 'appScrollReveal' });
 
+  /** When true the element hides again once it scrolls out of view and re-reveals on the way back, instead of revealing once and staying put. */
+  readonly revealRepeat = input(false);
+
   readonly revealed = signal(false);
+
+  private pendingReveal: ReturnType<typeof setTimeout> | undefined;
 
   ngAfterViewInit(): void {
     if (typeof IntersectionObserver === 'undefined') {
@@ -31,11 +36,16 @@ export class ScrollRevealDirective implements AfterViewInit {
           if (entry.isIntersecting) {
             const delay = this.revealDelay();
             if (delay > 0) {
-              setTimeout(() => this.revealed.set(true), delay);
+              this.pendingReveal = setTimeout(() => this.revealed.set(true), delay);
             } else {
               this.revealed.set(true);
             }
-            observer.unobserve(entry.target);
+            if (!this.revealRepeat()) {
+              observer.unobserve(entry.target);
+            }
+          } else if (this.revealRepeat()) {
+            clearTimeout(this.pendingReveal);
+            this.revealed.set(false);
           }
         }
       },
@@ -43,6 +53,9 @@ export class ScrollRevealDirective implements AfterViewInit {
     );
 
     observer.observe(this.elementRef.nativeElement);
-    this.destroyRef.onDestroy(() => observer.disconnect());
+    this.destroyRef.onDestroy(() => {
+      clearTimeout(this.pendingReveal);
+      observer.disconnect();
+    });
   }
 }
