@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, input, output, signal } from '@angular/core';
 
 interface HubNodeSpec {
   readonly key: string;
@@ -75,7 +75,19 @@ const LABEL_GAP = 22;
           />
         }
 
-        <g class="gut" [attr.transform]="coilTransform()">
+        <!-- A quiet easter egg — the gut itself (not the orbiting nodes) is
+             a shortcut straight to the root-cause map, for anyone curious
+             enough to click the thing the whole illustration centres on. -->
+        <g
+          class="gut"
+          tabindex="0"
+          role="button"
+          aria-label="Jump to the root-cause map"
+          [attr.transform]="coilTransform()"
+          (click)="gutClicked.emit()"
+          (keydown.enter)="gutClicked.emit()"
+          (keydown.space)="$event.preventDefault(); gutClicked.emit()"
+        >
           <path class="gut-tube" [attr.d]="gutPath" />
           <circle class="gut-bump" [attr.cx]="gutBump.x" [attr.cy]="gutBump.y" [attr.r]="gutBump.r" />
           @for (crease of gutCreases; track crease) {
@@ -180,6 +192,15 @@ const LABEL_GAP = 22;
       to {
         stroke-dashoffset: -120;
       }
+    }
+    .gut {
+      cursor: pointer;
+      outline: none;
+    }
+    .gut:focus-visible {
+      outline: 2px solid var(--oxblood);
+      outline-offset: 6px;
+      border-radius: 50%;
     }
     .gut-tube {
       fill: none;
@@ -368,6 +389,8 @@ export class GutHub {
   readonly activeIndex = input<number | null>(null);
   /** How many nodes (in declaration order) are "unlocked" so far — null shows all of them, as in the hero. */
   readonly revealCount = input<number | null>(null);
+  /** The easter egg: clicking/activating the gut itself (not a node). */
+  readonly gutClicked = output<void>();
 
   readonly hovered = signal<number | null>(null);
   private readonly isMobile = signal(this.readMobile());

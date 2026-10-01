@@ -7,19 +7,16 @@
           <h1 id="hero-heading" class="hero-headline">
             Your body has been<br />
             <em>speaking in symptoms.</em><br />
-            <span class="mark">We find the source.</span>
+            <span class="hero-headline-sub">It's time to <span class="mark">listen</span> &amp; <span class="mark">treat the cause.</span></span>
           </h1>
-          <p class="lede">
-            Skin flares, cycle changes, fatigue that won't lift — they often trace back to one place.
-            Thirty minutes is enough to start finding out.
-          </p>
+          <p class="lede">Decide whether you want to treat the cause or manage the symptoms for a lifetime.</p>
           <a class="source-link" href="#root-map">
             <span>Take the Quiz</span>
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
           </a>
         </div>
         <div class="hero-visual">
-          <app-gut-hub [style.opacity]="heroGutOpacity()" />
+          <app-gut-hub [style.opacity]="heroGutOpacity()" (gutClicked)="jumpToRootMap()" />
         </div>
       </div>
     </div>

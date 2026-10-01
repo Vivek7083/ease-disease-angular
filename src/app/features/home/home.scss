@@ -109,6 +109,10 @@
   color: var(--oxblood);
 }
 
+.hero-headline-sub {
+  font-size: calc(1em - 3px);
+}
+
 .hero-headline .mark {
   font-style: normal;
   background: linear-gradient(transparent 62%, color-mix(in oklab, var(--evidence-blue) 55%, transparent) 62%);

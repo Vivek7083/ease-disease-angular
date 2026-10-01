@@ -67,9 +67,13 @@
   max-width: 200px;
   overflow: hidden;
   pointer-events: none;
-  transition:
-    max-width var(--dur-base) var(--ease),
-    opacity var(--dur-micro) linear;
+  /* Opacity itself is already a continuous, scroll-bound value (see
+     BookingCtaService.opacity in home.ts) — it's updated every scroll frame,
+     so transitioning it here would make it perpetually chase a moving
+     target instead of tracking the scroll directly. Only the discrete
+     visible/hidden toggle (max-width) needs an eased transition, and a
+     longer, softer one reads as a graceful unfurl rather than a snap. */
+  transition: max-width var(--dur-scene) var(--ease-out-soft);
 }
 
 .chrome-cta.visible {

@@ -44,6 +44,10 @@ export class Home implements AfterViewInit {
     document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  protected jumpToRootMap(): void {
+    document.getElementById('root-map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   /**
    * The hook · a pinned scrollytelling track, active at every breakpoint.
    * Desktop (>=HOOK_HORIZONTAL_BREAKPOINT): a continuous horizontal slide,
