@@ -136,17 +136,17 @@ export class Home implements AfterViewInit {
       title: 'We start by listening',
       body: "Before anything else, we want your side of the story — your symptoms, your days, what's already been tried. We'll go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
       bodyShort:
-        "Your symptoms, your days, what's already been tried — we go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
+        "Your symptoms, your days, what's already been tried — we go through it together in your first 30-minute call, nothing rushed.",
     },
     {
       title: 'Then we look for proof',
       body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
-      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up, so healing starts right away.",
+      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up.",
     },
     {
       title: 'Food first, then supplements',
       body: 'We use food as medicine first. Supplements only join in where your results and history actually point to them — never by default.',
-      bodyShort: 'Food as medicine first, supplements only when results call for them.',
+      bodyShort: 'Food first, supplements only when results call for it.',
     },
     {
       title: 'What makes it last',
