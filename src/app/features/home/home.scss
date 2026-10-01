@@ -1208,7 +1208,17 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* flex-start, not center: .hook-viewport also writes justify-content:
+     center, but it's a no-op there because .hook-deck is flex:1 and
+     absorbs all the leftover space itself, which is what actually pins
+     the heading right under padding-top every time. .treat-timeline has
+     no flex:1 sizing of its own, so with justify-content:center here the
+     heading+timeline centered as one block — meaning the heading's
+     distance from the top moved with the row's content height instead of
+     staying fixed like Hook's. Pinning the heading at flex-start and
+     letting the timeline's own auto margins (below) absorb the leftover
+     space instead reproduces Hook's actual mechanism. */
+  justify-content: flex-start;
   /* A real gap between the heading and the node row, not just whatever's
      left over — matches .hook-viewport's own rhythm instead of the
      cramped "shrink everything to make it fit" pass this replaced, which
@@ -1229,6 +1239,9 @@
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--gutter-desktop);
+  /* Pins to its own content height — see the justify-content comment
+     above. */
+  flex: 0 0 auto;
 }
 
 .treat-timeline {
@@ -1241,6 +1254,11 @@
   max-width: 1480px;
   margin-inline: auto;
   padding-inline: var(--gutter-desktop);
+  /* Auto margins on the column's main (vertical) axis absorb whatever
+     space is left under the pinned heading, centering the row in it —
+     the same net look as the old justify-content: center, but without
+     dragging the heading along with it. */
+  margin-block: auto;
 }
 
 .treat-node {
@@ -1292,6 +1310,16 @@
   background: linear-gradient(to right, var(--oxblood), color-mix(in oklab, var(--oxblood) 40%, transparent));
   transform-origin: left center;
   transition: transform 60ms linear;
+}
+
+.treat-node-copy {
+  display: flex;
+  flex-direction: column;
+  /* Matches .treat-node's own gap, so title-to-body and body-to-image read
+     as the same rhythm — without this, title-to-body collapsed to 0 (no
+     margin of its own) while body-to-image got the flex gap from
+     .treat-node, which is what read as "inconsistent." */
+  gap: var(--sp-3);
 }
 
 .treat-node-title {

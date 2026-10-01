@@ -139,12 +139,13 @@ export class Home implements AfterViewInit {
     {
       title: 'Then we look for proof',
       body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
-      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up.",
+      bodyShort:
+        "Blood tests chosen for you get to why it's happening, not just what's showing up, so healing can start before results come back.",
     },
     {
       title: 'Food first, then supplements',
       body: 'We use food as medicine first. Supplements only join in where your results and history actually point to them — never by default.',
-      bodyShort: 'Food as medicine first, supplements only where your results point to them.',
+      bodyShort: 'Food as medicine first, supplements only when results call for them.',
     },
     {
       title: 'What makes it last',
