@@ -24,6 +24,11 @@ interface HookPoint {
   readonly icon: 'doctor' | 'root' | 'ai' | 'balance';
 }
 
+interface TreatStep {
+  readonly title: string;
+  readonly body: string;
+}
+
 @Component({
   selector: 'app-home',
   imports: [NgOptimizedImage, CanvasStopDirective, ScrollRevealDirective, Wordmark, CtaPill, EyebrowLabel, EvidenceTick, GutHub, LevelCard, TeamCard, RootMap],
@@ -51,6 +56,184 @@ export class Home implements AfterViewInit {
 
   /** How We Treat · Step 1 — topics that surface one by one during the call illustration. */
   protected readonly treatStepOneTags = ['Diet', 'Sleep', 'Past reports', 'Lifestyle', 'Goals'] as const;
+
+  /**
+   * ---------------- How We Treat · pinned step sequence ----------------
+   * Same pinned, scroll-scrubbed deck mechanic as the Hook section's
+   * desktop track, but on mobile — each step's content and illustration
+   * share one spot and cross-dissolve into the next as you scroll, rather
+   * than stacking one after another down the page.
+   *
+   * The plateau is deliberately wide (most of each step's travel): the
+   * illustration needs to actually hold fully visible for a readable beat,
+   * not just flash past mid-crossfade. A connecting line grows beneath the
+   * active step's badge during that same hold (see treatLineProgress) —
+   * once it finishes growing, a short, quick burst (the narrow remaining
+   * fade) swaps in the next step. So the "wait" is spent watching the line
+   * connect forward, not watching two steps smear through each other.
+   */
+  protected readonly treatSteps: readonly TreatStep[] = [
+    {
+      title: 'We start by listening',
+      body: "Before anything else, we want your side of the story — your symptoms, your days, what's already been tried. We'll go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
+    },
+    {
+      title: 'Then we look for proof',
+      body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
+    },
+    {
+      title: 'Food first, then supplements',
+      body: 'We use food as medicine first. Supplements only join in where your results and history actually point to them — never by default.',
+    },
+    {
+      title: 'What makes it last',
+      body: 'Sleep, stress and mindset shape recovery as much as food does. Regular check-ins keep the plan working as your life changes.',
+    },
+  ];
+
+  /**
+   * Scroll budget per step, in vh — the pin's total height is this × step
+   * count. Balances two pulls in opposite directions: a step needs to hold
+   * still long enough to actually read the body copy (too little and it
+   * flashes past mid-scroll), but on a phone, scroll distance is physical
+   * effort (each screen-height is roughly a swipe) — three steps at 150vh
+   * each meant ~4-5 swipes just to get through this one section, which is
+   * exactly the "takes a lot of effort" complaint. This is the middle
+   * ground: a real, readable hold per step without turning the section
+   * into a long haul.
+   */
+  protected readonly treatVhPerStep = 95;
+
+  /**
+   * Same trailing-hold trick as HOOK_DRAG_PHASE: the drag through all steps
+   * only uses this fraction of the pin's scrollable range, so the last step
+   * reaches full view and then actually holds still for a beat before the
+   * pin releases, instead of arriving and being yanked away in the same
+   * instant.
+   */
+  private static readonly TREAT_DRAG_PHASE = 0.82;
+  /**
+   * Must stay under 0.5: plateau+fade sum to 1 (the full unit spacing
+   * between steps) for a gap-free handoff, but the plateau ALSO can't pass
+   * 0.5 on its own — past that, step i and step i+1's plateaus start
+   * overlapping and both sit at full opacity simultaneously, which is the
+   * garbled double-exposed text this was fixed from. Same ratio Hook's
+   * desktop deck already proved out.
+   */
+  private static readonly TREAT_CARD_PLATEAU = 0.45;
+  private static readonly TREAT_CARD_FADE = 0.55;
+  /** >1 narrows the illustration's own visible window relative to the
+   *  content's (see treatIllustrationVisibility) — it crosses the same
+   *  plateau/fade thresholds sooner on both sides, so it departs before
+   *  the content does and arrives after the new content has settled in. */
+  private static readonly TREAT_ILLUSTRATION_STRETCH = 1.6;
+  /**
+   * Vertical drift as a step crosses in/out. Kept small deliberately — the
+   * sticky viewport has very little vertical slack around the illustration
+   * (it's sized close to the full available height), so anything much
+   * bigger than this pushes the illustration far enough to get clipped by
+   * the viewport's own overflow:hidden mid-transition, which read as "the
+   * illustration isn't fully visible." This is enough for a subtle
+   * "connected" drift without risking that.
+   */
+  private static readonly TREAT_CARD_PARALLAX_PX = 20;
+
+  private readonly treatPin = viewChild<ElementRef<HTMLElement>>('treatPin');
+  private readonly treatPinProgress = signal(0);
+
+  protected readonly treatDragProgress = computed(() => Home.clamp01(this.treatPinProgress() / Home.TREAT_DRAG_PHASE));
+  protected readonly treatDragUnits = computed(() => this.treatDragProgress() * (this.treatSteps.length - 1));
+
+  private treatCardDistance(i: number): number {
+    return this.treatDragUnits() - i;
+  }
+
+  /**
+   * 0..1 growth of the connecting line trailing below step i's badge, from
+   * "just arrived" (0) to "about to hand off to step i+1" (1) — the same
+   * units value driving the crossfade, just read as forward-only progress
+   * past this step instead of distance from it. Reaching 1 lines up exactly
+   * with step i+1 reaching full opacity (see treatCardVisibility), so the
+   * line finishes growing right as the handoff completes.
+   */
+  protected treatLineProgress(i: number): number {
+    return Home.clamp01(this.treatDragUnits() - i);
+  }
+
+  protected treatCardVisibility(i: number): number {
+    const distance = Math.abs(this.treatCardDistance(i));
+    if (distance <= Home.TREAT_CARD_PLATEAU) {
+      return 1;
+    }
+    if (distance >= Home.TREAT_CARD_PLATEAU + Home.TREAT_CARD_FADE) {
+      return 0;
+    }
+    return 1 - (distance - Home.TREAT_CARD_PLATEAU) / Home.TREAT_CARD_FADE;
+  }
+
+  protected treatCardTransform(i: number): string {
+    const delta = Home.clampSigned(this.treatCardDistance(i), -1, 1);
+    return `translateY(${delta * Home.TREAT_CARD_PARALLAX_PX}px)`;
+  }
+
+  /**
+   * Dark text (and the solid badge circle) on a light canvas stays
+   * distractingly legible even at low opacity — two faint-but-crisp
+   * paragraphs, or two overlapping "01"/"02" badges, read as "garbled," not
+   * "a clean dissolve," the way a photo crossfade would. Blurring both the
+   * copy AND the rail as they fade (same idea as Hook's cardImageFilter,
+   * applied to text/UI instead of an image) turns the departing/arriving
+   * step into a soft, indistinct shape instead of readable ghost content.
+   */
+  private static readonly TREAT_COPY_MAX_BLUR_PX = 6;
+
+  protected treatCopyFilter(i: number): string {
+    const blur = (1 - this.treatCardVisibility(i)) * Home.TREAT_COPY_MAX_BLUR_PX;
+    return blur > 0.05 ? `blur(${blur}px)` : 'none';
+  }
+
+  /**
+   * The illustration gets its own, narrower window inside the content's
+   * wider one — stretching its distance-from-center by a constant factor
+   * means it crosses the same plateau/fade thresholds sooner on both sides:
+   * it departs while the content is still fully visible, and only arrives
+   * once the new content has already settled in. That's the sequence that
+   * was asked for — old illustration gone, new heading up, then the new
+   * illustration appears — without needing a second, separate timeline.
+   */
+  protected treatIllustrationVisibility(i: number): number {
+    const distance = Math.abs(this.treatCardDistance(i)) * Home.TREAT_ILLUSTRATION_STRETCH;
+    if (distance <= Home.TREAT_CARD_PLATEAU) {
+      return 1;
+    }
+    if (distance >= Home.TREAT_CARD_PLATEAU + Home.TREAT_CARD_FADE) {
+      return 0;
+    }
+    return 1 - (distance - Home.TREAT_CARD_PLATEAU) / Home.TREAT_CARD_FADE;
+  }
+
+  protected treatCardPointerEvents(i: number): 'auto' | 'none' {
+    return this.treatCardVisibility(i) > 0.5 ? 'auto' : 'none';
+  }
+
+  private updateTreatScroll(): void {
+    const pin = this.treatPin()?.nativeElement;
+    if (!pin) {
+      this.treatPinProgress.set(0);
+      return;
+    }
+
+    const rect = pin.getBoundingClientRect();
+    const viewportHeight = document.documentElement.clientHeight;
+    const scrollable = rect.height - viewportHeight;
+    if (scrollable <= 0) {
+      this.treatPinProgress.set(0);
+      return;
+    }
+
+    const scrolled = Math.min(Math.max(-rect.top, 0), scrollable);
+    this.treatPinProgress.set(scrolled / scrollable);
+  }
 
   /**
    * The hook · a pinned scrollytelling track, active at every breakpoint.
@@ -492,6 +675,7 @@ export class Home implements AfterViewInit {
   ngAfterViewInit(): void {
     const update = () => {
       this.updateHookScroll();
+      this.updateTreatScroll();
       this.updateHeroExitProgress();
       this.updateCloseFill();
       this.updateMobileHeadingReveal();

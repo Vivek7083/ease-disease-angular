@@ -727,15 +727,54 @@
   max-width: 48ch;
 }
 
-.treat-step {
+.treat-pin {
+  position: relative;
+}
+
+.treat-viewport {
+  position: sticky;
+  top: 0;
+  /* svh over plain vh for the same reason as .hook-viewport — vh drifts
+     with mobile browser chrome showing/hiding, which can release the
+     sticky pin before updateTreatScroll's own math thinks the hold is
+     over. */
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-10);
+  justify-content: center;
+  /* Clears the fixed chrome wordmark, same clearance as .hook-viewport. */
+  padding-top: var(--sp-16);
+}
+
+.treat-deck {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+.treat-deck-card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Frame-smoothing only (see the same convention on .hook-deck-card) — the
+     opacity itself is already a continuous, scroll-bound value recomputed
+     every frame; this just smooths between those frames. */
+  transition:
+    opacity 60ms linear,
+    transform 60ms linear;
 }
 
 /* The rail is what makes this read as "step 1 of a sequence" rather than a
    continuation of the heading's prose — a numbered badge with a line
-   trailing off below it, foreshadowing the steps still to come. */
+   trailing off below it. The line now runs the full height of
+   .treat-step-content (copy + illustration both), not just alongside the
+   text, since .treat-step-rail is a row sibling of that whole column and
+   stretches to match it by default (align-items: stretch). */
 .treat-step-main {
   display: flex;
   gap: var(--sp-4);
@@ -747,6 +786,14 @@
   align-items: center;
   flex: 0 0 auto;
   padding-top: 2px;
+}
+
+.treat-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-10);
+  flex: 1;
+  min-width: 0;
 }
 
 .treat-step-badge {
@@ -770,12 +817,16 @@
   flex: 1;
   min-height: var(--sp-16);
   margin-top: var(--sp-2);
-  background: linear-gradient(to bottom, color-mix(in oklab, var(--oxblood) 40%, transparent), transparent);
+  background: linear-gradient(to bottom, var(--oxblood), color-mix(in oklab, var(--oxblood) 40%, transparent));
+  /* Grows downward from the badge (treatLineProgress, 0→1) as the reader
+     scrolls through this step's hold — scaleY instead of height so it's a
+     cheap transform, not a layout-triggering resize every frame. */
+  transform-origin: top;
+  transition: transform 60ms linear;
 }
 
 .treat-step-copy {
-  flex: 1;
-  min-width: 0;
+  transition: filter 60ms linear;
 }
 
 .treat-step-title {
@@ -788,19 +839,53 @@
 
 .treat-step-body {
   margin-top: var(--sp-3);
+  margin-bottom: var(--sp-5);
   color: var(--text-quiet-light);
   font-size: clamp(0.94rem, 0.88rem + 0.2vw, 1.02rem);
   line-height: var(--lh-body);
   max-width: 48ch;
 }
 
+/* This copy is long enough to wrap on narrow phones — the base .source-link
+   is an inline-flex row, which on a wrap just centers the arrow against the
+   whole two-line block instead of sitting next to the last word. Going
+   `inline` here instead lets the text flow and wrap normally. Underline
+   switches from border-bottom (which would redraw under every wrapped
+   line) to text-decoration, which stops at the icon's inline-block
+   boundary instead of running under it. */
 .treat-step-copy .source-link {
-  margin-top: var(--sp-5);
+  /* `inline` has no vertical margin of its own (ignored on non-replaced
+     inline boxes) — the gap above comes from .treat-step-body's own
+     margin-bottom instead. */
+  display: inline;
   background: none;
   border: none;
-  border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
+  padding: 0;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--oxblood) 45%, transparent);
+  text-underline-offset: 3px;
   cursor: pointer;
-  padding-inline: 0;
+}
+
+/* Adjacent inline-block boxes (the arrow) get their own implicit break
+   opportunity even with zero whitespace between them and the preceding
+   word — which orphaned the arrow alone on its own line at some widths.
+   Wrapping the last word and the arrow in one nowrap inline-block makes
+   them a single unbreakable unit: either both fit on the current line, or
+   both wrap to the next one together. */
+.source-link-tail {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.treat-step-copy .source-link svg {
+  display: inline-block;
+  vertical-align: -3px;
+  margin-left: var(--sp-2);
+}
+
+.treat-step-copy .source-link:hover {
+  text-decoration-color: var(--oxblood);
 }
 
 /* ---- the phone illustration: a video call, not a chat thread — two tiles
@@ -810,11 +895,21 @@
 .treat-step-visual {
   display: flex;
   justify-content: center;
+  transition: opacity 60ms linear;
 }
 
 .treat-phone {
   position: relative;
-  width: clamp(220px, 60vw, 260px);
+  /* Width-only clamps (60vw) don't help on a short viewport (a phone in
+     landscape, a small device, or just a browser with a lot of chrome) —
+     the 9:19.5 aspect ratio can still blow past the available height, since
+     the pinned stage has very little vertical slack to begin with (it's
+     already a tight fit against the copy above it). calc(44vh * 0.4615) is
+     that same ratio applied to a height budget instead, so whichever
+     constraint — width or height — is tighter actually wins, and the
+     illustration keeps shrinking proportionally as the viewport gets
+     shorter instead of hitting a floor and clipping anyway. */
+  width: clamp(150px, min(50vw, calc(44vh * 0.4615)), 230px);
   aspect-ratio: 9 / 19.5;
   border: 2px solid color-mix(in oklab, var(--ink) 22%, transparent);
   border-radius: 34px;
@@ -1027,7 +1122,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-4);
+  gap: 6%;
   flex: none;
   padding-top: var(--sp-1);
 }
@@ -1036,16 +1131,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  /* % of .treat-call-controls (itself 100% of the phone screen's width) so
+     these scale down together with .treat-phone instead of staying a fixed
+     px size — the phone's own width now ranges from 150-230px (see
+     .treat-phone) depending on viewport height, and a fixed px button sized
+     for the old 220-260px phone looked oversized against the new one.
+     aspect-ratio (not a fixed height) plus flex: 0 0 auto is what actually
+     keeps it circular: a flex item with only `width` set and the default
+     flex-shrink: 1 gets its WIDTH compressed under a tight phone-screen
+     fit, but not its height, which is exactly what turned these into
+     ovals. */
+  flex: 0 0 auto;
+  width: 15%;
+  aspect-ratio: 1;
   border-radius: 50%;
   background: color-mix(in oklab, var(--ivory) 16%, transparent);
   color: var(--text-quiet-dark);
 }
 
 .treat-call-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 46%;
+  height: 46%;
   fill: none;
   stroke: currentColor;
   stroke-width: 1.7;
@@ -1054,8 +1160,7 @@
 }
 
 .treat-call-btn-end {
-  width: 44px;
-  height: 44px;
+  width: 19%;
   background: var(--oxblood);
   color: var(--ivory);
 }
@@ -1065,7 +1170,33 @@
   stroke: none;
 }
 
+/* ---- step 2 illustration: hands holding a vial + results card ----
+   Same frame weight as .treat-phone (width, radius, shadow) so the two
+   steps read as a matched pair rather than two different design systems. */
+.treat-illustration-card {
+  position: relative;
+  /* Same height-aware sizing as .treat-phone, ratio adjusted for this
+     frame's own 9:16.125 aspect ratio (9/16.125 = 0.5581). */
+  width: clamp(150px, min(50vw, calc(44vh * 0.5581)), 230px);
+  aspect-ratio: 9 / 16.125;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px -24px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+
+.treat-illustration-img {
+  object-fit: cover;
+  object-position: center top;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .treat-deck-card,
+  .treat-step-visual,
+  .treat-step-line,
+  .treat-step-copy {
+    transition: none;
+  }
+
   /* Five clouds share one spot and only separate in time via the animation
      — freezing it would stack all five on top of each other unreadably, so
      reduced motion drops the loop entirely rather than freezing it. */
