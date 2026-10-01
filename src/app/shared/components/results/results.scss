@@ -172,10 +172,10 @@
 @media (min-width: 900px) {
   :host {
     --col-gap: var(--sp-6);
-    --row-gap: var(--sp-10);
-    --twig-h: var(--sp-5);
+    --row-gap: var(--sp-8);
+    --twig-h: var(--sp-4);
     --trunk-offset: var(--sp-6);
-    gap: var(--sp-10);
+    gap: var(--sp-8);
   }
 
   .results-intro {
@@ -211,13 +211,13 @@
   }
 
   .results-item {
-    --leaf-sweep: 80px;
+    --leaf-sweep: 52px;
     grid-template-columns: 1fr;
     /* start, not the default stretch — otherwise a two-line body in one
        cell pushes that cell's title off the shared row. */
     align-content: start;
-    row-gap: var(--sp-2);
-    padding: var(--sp-6) var(--sp-10) var(--sp-6) var(--sp-6);
+    row-gap: var(--sp-1);
+    padding: var(--sp-4) var(--sp-8) var(--sp-4) var(--sp-5);
   }
 
   /* Horizontal stem segment across the top of this leaf, reaching half a
@@ -263,7 +263,7 @@
     content: '';
     position: absolute;
     top: calc(-1 * var(--twig-h));
-    left: var(--sp-8);
+    left: var(--sp-6);
     width: var(--stem-w);
     height: var(--twig-h);
     background: var(--oxblood);
@@ -273,31 +273,59 @@
     grid-row: auto;
   }
 
-  .results-body {
-    font-size: 1rem;
+  .results-title {
+    font-size: 1.25rem;
   }
 
+  .results-body {
+    font-size: 0.9rem;
+  }
+
+  /* Large screens: a compact two-column card — attribution on the left,
+     a modestly sized quote on the right — instead of one huge block of
+     display type. The quote stays readable at ~1.4–1.6rem without
+     dominating the section. */
   .results-quote {
-    padding: var(--sp-12) clamp(var(--sp-10), 7vw, var(--sp-20));
-    border-radius: var(--r-xl);
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
+    column-gap: var(--sp-10);
+    align-items: center;
+    padding: var(--sp-8) var(--sp-10);
+    border-radius: var(--r-lg);
   }
 
   .results-quote-mark {
-    top: var(--sp-3);
-    left: var(--sp-8);
-    font-size: 8rem;
+    position: static;
+    /* Hangs in the gap right before the quote's first line (right edge of
+       the attribution column), not out at the card's left edge. */
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: end;
+    align-self: start;
+    margin-right: calc(-1 * var(--sp-8));
+    font-size: 4rem;
+    line-height: 1;
+    height: 2.4rem;
+    opacity: 0.9;
+  }
+
+  .results-quote blockquote {
+    grid-column: 2;
+    grid-row: 1 / span 2;
   }
 
   .results-quote blockquote p {
-    max-width: 30ch;
-    font-size: clamp(1.8rem, 1.1rem + 1.8vw, 2.6rem);
+    max-width: 52ch;
+    font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.5rem);
+    line-height: 1.4;
+    text-wrap: pretty;
   }
 
   .results-quote figcaption {
-    flex-direction: row;
-    align-items: baseline;
-    gap: var(--sp-4);
-    max-width: 28rem;
-    margin-top: var(--sp-6);
+    grid-column: 1;
+    grid-row: 2;
+    align-self: end;
+    margin-top: 0;
+    padding-top: var(--sp-3);
   }
 }
