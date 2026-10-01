@@ -45,8 +45,14 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
         box-shadow var(--dur-base) var(--ease);
     }
     .cta.compact {
-      padding: 0 var(--sp-5);
-      font-size: 0.94rem;
+      /* Matches the chrome wordmark's own 36px-tall glyph (wordmark.ts) so
+         the two sit aligned in the top corner instead of the pill reading
+         visibly taller/lower than the logo beside it. 36px stays well above
+         WCAG 2.5.8's 24px AA minimum target size. */
+      min-height: 36px;
+      padding: 0 var(--sp-4);
+      font-size: 0.86rem;
+      gap: var(--sp-2);
     }
     .cta:hover {
       transform: translateY(-1px);

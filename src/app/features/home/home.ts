@@ -128,13 +128,6 @@ export class Home implements AfterViewInit {
    */
   protected readonly cardsOpacity = computed(() => this.headingRevealProgress());
   /**
-   * The scrubber only makes sense while there's a card on screen to scrub
-   * through — it fades in alongside the cards themselves and fades back
-   * out again as the last card finishes its own exit, rather than sitting
-   * there once the cards are gone.
-   */
-  protected readonly scrubberVisibility = computed(() => this.cardsOpacity() * (1 - Home.clamp01((this.cardsPhaseProgress() - 0.94) / 0.06)));
-  /**
    * Desktop only: card 1 arrives fully visible and then holds still for
    * this opening slice of pinned scroll before the track starts panning —
    * the same "real reading time" the mobile stack already gives every card
@@ -175,36 +168,23 @@ export class Home implements AfterViewInit {
   /** Same range as hookDragUnits, but each card holds still for its dwell share before the next one moves. */
   protected readonly hookEffectiveUnits = computed(() => this.mapWithDwell(this.hookDragUnits()));
 
-  protected readonly hookActiveIndex = computed(() => {
-    const count = this.hookPoints.length;
-    return this.hookHorizontal() ? Math.round(this.hookEffectiveUnits()) : Math.min(count - 1, Math.floor(this.cardsPhaseProgress() * count));
-  });
+  /** Desktop only — mobile's own active card is `mobileActiveCard` below. */
+  protected readonly hookActiveIndex = computed(() => Math.round(this.hookEffectiveUnits()));
   protected readonly hookTrackOffset = computed(() => -this.hookEffectiveUnits() * window.innerWidth);
 
   /**
-   * Mobile cards render as a physical stack — the active card on top,
-   * the rest peeking out behind it — rather than crossfading in place.
-   * continuousCardIndex is a smooth (non-floored) version of "which card
-   * are we on", so a card's depth relative to it can pass smoothly through
-   * fractional values as the reader scrolls, instead of snapping between
-   * two fixed states.
+   * Cards 2+ visibly slide in from off-stage (off the right edge of the
+   * horizontal track) the moment they become active — but card 1 starts the
+   * sequence already sitting at rest, since there's nothing before it to
+   * reveal it from. That read as it "appearing out of nowhere". This gives
+   * it the same from-the-right entrance as the rest — driven by
+   * hookEntryProgress (the same signal the heading's typewriter uses), not
+   * cardsOpacity/hookProgress, which only start once the pin is fully stuck:
+   * syncing to those left a dead beat after the heading finished typing,
+   * then an abrupt, separate pop-in. This way card 1 arrives continuously
+   * alongside the heading and is already in place the moment typing
+   * finishes.
    */
-  protected readonly continuousCardIndex = computed(() => this.cardsPhaseProgress() * this.hookPoints.length);
-
-  /**
-   * Cards 2+ visibly slide in from off-stage (behind the stack, or off the
-   * right edge of the horizontal track) the moment they become active — but
-   * card 1 starts the sequence already sitting at rest, since there's
-   * nothing before it to reveal it from. That read as it "appearing out of
-   * nowhere". This gives it the same from-the-right entrance as the rest —
-   * driven by hookEntryProgress (the same signal the heading's typewriter
-   * uses), not cardsOpacity/hookProgress, which only start once the pin is
-   * fully stuck: syncing to those left a dead beat after the heading
-   * finished typing, then an abrupt, separate pop-in. This way card 1
-   * arrives continuously alongside the heading and is already in place the
-   * moment typing finishes.
-   */
-  private static readonly FIRST_CARD_ENTRANCE_TRAVEL = 90;
   protected readonly firstCardEntrance = computed(() => 1 - this.headingRevealProgress());
 
   /**
@@ -230,187 +210,174 @@ export class Home implements AfterViewInit {
     return `inset(0 0 0 ${(1 - reveal) * 100}%)`;
   }
 
-  /** i's position in the stack: 0 = on top, 1 = next one back, negative = already peeled off. */
-  protected cardDepth(i: number): number {
-    return i - this.continuousCardIndex();
-  }
-
-/**
-   * Each card's own turn (once it's on top) splits into a still DWELL —
-   * the "viewing scroll space" where scrolling doesn't move the card at
-   * all, so the reader gets real room to read it — followed by a short,
-   * abrupt EXIT once they keep scrolling past that. A continuous slide the
-   * whole way (the previous version) never actually gave the card a
-   * moment to just sit still and be read.
-   */
-  private static readonly CARD_DWELL = 0.66;
-
-  /** How far (px) and how much the card shrinks over the abrupt exit — a quick flick left, not a slow drift. */
-  private static readonly CARD_EXIT_TRAVEL = 420;
-  private static readonly CARD_EXIT_SHRINK = 0.08;
-
-  /**
-   * 0 the instant a card arrives on top, 1 once it has fully exited —
-   * clamped, since further scrolling after a card is long gone shouldn't
-   * keep changing a number nothing reads visually anymore.
-   */
-  private cardTurnProgress(i: number): number {
-    return Home.clamp01(-this.cardDepth(i));
-  }
-
-  /**
-   * depth > 0: still waiting in the stack — nudged down and scaled
-   * slightly smaller the further back it sits, like a real stack of cards
-   * seen from above.
-   * depth <= 0: this card has had its turn. For the first CARD_DWELL share
-   * of that turn it sits perfectly still (the reading window); only past
-   * that does it flick left and shrink slightly on its way out — abrupt
-   * because it happens over the remaining, smaller share of the turn, not
-   * the whole thing.
-   */
+  /** Desktop only: card 1 slides in from the right alongside the heading's own reveal; cards 2+ are fully positioned by hookTrackOffset instead. */
   protected cardTransform(i: number): string | null {
     const entrance = i === 0 ? this.firstCardEntrance() : 0;
-
-    if (this.hookHorizontal()) {
-      // Full-width slide, same as every later card sliding in off the right
-      // edge of the track as it pans — a fixed px nudge (the mobile
-      // treatment) read as far too small a motion on a full 100vw slide.
-      return entrance > 0 ? `translateX(${entrance * 100}%)` : null;
-    }
-
-    const entranceTransform = entrance > 0 ? `translateX(${entrance * Home.FIRST_CARD_ENTRANCE_TRAVEL}px)` : '';
-
-    const depth = this.cardDepth(i);
-    if (depth > 0) {
-      const behind = Math.min(depth, 3);
-      return `translateY(${behind * 16}px) scale(${1 - behind * 0.045}) ${entranceTransform}`.trim();
-    }
-    const turn = this.cardTurnProgress(i);
-    if (turn <= Home.CARD_DWELL) {
-      return entranceTransform || 'none';
-    }
-    const exit = (turn - Home.CARD_DWELL) / (1 - Home.CARD_DWELL);
-    return `translateX(${-exit * Home.CARD_EXIT_TRAVEL}px) scale(${1 - exit * Home.CARD_EXIT_SHRINK})`;
+    return entrance > 0 ? `translateX(${entrance * 100}%)` : null;
   }
 
   /**
-   * Fully opaque through the entire dwell (reading window) — it only
-   * starts fading once it's already flicking away to the left during its
-   * own abrupt exit, so nothing ever reads as "see-through" while it's
-   * sitting still and being read.
+   * ---------------- Mobile · swipeable card carousel ----------------
+   * Touch users reach for a swipe gesture on a stacked card, not a scroll
+   * gesture — a pinned scroll-hijacked track reads as broken/stuck on a
+   * phone. Below HOOK_HORIZONTAL_BREAKPOINT the hook section is plain,
+   * normal-height content: scrolling the page always just scrolls the page,
+   * and cards only change in response to a real horizontal swipe or a drag
+   * on the pill below them.
    */
-  protected cardOpacity(i: number): number {
-    const depth = this.cardDepth(i);
-    if (depth > 0) {
-      return 1;
-    }
-    const turn = this.cardTurnProgress(i);
-    if (turn <= Home.CARD_DWELL) {
-      return 1;
-    }
-    const exit = (turn - Home.CARD_DWELL) / (1 - Home.CARD_DWELL);
-    return 1 - exit;
+  protected readonly mobileActiveCard = signal(0);
+
+  /** Live, unsnapped drag offset (px) while a finger is down on the track; 0 at rest. */
+  private readonly mobileDragOffset = signal(0);
+  protected readonly isCarouselDragging = signal(false);
+
+  /** Keep in sync with .hook-carousel-track's own `gap` in home.scss — baked into the step distance so each index still lands exactly on the next slide. */
+  private static readonly HOOK_CARD_GAP_PX = 12;
+
+  protected readonly carouselTransform = computed(
+    () => `translateX(calc(${-this.mobileActiveCard()} * (100% + ${Home.HOOK_CARD_GAP_PX}px) + ${this.mobileDragOffset()}px))`,
+  );
+
+  private readonly carouselTrack = viewChild<ElementRef<HTMLElement>>('carouselTrack');
+  private carouselPointerId: number | null = null;
+  private carouselStartX = 0;
+  private carouselLastX = 0;
+  private carouselLastTime = 0;
+  private carouselVelocity = 0;
+
+  /** Fraction of the track's own width a drag must cross to commit to the next/previous card instead of springing back. */
+  private static readonly HOOK_SWIPE_COMMIT_FRACTION = 0.22;
+  /** A fast flick commits even under that distance threshold — px/ms. */
+  private static readonly HOOK_SWIPE_VELOCITY_COMMIT = 0.5;
+  /** Dragging past the first/last card still "gives" a little instead of stopping dead. */
+  private static readonly HOOK_RUBBER_BAND_FACTOR = 0.35;
+
+  protected onCarouselPointerDown(event: PointerEvent): void {
+    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+    this.carouselPointerId = event.pointerId;
+    this.isCarouselDragging.set(true);
+    this.carouselStartX = event.clientX;
+    this.carouselLastX = event.clientX;
+    this.carouselLastTime = performance.now();
+    this.carouselVelocity = 0;
+    this.mobileDragOffset.set(0);
   }
 
-  /** The card mid-exit needs to stay above the one it's revealing while both are visible. */
-  protected cardZIndex(i: number): number {
-    return Math.round(1000 - this.cardDepth(i) * 10);
+  protected onCarouselPointerMove(event: PointerEvent): void {
+    if (this.carouselPointerId !== event.pointerId) {
+      return;
+    }
+    const now = performance.now();
+    const dt = Math.max(1, now - this.carouselLastTime);
+    this.carouselVelocity = (event.clientX - this.carouselLastX) / dt;
+    this.carouselLastX = event.clientX;
+    this.carouselLastTime = now;
+
+    let dx = event.clientX - this.carouselStartX;
+    const count = this.hookPoints.length;
+    const index = this.mobileActiveCard();
+    if ((index === 0 && dx > 0) || (index === count - 1 && dx < 0)) {
+      dx *= Home.HOOK_RUBBER_BAND_FACTOR;
+    }
+    this.mobileDragOffset.set(dx);
   }
 
-  /** 0..1 across the whole card sequence — what the scrubber's own small fill tracks. */
-  protected readonly scrubberProgress = computed(() => this.cardsPhaseProgress());
+  protected onCarouselPointerUp(event: PointerEvent): void {
+    if (this.carouselPointerId !== event.pointerId) {
+      return;
+    }
+    this.carouselPointerId = null;
+    this.isCarouselDragging.set(false);
 
-  private scrubbing = false;
+    const width = this.carouselTrack()?.nativeElement.clientWidth || window.innerWidth;
+    const dx = this.mobileDragOffset();
+    const commitDistance = width * Home.HOOK_SWIPE_COMMIT_FRACTION;
+    const count = this.hookPoints.length;
+    const index = this.mobileActiveCard();
 
-  protected onScrubberPointerDown(event: PointerEvent): void {
+    let next = index;
+    if (dx <= -commitDistance || this.carouselVelocity <= -Home.HOOK_SWIPE_VELOCITY_COMMIT) {
+      next = Math.min(count - 1, index + 1);
+    } else if (dx >= commitDistance || this.carouselVelocity >= Home.HOOK_SWIPE_VELOCITY_COMMIT) {
+      next = Math.max(0, index - 1);
+    }
+
+    this.mobileActiveCard.set(next);
+    this.mobileDragOffset.set(0);
+  }
+
+  /**
+   * The pill below the cards — a small, single filled bar (not dots), like a
+   * loading bar: empty at card 1, full at the last card. It's draggable too:
+   * tap anywhere to jump proportionally, or drag for the fill to track your
+   * finger continuously while the carousel snaps card-by-card underneath it.
+   */
+  protected readonly isPillDragging = signal(false);
+  private readonly pillDragFraction = signal<number | null>(null);
+  private pillPointerId: number | null = null;
+
+  protected readonly pillFillPercent = computed(() => {
+    const count = this.hookPoints.length;
+    if (count <= 1) {
+      return 100;
+    }
+    const dragFraction = this.pillDragFraction();
+    return (dragFraction ?? this.mobileActiveCard() / (count - 1)) * 100;
+  });
+
+  protected onPillPointerDown(event: PointerEvent): void {
     const track = event.currentTarget as HTMLElement;
     track.setPointerCapture(event.pointerId);
-    this.scrubbing = true;
-    this.scrubToPointer(event, track);
+    this.pillPointerId = event.pointerId;
+    this.isPillDragging.set(true);
+    this.scrubPillToPointer(event, track);
   }
 
-  protected onScrubberPointerMove(event: PointerEvent): void {
-    if (!this.scrubbing) {
+  protected onPillPointerMove(event: PointerEvent): void {
+    if (this.pillPointerId !== event.pointerId) {
       return;
     }
-    this.scrubToPointer(event, event.currentTarget as HTMLElement);
+    this.scrubPillToPointer(event, event.currentTarget as HTMLElement);
   }
 
-  protected onScrubberPointerUp(): void {
-    this.scrubbing = false;
+  protected onPillPointerUp(event: PointerEvent): void {
+    if (this.pillPointerId !== event.pointerId) {
+      return;
+    }
+    this.pillPointerId = null;
+    this.isPillDragging.set(false);
+    this.pillDragFraction.set(null);
   }
 
-  /**
-   * Converts a pointer's horizontal position on the scrubber directly into
-   * a scroll position — reverses the same math updateHookScroll reads
-   * scroll position with, so dragging the bar and scrolling the page drive
-   * the exact same underlying progress value. Not smooth-scrolled: during
-   * a drag the reader's finger IS the animation, so the scroll should track
-   * it 1:1 rather than chase it.
-   */
-  private scrubToPointer(event: PointerEvent, track: HTMLElement): void {
-    const pin = this.hookPin()?.nativeElement;
-    if (!pin) {
-      return;
-    }
-    const viewportHeight = document.documentElement.clientHeight;
-    const rect = pin.getBoundingClientRect();
-    const scrollable = rect.height - viewportHeight;
-    if (scrollable <= 0) {
-      return;
-    }
-    const trackRect = track.getBoundingClientRect();
-    const fraction = Home.clamp01((event.clientX - trackRect.left) / trackRect.width);
-    const targetHookProgress = Home.HEADING_REVEAL_PHASE + fraction * (1 - Home.HEADING_REVEAL_PHASE);
-    const pinDocumentTop = rect.top + window.scrollY;
-    window.scrollTo({ top: pinDocumentTop + Home.clamp01(targetHookProgress) * scrollable });
-  }
-
-  /**
-   * A horizontal drag on the top card drives it exactly the way scrolling
-   * already does — it just converts left/right finger movement into the
-   * equivalent vertical scroll delta, rather than being a separate,
-   * parallel animation. Swipe left (finger moves left) advances forward,
-   * matching the direction the card itself flicks away on exit.
-   */
-  private static readonly CARD_SWIPE_DISTANCE_PER_CARD = 160;
-
-  private cardSwiping = false;
-  private cardSwipeStartX = 0;
-  private cardSwipeStartScrollY = 0;
-
-  protected onCardSwipeStart(event: PointerEvent): void {
-    if (this.hookHorizontal()) {
-      return;
-    }
-    (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-    this.cardSwiping = true;
-    this.cardSwipeStartX = event.clientX;
-    this.cardSwipeStartScrollY = window.scrollY;
-  }
-
-  protected onCardSwipeMove(event: PointerEvent): void {
-    if (!this.cardSwiping) {
-      return;
-    }
-    const pin = this.hookPin()?.nativeElement;
-    if (!pin) {
-      return;
-    }
-    const viewportHeight = document.documentElement.clientHeight;
-    const scrollable = pin.getBoundingClientRect().height - viewportHeight;
-    if (scrollable <= 0) {
-      return;
-    }
+  private scrubPillToPointer(event: PointerEvent, track: HTMLElement): void {
+    const rect = track.getBoundingClientRect();
+    const fraction = Home.clamp01((event.clientX - rect.left) / rect.width);
+    this.pillDragFraction.set(fraction);
     const count = this.hookPoints.length;
-    const cardSegmentPx = (scrollable * (1 - Home.HEADING_REVEAL_PHASE)) / count;
-    const pxPerDragPx = cardSegmentPx / Home.CARD_SWIPE_DISTANCE_PER_CARD;
-    const dx = event.clientX - this.cardSwipeStartX;
-    window.scrollTo({ top: this.cardSwipeStartScrollY - dx * pxPerDragPx });
+    this.mobileActiveCard.set(Math.round(fraction * (count - 1)));
   }
 
-  protected onCardSwipeEnd(): void {
-    this.cardSwiping = false;
+  /**
+   * Off by default — a hardcoded switch, not a user preference, so turning
+   * gentle auto-advance on later is a one-line flip rather than new work.
+   * Paused automatically while the reader's finger is actually on the
+   * carousel or the pill.
+   */
+  private static readonly HOOK_MOBILE_AUTOPLAY_ENABLED = false;
+  private static readonly HOOK_MOBILE_AUTOPLAY_INTERVAL_MS = 4200;
+  private mobileAutoplayTimer: ReturnType<typeof setInterval> | undefined;
+
+  private setupMobileAutoplay(): void {
+    if (!Home.HOOK_MOBILE_AUTOPLAY_ENABLED) {
+      return;
+    }
+    this.mobileAutoplayTimer = setInterval(() => {
+      if (this.hookHorizontal() || this.isCarouselDragging() || this.isPillDragging()) {
+        return;
+      }
+      const count = this.hookPoints.length;
+      this.mobileActiveCard.update((i) => (i + 1) % count);
+    }, Home.HOOK_MOBILE_AUTOPLAY_INTERVAL_MS);
   }
 
   /**
@@ -480,11 +447,37 @@ export class Home implements AfterViewInit {
     this.closeFillProgress.set(Home.clamp01((start - rect.top) / (start - end)));
   }
 
+  /**
+   * Mobile heading reveal — a plain IntersectionObserver fade-in (the old
+   * appScrollReveal directive) snaps on at a fixed trigger point and then
+   * runs on its own fixed-duration timer, independent of how fast the
+   * reader is actually scrolling — which is exactly what read as abrupt.
+   * This instead recomputes every scroll frame from the heading's own
+   * position, the same way updateCloseFill already does for the closing
+   * quote, so the reveal is genuinely tied 1:1 to the scroll gesture.
+   */
+  private readonly mobileHookHeading = viewChild<ElementRef<HTMLElement>>('mobileHookHeading');
+  protected readonly mobileHeadingRevealProgress = signal(0);
+
+  private updateMobileHeadingReveal(): void {
+    const el = this.mobileHookHeading()?.nativeElement;
+    if (!el) {
+      this.mobileHeadingRevealProgress.set(0);
+      return;
+    }
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const start = vh * 0.92;
+    const end = vh * 0.6;
+    this.mobileHeadingRevealProgress.set(Home.easeOutQuad(Home.clamp01((start - rect.top) / (start - end))));
+  }
+
   ngAfterViewInit(): void {
     const update = () => {
       this.updateHookScroll();
       this.updateHeroExitProgress();
       this.updateCloseFill();
+      this.updateMobileHeadingReveal();
       this.bookingCta.label.set(this.hookProgress() > 0 ? 'Book your slot' : 'Book now');
     };
 
@@ -501,11 +494,13 @@ export class Home implements AfterViewInit {
     window.addEventListener('scroll', queue, { passive: true });
     window.addEventListener('resize', queue, { passive: true });
     update();
+    this.setupMobileAutoplay();
 
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('scroll', queue);
       window.removeEventListener('resize', queue);
       cancelAnimationFrame(this.hookRaf);
+      clearInterval(this.mobileAutoplayTimer);
       this.bookingCta.visible.set(false);
       this.bookingCta.registerHandler(() => {});
     });

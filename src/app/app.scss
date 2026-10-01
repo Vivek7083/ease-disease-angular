@@ -56,9 +56,12 @@
 
 /* The booking CTA and the scroll rail now live in different corners
    entirely (top-right vs. right-middle) — they can't overlap or fight for
-   space, so neither needs to guess the other's geometry. */
+   space, so neither needs to guess the other's geometry. Same `top` as
+   .chrome-wordmark (not --sp-6) — the pill's own compact min-height now
+   matches the wordmark glyph's 36px, so an equal top is what actually lines
+   the two up instead of the pill sitting a few px lower. */
 .chrome-cta {
-  top: max(env(safe-area-inset-top, 0px), var(--sp-6));
+  top: max(env(safe-area-inset-top, 0px), var(--sp-5));
   right: var(--sp-6);
   display: block;
   max-width: 200px;
