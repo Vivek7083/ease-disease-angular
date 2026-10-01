@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
 import { BookingCtaService } from '../../core/services/booking-cta';
@@ -25,7 +26,7 @@ interface HookPoint {
 
 @Component({
   selector: 'app-home',
-  imports: [CanvasStopDirective, ScrollRevealDirective, Wordmark, CtaPill, EyebrowLabel, EvidenceTick, GutHub, LevelCard, TeamCard, RootMap],
+  imports: [NgOptimizedImage, CanvasStopDirective, ScrollRevealDirective, Wordmark, CtaPill, EyebrowLabel, EvidenceTick, GutHub, LevelCard, TeamCard, RootMap],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -47,6 +48,9 @@ export class Home implements AfterViewInit {
   protected jumpToRootMap(): void {
     document.getElementById('root-map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+
+  /** How We Treat · Step 1 — topics that surface one by one during the call illustration. */
+  protected readonly treatStepOneTags = ['Diet', 'Sleep', 'Past reports', 'Lifestyle', 'Goals'] as const;
 
   /**
    * The hook · a pinned scrollytelling track, active at every breakpoint.

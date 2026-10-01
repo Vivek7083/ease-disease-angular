@@ -11,8 +11,11 @@
 /* hook — #F9F2E8 → #F4E9DA */
 --canvas-hook-from:color-mix(in oklab,var(--ivory) 78%,var(--parchment));
 --canvas-hook-to:color-mix(in oklab,var(--ivory) 34%,var(--parchment));
-/* descent — #F4E9DA → parchment. The dark beat is a deep panel ON this canvas. */
---canvas-descent-from:color-mix(in oklab,var(--ivory) 34%,var(--parchment));
+/* treat — #F4E9DA → a touch warmer, a quiet step toward descent */
+--canvas-treat-from:var(--canvas-hook-to);
+--canvas-treat-to:color-mix(in oklab,var(--ivory) 20%,var(--parchment));
+/* descent — treat-to → parchment. The dark beat is a deep panel ON this canvas. */
+--canvas-descent-from:var(--canvas-treat-to);
 --canvas-descent-to:var(--parchment);
 /* turn — parchment → #F0D5BB. The ember dawn as warmth, not as brightness. */
 --canvas-turn-from:var(--parchment);
@@ -32,6 +35,7 @@
    breathing zone: the lowest ratio anywhere on the canvas is ink 12.58:1. */
 --canvas-hero-text:var(--ink);
 --canvas-hook-text:var(--ink);
+--canvas-treat-text:var(--ink);
 --canvas-descent-text:var(--ink);
 --canvas-turn-text:var(--ink);
 --canvas-levels-text:var(--ink);
@@ -41,6 +45,7 @@
 /* Body copy permission: 1 = allowed. Allowed everywhere on an ivory-first canvas. */
 --canvas-hero-body:1; /* @kind other */
 --canvas-hook-body:1; /* @kind other */
+--canvas-treat-body:1; /* @kind other */
 --canvas-descent-body:1; /* @kind other */
 --canvas-turn-body:1; /* @kind other */
 --canvas-levels-body:1; /* @kind other */
