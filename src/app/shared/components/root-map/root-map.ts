@@ -106,7 +106,7 @@ const NOTES_STEP = 0.14;
          flow on mobile. -->
     <ng-template #mapTpl>
       <div class="root-map-wrap">
-        <div class="root-map" [class.focus]="focusSet().size > 0" #mapBox>
+        <div class="root-map" [class.focus]="selected().size > 0" #mapBox>
           <svg class="root-map-links" #linksSvg aria-hidden="true">
             @for (link of links; track link.from + '>' + link.to; let i = $index) {
               <path
@@ -508,9 +508,12 @@ const NOTES_STEP = 0.14;
     /* Default (symptoms layer, the buttons) lights up terracotta — the
        warmest, most immediate tone, for the layer the reader interacts
        with directly. */
+    /* Terracotta deepened a touch toward oxblood: plain terracotta under
+       ivory text is only ~3.7:1, below the 4.5:1 AA minimum. */
     .root-map-node.lit {
-      background: var(--terracotta);
-      border-color: var(--terracotta);
+      --lit-family: color-mix(in oklab, var(--terracotta) 72%, var(--oxblood));
+      background: var(--lit-family);
+      border-color: var(--lit-family);
       color: var(--ivory);
     }
 
@@ -659,6 +662,36 @@ const NOTES_STEP = 0.14;
       line-height: 1.5;
       letter-spacing: 0.01em;
       color: color-mix(in oklab, var(--text-quiet-light) 70%, transparent);
+    }
+
+    /* Laptops and tablets in landscape (900-1199px): the 580px map plus
+       two note columns doesn't fit inside the page gutters, so the stage
+       breaks out to nearly the full viewport width, the map narrows, and
+       the pills tighten — otherwise the side columns squeeze to under
+       150px and the notes overflow the pinned viewport. */
+    @media (min-width: 900px) and (max-width: 1199px) {
+      .rm-viewport {
+        margin-inline: calc(var(--gutter-desktop) * -1 + var(--sp-4));
+      }
+
+      .rm-stage {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 440px) minmax(0, 1fr);
+        gap: var(--sp-4);
+      }
+
+      .rm-stage .root-map {
+        gap: var(--sp-6);
+      }
+
+      .rm-stage .root-map-node {
+        font-size: 0.84rem;
+        min-height: 34px;
+        padding: 0 12px;
+      }
+
+      .rm-col {
+        gap: var(--sp-4);
+      }
     }
 
     .rm-col {

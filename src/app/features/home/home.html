@@ -505,9 +505,18 @@
       <h2 id="levels-heading" class="t-display">Start with a conversation. Go as deep as you need.</h2>
       <div class="levels-grid">
         @for (level of levels; track level.name) {
-          <app-level-card [level]="level" />
+          <app-level-card [level]="level" (booked)="bookConsultation()" />
         }
       </div>
+      <p class="levels-fallback">
+        Not sure which one?
+        <a class="source-link" href="#root-map">
+          <span>Take the Digestion Quiz</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
+        </a>
+        · Still deciding?
+        <button type="button" class="inline-cta" (click)="bookConsultation()">Book a free 15-minute call</button>
+      </p>
     </div>
   </section>
 

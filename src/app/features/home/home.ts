@@ -937,7 +937,6 @@ export class Home implements AfterViewInit {
     'What could be driving it — your likely underlying cause(s)',
     'Recommended tests and supplements to start with',
     'A basic anti-inflammatory diet, and where your diet or lifestyle is going wrong',
-    'Simple supplement guidance — magnesium, vitamin D3',
     'Why healing begins with improving digestion',
   ];
 
@@ -966,25 +965,31 @@ export class Home implements AfterViewInit {
 
   protected readonly levels: readonly Level[] = [
     {
-      tag: 'Level 01',
-      name: 'First consultation',
+      tag: 'Step 1',
+      name: 'One-time consultation',
       price: '₹499',
-      priceNote: '30 minutes · one time',
-      features: ['A full conversation about your history', 'A first look at where your pattern may start', 'A clear next step, no obligation'],
+      priceNote: '30 minutes · ₹599 to be confirmed',
+      ctaLabel: 'Book a Consultation',
+      features: [
+        'We listen to your concerns, history and health goals',
+        'We explain what may be behind your dis-ease, in plain words',
+        'We suggest the tests and supplements that make sense for you',
+        'You leave with a simple anti-inflammatory food plan and starting supplement guidance',
+      ],
     },
     {
-      tag: 'Level 02–04',
-      name: 'Root-cause programme',
-      price: 'Coming after your call',
-      features: ['Built around what your first consultation finds', 'Ongoing check-ins with your practitioner', 'Adjusted as your body responds'],
+      tag: 'Digest with Ease',
+      name: 'Digest with Ease',
+      price: 'Scope, duration & price to be confirmed',
+      ctaLabel: 'Book This Program',
+      description: 'Guided support if your main concern starts in digestion: bloating, acidity, irregular bowels, food sensitivities.',
     },
     {
-      tag: 'E.A.S.E. DIS-EASE',
-      name: '3-month lifestyle programme',
-      price: '₹15,999',
-      priceNote: '≈ ₹5,333 / month',
-      recommended: true,
-      features: ['Ongoing consults & check-ins', 'Blood report reviews', 'Mental & emotional support', 'Reviewed by Dr. Akshai'],
+      tag: 'Transform with Ease',
+      name: 'Transform with Ease',
+      price: 'Scope, duration & price to be confirmed',
+      ctaLabel: 'Book This Program',
+      description: 'Whole-person support if your symptoms show up in many places: skin, hormones, energy, sleep, mood, weight.',
     },
   ];
 

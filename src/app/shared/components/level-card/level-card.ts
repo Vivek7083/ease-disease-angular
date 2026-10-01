@@ -1,18 +1,23 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { EvidenceTick } from '../evidence-tick/evidence-tick';
+import { CtaPill } from '../cta-pill/cta-pill';
 
 export interface Level {
   readonly tag: string;
   readonly name: string;
   readonly price: string;
   readonly priceNote?: string;
-  readonly features: readonly string[];
+  readonly ctaLabel: string;
+  /** A single-line description, for a package whose scope isn't broken into
+   *  bullet features yet (e.g. still template/TBC from the source PRD). */
+  readonly description?: string;
+  readonly features?: readonly string[];
   readonly recommended?: boolean;
 }
 
 @Component({
   selector: 'app-level-card',
-  imports: [EvidenceTick],
+  imports: [EvidenceTick, CtaPill],
   template: `
     <article class="level" [class.recommended]="level().recommended">
       @if (level().recommended) {
@@ -26,14 +31,19 @@ export interface Level {
           <span class="note">{{ note }}</span>
         }
       </p>
-      <ul>
-        @for (feature of level().features; track feature) {
-          <li>
-            <app-evidence-tick />
-            {{ feature }}
-          </li>
-        }
-      </ul>
+      @if (level().description; as description) {
+        <p class="description">{{ description }}</p>
+      } @else if (level().features; as features) {
+        <ul>
+          @for (feature of features; track feature) {
+            <li>
+              <app-evidence-tick />
+              {{ feature }}
+            </li>
+          }
+        </ul>
+      }
+      <app-cta-pill class="cta" [label]="level().ctaLabel" variant="ghostDark" (pressed)="booked.emit()" />
     </article>
   `,
   styles: `
@@ -114,8 +124,19 @@ export interface Level {
     li:first-child {
       border-top: none;
     }
+    .description {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: var(--text-quiet-light);
+      margin: var(--sp-5) 0 0;
+    }
+    .cta {
+      display: block;
+      margin-top: var(--sp-5);
+    }
   `,
 })
 export class LevelCard {
   readonly level = input.required<Level>();
+  readonly booked = output<void>();
 }
