@@ -232,7 +232,7 @@
   padding-inline: var(--gutter-mobile);
   flex: 0 0 auto;
   /* Left-to-right typewriter-style reveal (headingRevealProgress in
-     home.ts) — same frame-smoothing transition as .hook-track's opacity.
+     home.ts) — same frame-smoothing transition as .hook-deck's opacity.
      opacity/transform are the mobile heading's own scroll-tied reveal
      (mobileHeadingRevealProgress) — harmless no-op on desktop, which never
      sets inline opacity/transform on this element. */
@@ -253,7 +253,13 @@
   font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
   font-weight: 400;
   line-height: 1.15;
-  color: var(--ink);
+  /* Plain --ink read as just another line of body copy once it's sitting
+     pinned on screen for a while, surrounded by the cards' own (also --ink)
+     titles — nothing marked it as THE section heading. A muted burgundy
+     tint (not the hero's full-strength --oxblood) ties it to the same
+     accent already used for links/CTAs/emphasis elsewhere, while staying
+     quiet enough not to compete with the cards. */
+  color: color-mix(in oklab, var(--oxblood) 58%, var(--ink));
 }
 
 /* ---------- the hook · story track ---------- */
@@ -287,10 +293,16 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-6);
-  padding-block: var(--sp-10);
+  padding-bottom: var(--sp-10);
+  /* This is desktop-only content (mobile never renders .hook-viewport), so
+     the fixed chrome wordmark/CTA (~56-60px tall incl. its own top offset)
+     is always above it — centering the heading+deck block with only
+     --sp-10 (40px) of top padding let the heading's top edge land right
+     under/behind the logo on shorter laptop screens. */
+  padding-top: var(--sp-16);
 }
 
-/* Dissolves on desktop (default) so .hook-heading-row and .hook-track stay
+/* Dissolves on desktop (default) so .hook-heading-row and .hook-deck stay
    direct flex items of .hook-viewport exactly as before — same
    display:contents trick app-root-map uses for its own wrapper. */
 .hook-stack {
@@ -465,66 +477,59 @@
   }
 }
 
-.hook-track {
+/* Desktop card deck — every card stacked in the same spot (not laid out
+   side by side), each one's opacity/transform/blur a continuous function of
+   its distance from the current scroll position (see cardVisibility et al.
+   in home.ts). A card's fade-out and its neighbor's fade-in happen across
+   the same window, so they cross-dissolve into each other instead of
+   handing off with a cut. The 60ms linear transitions below are the same
+   "frame smoothing" trick used elsewhere in this file — they interpolate
+   between discrete rAF-driven values, not a separate easing/dwell of their
+   own, so the motion stays exactly proportional to scroll. */
+.hook-deck {
   position: relative;
   width: 100%;
   flex: 1;
   min-height: 0;
-  /* Fades in once the heading finishes typing (cardsOpacity in home.ts) —
-     same frame-smoothing trick as the heading's clip-path transition. */
   transition: opacity 60ms linear;
 }
 
-.hook-pin.is-horizontal .hook-viewport {
-  /* Cross-axis fix: the track's explicit width (4x viewport) is far wider
-     than this column's own width, and `align-items: center` (the base
-     rule) centers oversized flex items — hanging half the track off each
-     side *before* our own translateX ever applies. That pre-shift is what
-     made every scroll position show the wrong, misaligned slice of the
-     track (partial/blank views, "missing" card text). flex-start removes
-     that hidden offset so translateX(0) truly means "card one, no shift". */
-  align-items: flex-start;
-}
-
-.hook-pin.is-horizontal .hook-track {
-  display: flex;
-  flex-wrap: nowrap;
-  width: calc(var(--hook-count) * 100vw);
-  height: auto;
-  will-change: transform;
-}
-
-.hook-slide {
+.hook-deck-card {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   padding-inline: var(--gutter-mobile);
-  opacity: 0;
-  transform: translateY(18px);
-  pointer-events: none;
+  will-change: opacity, transform;
   transition:
-    opacity var(--dur-scene) var(--ease-out-soft),
-    transform var(--dur-scene) var(--ease-out-soft);
+    opacity 60ms linear,
+    transform 60ms linear;
 }
 
-.hook-slide.active {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-}
-
-.hook-pin.is-horizontal .hook-slide {
-  position: relative;
-  inset: auto;
-  flex: 0 0 100vw;
-  width: 100vw;
+.hook-pin.is-horizontal .hook-deck-card {
   padding-inline: var(--gutter-desktop);
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  transition: none;
+}
+
+/* Blur lives on the image only — blurring the copy meant two overlapping
+   paragraphs of blurred text mid-crossfade, which read as noise rather than
+   depth. The image tolerates it fine as a decorative cue. */
+.hook-pin.is-horizontal .hook-image-placeholder {
+  transition:
+    transform 60ms linear,
+    filter 60ms linear;
+}
+
+.hook-pin.is-horizontal .hook-copy {
+  transition: transform 60ms linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-deck-card,
+  .hook-pin.is-horizontal .hook-image-placeholder,
+  .hook-pin.is-horizontal .hook-copy {
+    transition: none;
+  }
 }
 
 /* No card chrome — no border, no shadow, no background box. Content sits
@@ -626,7 +631,7 @@
     max-width: 1040px;
   }
 
-  .hook-pin.is-horizontal .hook-slide:nth-child(even) .hook-card {
+  .hook-pin.is-horizontal .hook-deck-card:nth-child(even) .hook-card {
     flex-direction: row-reverse;
   }
 
@@ -649,10 +654,6 @@
   .hook-pin.is-horizontal .hook-copy {
     flex: 1;
     min-width: 0;
-    /* Same frame-smoothing as the heading's own clip-path reveal — the
-       wipe itself is driven every scroll frame by cardInfoClipPath, this
-       just keeps it from stepping between rAF ticks. */
-    transition: clip-path 60ms linear;
   }
 
   .hook-pin.is-horizontal .hook-copy h3 {

@@ -60,6 +60,18 @@ export class Home implements AfterViewInit {
   private static readonly HOOK_HORIZONTAL_BREAKPOINT = 900;
 
   /**
+   * How much pinned scroll each card gets, on desktop — the pin's total
+   * height is this × the card count. The middle cards (not the first, which
+   * also gets a free head start from the pre-lock entry reveal, or the
+   * last, which gets its own trailing hold below) only ever get their share
+   * of this budget, so raising it is what actually gives them real
+   * breathing room before the next one starts crossfading in, without
+   * touching the shape of the crossfade curve itself (still smooth either
+   * way — this only stretches it out).
+   */
+  protected readonly hookVhPerCard = 115;
+
+  /**
    * On desktop, the drag through all cards uses only this fraction of the
    * pin's scrollable range — the rest is a trailing hold at the last card's
    * fully-arrived position. Without it, the last card reaches full view at
@@ -131,93 +143,87 @@ export class Home implements AfterViewInit {
    * loaded" the instant its viewport is reached, exactly like the heading.
    */
   protected readonly cardsOpacity = computed(() => this.headingRevealProgress());
-  /**
-   * Desktop only: card 1 arrives fully visible and then holds still for
-   * this opening slice of pinned scroll before the track starts panning —
-   * the same "real reading time" the mobile stack already gives every card
-   * via CARD_DWELL. Without it, dragging began on the very first pixel of
-   * pinned scroll and card 1 never got a moment to actually be read.
-   */
-  private static readonly HOOK_HORIZONTAL_LEAD_DWELL = 0.1;
   protected readonly hookDragProgress = computed(() => {
     if (!this.hookHorizontal()) {
       return Math.min(1, this.cardsPhaseProgress() / Home.HOOK_DRAG_PHASE);
     }
-    const lead = Home.HOOK_HORIZONTAL_LEAD_DWELL;
-    return Home.clamp01((this.cardsPhaseProgress() - lead) / (Home.HOOK_DRAG_PHASE - lead));
+    return Home.clamp01(this.cardsPhaseProgress() / Home.HOOK_DRAG_PHASE);
   });
 
-  /**
-   * Raw drag progress panned linearly the whole way, so a card was never
-   * actually still — it was always mid-transition into the next one, which
-   * read as "I can't finish reading before the next card shows up". Only
-   * this fraction of each card's own unit of drag is spent actually
-   * panning/revealing; the rest holds the arrived card flat in place (a
-   * real reading window) before the next one starts sliding in. Mirrors the
-   * mobile stack's CARD_DWELL, just expressed per unit of continuous drag
-   * instead of per discrete card turn.
-   */
-  private static readonly HOOK_TRANSITION_FRACTION = 0.55;
-
-  private mapWithDwell(t: number): number {
-    const whole = Math.floor(t);
-    const frac = t - whole;
-    const eased = Math.min(1, frac / Home.HOOK_TRANSITION_FRACTION);
-    return Math.min(this.hookPoints.length - 1, whole + eased);
-  }
-
-  /** Continuous 0..(count-1) position along the desktop drag, before the per-card dwell is applied. */
+  /** Continuous 0..(count-1) position along the desktop drag — the single
+   *  number every card's visibility/parallax below is computed from. No
+   *  dwell/hold mapping on top of it: scroll maps to motion proportionally
+   *  the whole way, which is what actually reads as smooth rather than a
+   *  sprint-then-freeze-then-sprint rhythm. */
   protected readonly hookDragUnits = computed(() => this.hookDragProgress() * (this.hookPoints.length - 1));
 
-  /** Same range as hookDragUnits, but each card holds still for its dwell share before the next one moves. */
-  protected readonly hookEffectiveUnits = computed(() => this.mapWithDwell(this.hookDragUnits()));
-
-  /** Desktop only — mobile's own active card is `mobileActiveCard` below. */
-  protected readonly hookActiveIndex = computed(() => Math.round(this.hookEffectiveUnits()));
-  protected readonly hookTrackOffset = computed(() => -this.hookEffectiveUnits() * window.innerWidth);
-
   /**
-   * Cards 2+ visibly slide in from off-stage (off the right edge of the
-   * horizontal track) the moment they become active — but card 1 starts the
-   * sequence already sitting at rest, since there's nothing before it to
-   * reveal it from. That read as it "appearing out of nowhere". This gives
-   * it the same from-the-right entrance as the rest — driven by
-   * hookEntryProgress (the same signal the heading's typewriter uses), not
-   * cardsOpacity/hookProgress, which only start once the pin is fully stuck:
-   * syncing to those left a dead beat after the heading finished typing,
-   * then an abrupt, separate pop-in. This way card 1 arrives continuously
-   * alongside the heading and is already in place the moment typing
-   * finishes.
+   * Desktop card deck: every card is stacked in the same spot (position:
+   * absolute) rather than laid out side by side on a wide track. Each one's
+   * opacity/position/blur is a continuous function of its distance from the
+   * current drag position — full strength on a plateau right at its own
+   * "turn", fading out over the approach/departure. Because a card's fade-out
+   * and its neighbor's fade-in both happen across that same window, they
+   * cross-dissolve through each other rather than handing off with a cut.
    */
-  protected readonly firstCardEntrance = computed(() => 1 - this.headingRevealProgress());
-
   /**
-   * Desktop only: each card's own info column reveals left-to-right as it
-   * slides in — the same clip-path wipe the heading uses for its typewriter
-   * reveal, so a card arriving mid-scroll isn't just a solid block sliding
-   * into place with its text already fully drawn. Card 1 has no drag
-   * transition to key off (it's already at rest at drag 0), so it reuses
-   * hookEntryProgress — the same signal driving its slide-in and the
-   * heading's own reveal. Cards 2+ key off their own slice of the
-   * continuous drag: 0 right as the previous card starts giving way, 1 once
-   * this one has fully arrived.
+   * A bigger plateau (and correspondingly narrower fade) than a literal
+   * 50/50 split — each card spends most of its turn fully legible, with only
+   * a brief, smooth window where it's actually crossfading into its
+   * neighbor. This is purely a reshaping of the opacity curve, not the
+   * motion: position/scale keep moving continuously throughout regardless,
+   * so narrowing the fade doesn't bring back the old sprint-then-freeze
+   * abruptness — it just means less time where nothing on screen is clearly
+   * readable.
    */
-  protected cardInfoReveal(i: number): number {
-    if (i === 0) {
-      return this.headingRevealProgress();
+  private static readonly HOOK_CARD_PLATEAU = 0.4;
+  private static readonly HOOK_CARD_FADE = 0.6;
+  /** Subtle drift, not a full-screen throw — this is parallax, not a slide carousel. */
+  private static readonly HOOK_CARD_PARALLAX_PX = 90;
+  /** Blur is only ever applied to the image (see cardImageFilter) — blurring
+   *  the copy made two overlapping paragraphs of blurred text during a
+   *  crossfade, which read as noise, not depth. */
+  private static readonly HOOK_CARD_MAX_BLUR_PX = 5;
+  /** Image and copy drift at slightly different rates for a layered, dimensional feel within each card. */
+  private static readonly HOOK_IMAGE_PARALLAX_FACTOR = 0.5;
+  private static readonly HOOK_COPY_PARALLAX_FACTOR = 1.15;
+
+  private cardDelta(i: number): number {
+    return Home.clampSigned(this.hookDragUnits() - i, -1, 1);
+  }
+
+  protected cardVisibility(i: number): number {
+    const distance = Math.abs(this.hookDragUnits() - i);
+    if (distance <= Home.HOOK_CARD_PLATEAU) {
+      return 1;
     }
-    return Home.clamp01(this.hookEffectiveUnits() - (i - 1));
+    if (distance >= Home.HOOK_CARD_PLATEAU + Home.HOOK_CARD_FADE) {
+      return 0;
+    }
+    return 1 - (distance - Home.HOOK_CARD_PLATEAU) / Home.HOOK_CARD_FADE;
   }
 
-  protected cardInfoClipPath(i: number): string {
-    const reveal = this.cardInfoReveal(i);
-    return `inset(0 0 0 ${(1 - reveal) * 100}%)`;
+  protected cardDeckTransform(i: number): string {
+    const translate = this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX;
+    const scale = 0.96 + 0.04 * this.cardVisibility(i);
+    return `translateX(${translate}px) scale(${scale})`;
   }
 
-  /** Desktop only: card 1 slides in from the right alongside the heading's own reveal; cards 2+ are fully positioned by hookTrackOffset instead. */
-  protected cardTransform(i: number): string | null {
-    const entrance = i === 0 ? this.firstCardEntrance() : 0;
-    return entrance > 0 ? `translateX(${entrance * 100}%)` : null;
+  protected cardImageTransform(i: number): string {
+    return `translateX(${this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX * Home.HOOK_IMAGE_PARALLAX_FACTOR}px)`;
+  }
+
+  protected cardImageFilter(i: number): string {
+    const blur = (1 - this.cardVisibility(i)) * Home.HOOK_CARD_MAX_BLUR_PX;
+    return blur > 0.05 ? `blur(${blur}px)` : 'none';
+  }
+
+  protected cardCopyTransform(i: number): string {
+    return `translateX(${this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX * Home.HOOK_COPY_PARALLAX_FACTOR}px)`;
+  }
+
+  protected cardPointerEvents(i: number): 'auto' | 'none' {
+    return this.cardVisibility(i) > 0.5 ? 'auto' : 'none';
   }
 
   /**
@@ -405,6 +411,10 @@ export class Home implements AfterViewInit {
 
   private static clamp01(value: number): number {
     return Math.max(0, Math.min(1, value));
+  }
+
+  private static clampSigned(value: number, min: number, max: number): number {
+    return Math.max(min, Math.min(max, value));
   }
 
   private static easeOutQuad(t: number): number {
