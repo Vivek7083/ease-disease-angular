@@ -18,6 +18,13 @@ html {
   /* The scroll-progress rail (right-middle chrome) replaces the browser's
      own scrollbar as the scroll affordance. */
   scrollbar-width: none;
+  /* Decorative fixed layers (.ambient-field in app.scss) are deliberately
+     oversized via negative inset + a drift animation so their blur edges
+     never show. Some mobile browser engines still count an oversized fixed
+     element toward the page's scrollable area, producing a horizontal
+     scrollbar nothing on this page is meant to have — block it at the root
+     rather than chase it per element. */
+  overflow-x: hidden;
 }
 
 html::-webkit-scrollbar {
@@ -32,6 +39,7 @@ body {
   font-size: var(--fs-body-m);
   line-height: var(--lh-body);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
 h1,

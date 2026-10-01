@@ -64,8 +64,12 @@
      column used to run well past 100svh, forcing a long scroll of blank
      canvas just to finish exiting the hero before the hook's pin could
      take over (see heroGutOpacity in home.ts for the other half of that
-     fix). */
-  padding-block: clamp(var(--sp-6), 6vh, var(--sp-10));
+     fix). Top padding is deliberately taller than the bottom: app.scss's
+     fixed .chrome-wordmark/.chrome-cta float above everything regardless
+     of section padding, so the headline needs enough clearance to start
+     below them instead of rendering underneath. */
+  padding-top: max(calc(var(--sp-16) + env(safe-area-inset-top, 0px)), calc(var(--sp-6) + 6vh));
+  padding-bottom: clamp(var(--sp-6), 6vh, var(--sp-10));
 }
 
 @media (min-width: 900px) {
