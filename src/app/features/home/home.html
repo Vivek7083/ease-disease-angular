@@ -400,7 +400,7 @@
   </section>
 
   <!-- ============ PROGRAMME — packages, picked by depth ============ -->
-  <section class="scene programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-turn-mid)" aria-labelledby="programme-heading">
+  <section class="scene programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="How it starts" />
       <h2 id="programme-heading" class="t-display">One conversation is where your plan begins.</h2>
@@ -416,6 +416,16 @@
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
         </a>
       </p>
+    </div>
+  </section>
+
+  <!-- ============ TEAM — meet the experts ============ -->
+  <section class="scene team" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
+    <div class="scene-inner">
+      <app-eyebrow-label text="Meet the experts" />
+      <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
+      <app-expert-carousel [members]="team" (connectRequested)="bookConsultation()" />
+      <p class="team-trust-note">[Template: certifications &amp; trust badges — pending from founders]</p>
     </div>
   </section>
 
@@ -471,20 +481,6 @@
           <span><strong>One practitioner</strong> who reads your whole picture, not just today's symptom</span>
         </li>
       </ul>
-    </div>
-  </section>
-
-  <!-- ============ TEAM — meet the experts ============ -->
-  <section class="scene team" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
-    <div class="scene-inner">
-      <app-eyebrow-label text="Meet the experts" />
-      <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
-      <div class="team-grid">
-        @for (member of team; track member.name) {
-          <app-team-card [member]="member" (connectRequested)="bookConsultation()" />
-        }
-      </div>
-      <p class="team-trust-note">[Template: certifications &amp; trust badges — pending from founders]</p>
     </div>
   </section>
 

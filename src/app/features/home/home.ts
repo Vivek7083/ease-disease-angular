@@ -10,7 +10,8 @@ import { EvidenceTick } from '../../shared/components/evidence-tick/evidence-tic
 import { GutHub } from '../../shared/components/gut-hub/gut-hub';
 import { type Level } from '../../shared/components/level-card/level-card';
 import { LevelSelector } from '../../shared/components/level-selector/level-selector';
-import { TeamCard, type TeamMember } from '../../shared/components/team-card/team-card';
+import { type TeamMember } from '../../shared/components/team-card/team-card';
+import { ExpertCarousel } from '../../shared/components/expert-carousel/expert-carousel';
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
 
@@ -48,7 +49,7 @@ interface TreatStep {
     EvidenceTick,
     GutHub,
     LevelSelector,
-    TeamCard,
+    ExpertCarousel,
     RootMap,
     Results,
   ],

@@ -1426,10 +1426,8 @@
   }
 }
 
-.team-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--sp-6);
+app-expert-carousel {
+  display: block;
   margin-top: var(--sp-8);
 }
 
@@ -1452,36 +1450,4 @@
   color: var(--text-quiet-light);
 }
 
-/* Three full cards stacked and scrolled past one at a time read as a wall of
-   near-identical boxes on a phone. A horizontal snap row — one card per
-   "page", the next peeking at the edge as a hint there's more — reads as a
-   deliberate choice instead of just a cramped grid. */
-@media (max-width: 899px) {
-  .team-grid {
-    display: flex;
-    gap: var(--sp-4);
-    margin-inline: calc(var(--gutter-mobile) * -1);
-    padding-inline: var(--gutter-mobile);
-    padding-bottom: var(--sp-2);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--gutter-mobile);
-    scrollbar-width: none;
-  }
-
-  .team-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .team-grid app-team-card {
-    flex: 0 0 82%;
-    scroll-snap-align: start;
-  }
-}
-
-@media (min-width: 900px) {
-  .team-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 

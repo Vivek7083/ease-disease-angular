@@ -17,7 +17,7 @@ export interface TeamMember {
   selector: 'app-team-card',
   imports: [NgOptimizedImage, CtaPill],
   template: `
-    <article class="team-card">
+    <article class="team-card" [class.is-split]="split()">
       <div class="portrait">
         @if (member().photo; as photo) {
           <img [ngSrc]="photo" fill alt="" />
@@ -25,11 +25,13 @@ export interface TeamMember {
           <span class="portrait-fallback" aria-hidden="true">{{ member().initials }}</span>
         }
       </div>
-      <h3>{{ member().name }}</h3>
-      <p class="role">{{ member().role }}</p>
-      <p class="credential">{{ member().credential }}</p>
-      <p class="bio">{{ member().bio }}</p>
-      <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostLight" (pressed)="connectRequested.emit()" />
+      <div class="info">
+        <h3>{{ member().name }}</h3>
+        <p class="role">{{ member().role }}</p>
+        <p class="credential">{{ member().credential }}</p>
+        <p class="bio">{{ member().bio }}</p>
+        <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostLight" (pressed)="connectRequested.emit()" />
+      </div>
     </article>
   `,
   styles: `
@@ -41,7 +43,7 @@ export interface TeamMember {
       background: var(--surface-deep);
       color: var(--ivory);
       border-radius: var(--r-lg);
-      padding: var(--sp-7) var(--sp-6) var(--sp-6);
+      padding: var(--sp-8) var(--sp-6) var(--sp-6);
       box-shadow: var(--shadow-lift);
     }
 
@@ -67,6 +69,12 @@ export interface TeamMember {
       font-family: var(--font-display);
       font-size: 1.6rem;
       font-weight: 600;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     h3 {
@@ -101,9 +109,40 @@ export interface TeamMember {
     .cta {
       margin-top: var(--sp-6);
     }
+
+    /* Split layout: photo and info sit side by side instead of stacked —
+       used for the large-screen spotlight, where there's width to spare and
+       centering everything would waste it. */
+    .team-card.is-split {
+      flex-direction: row;
+      align-items: center;
+      text-align: left;
+      gap: var(--sp-10);
+      padding: var(--sp-10);
+    }
+    .team-card.is-split .portrait {
+      flex: none;
+      width: 220px;
+      height: 220px;
+    }
+    .team-card.is-split .portrait-fallback {
+      font-size: 3.2rem;
+    }
+    .team-card.is-split .info {
+      align-items: flex-start;
+      flex: 1;
+    }
+    .team-card.is-split h3 {
+      margin-top: 0;
+      font-size: var(--fs-display-m);
+    }
+    .team-card.is-split .bio {
+      max-width: 48ch;
+    }
   `,
 })
 export class TeamCard {
   readonly member = input.required<TeamMember>();
+  readonly split = input(false);
   readonly connectRequested = output<void>();
 }
