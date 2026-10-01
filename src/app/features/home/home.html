@@ -171,121 +171,195 @@
        of the site uses). ============ -->
   <section class="scene treat" id="treat" appCanvasStop from="var(--canvas-hook-to)" to="var(--canvas-treat-to)" aria-labelledby="treat-heading">
     <div class="scene-inner treat-inner">
-      <div class="treat-heading-row reveal" [appScrollReveal]="0">
-        <app-eyebrow-label text="Built with you, not for you" />
-        <h2 id="treat-heading" class="treat-heading">Here's how we get to your root cause</h2>
-        <p class="treat-subtext">Four honest conversations. No guesswork, no generic checklist — just what your body is actually telling us.</p>
-      </div>
+      <!-- Shared between mobile (sits above the pin, in normal flow) and
+           desktop (sits inside the sticky viewport, alongside the nodes —
+           same as the Hook section's heading staying visible with its
+           cards instead of scrolling away before the pin even engages). -->
+      <ng-template #treatHeading>
+        <div class="treat-heading-row reveal" [appScrollReveal]="0">
+          <app-eyebrow-label text="Built with you, not for you" />
+          <h2 id="treat-heading" class="treat-heading">Here's how we get to your root cause</h2>
+          @if (treatHorizontal()) {
+            <p class="treat-subtext">Four honest conversations — no guesswork, no generic checklist.</p>
+          } @else {
+            <p class="treat-subtext">Four honest conversations. No guesswork, no generic checklist — just what your body is actually telling us.</p>
+          }
+        </div>
+      </ng-template>
 
-      <!-- Pinned, scroll-scrubbed deck — each step's content and
-           illustration share one spot and cross-dissolve into the next as
-           you scroll, rather than stacking down the page. Scrolling back up
-           reverses it, same as any pin; scrolling past the last step holds
-           it in place for a beat before the pin releases into Root Map. -->
-      <div class="treat-pin" #treatPin [style.height.vh]="treatSteps.length * treatVhPerStep">
-        <div class="treat-viewport">
-          <div class="treat-deck">
-            @for (step of treatSteps; track step.title; let i = $index) {
-              <div
-                class="treat-deck-card"
-                [style.opacity]="treatCardVisibility(i)"
-                [style.transform]="treatCardTransform(i)"
-                [style.pointer-events]="treatCardPointerEvents(i)"
-              >
-                <div class="treat-step-main">
-                  <div class="treat-step-rail" aria-hidden="true" [style.filter]="treatCopyFilter(i)">
-                    <span class="treat-step-badge">{{ '0' + (i + 1) }}</span>
-                    @if (i < treatSteps.length - 1) {
-                      <span class="treat-step-line" [style.transform]="'scaleY(' + treatLineProgress(i) + ')'"></span>
+      <!-- Shared between the mobile deck and the desktop timeline below —
+           the illustration markup is identical either way, only the
+           surrounding mechanic differs. -->
+      <ng-template #stepIllustration let-i="i">
+        @if (i === 0) {
+          <div class="treat-phone" aria-hidden="true">
+            <div class="treat-phone-notch"></div>
+            <div class="treat-phone-screen">
+              <div class="treat-call-header">
+                <span class="treat-call-dot"></span>
+                <span class="treat-call-timer">12:47</span>
+              </div>
+              <div class="treat-call-stage">
+                <div class="treat-call-tile treat-call-tile-main">
+                  <img ngSrc="images/treat-step1-nutritionist.png" fill alt="" class="treat-portrait" />
+                </div>
+                <div class="treat-call-tile treat-call-tile-self">
+                  <svg class="treat-avatar treat-avatar-self" viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="9" r="4" />
+                    <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+                  </svg>
+                  <div class="treat-cloud-stack">
+                    @for (tag of treatStepOneTags; track tag) {
+                      <span class="treat-cloud">{{ tag }}</span>
                     }
-                  </div>
-                  <div class="treat-step-content">
-                    <div class="treat-step-copy" [style.filter]="treatCopyFilter(i)">
-                      <h3 class="treat-step-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
-                      <p class="treat-step-body">{{ step.body }}</p>
-                      @if (i === 0) {
-                        <button class="source-link" type="button" (click)="bookConsultation()">
-                          <span>Start with a 30-minute </span
-                          ><span class="source-link-tail"
-                            >conversation<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg
-                          ></span>
-                        </button>
-                      }
-                    </div>
-
-                    <div class="treat-step-visual" [style.opacity]="treatIllustrationVisibility(i)">
-                      @if (i === 0) {
-                    <div class="treat-phone" aria-hidden="true">
-                      <div class="treat-phone-notch"></div>
-                      <div class="treat-phone-screen">
-                        <div class="treat-call-header">
-                          <span class="treat-call-dot"></span>
-                          <span class="treat-call-timer">12:47</span>
-                        </div>
-                        <div class="treat-call-stage">
-                          <div class="treat-call-tile treat-call-tile-main">
-                            <img ngSrc="images/treat-step1-nutritionist.png" fill alt="" class="treat-portrait" />
-                          </div>
-                          <div class="treat-call-tile treat-call-tile-self">
-                            <svg class="treat-avatar treat-avatar-self" viewBox="0 0 24 24" aria-hidden="true">
-                              <circle cx="12" cy="9" r="4" />
-                              <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-                            </svg>
-                            <div class="treat-cloud-stack">
-                              @for (tag of treatStepOneTags; track tag) {
-                                <span class="treat-cloud">{{ tag }}</span>
-                              }
-                            </div>
-                          </div>
-                        </div>
-                        <div class="treat-call-controls">
-                          <span class="treat-call-btn">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-                            </svg>
-                          </span>
-                          <span class="treat-call-btn">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <rect x="3" y="7" width="12" height="10" rx="2" /><path d="M15 10l6-3v10l-6-3z" />
-                            </svg>
-                          </span>
-                          <span class="treat-call-btn treat-call-btn-end">
-                            <svg viewBox="0 0 24 24" aria-hidden="true">
-                              <path
-                                d="M7 2c-.6 0-1 .4-1 1 0 7.7 6.3 14 14 14 .6 0 1-.4 1-1v-3.2c0-.5-.3-.9-.8-1l-3.6-.9c-.4-.1-.9 0-1.1.4l-.9 1.3c-2-.9-3.6-2.5-4.5-4.5l1.3-.9c.4-.3.5-.7.4-1.1L10.9 2.8c-.1-.5-.5-.8-1-.8H7z"
-                              />
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <p class="sr-only">
-                      Illustration: a video consultation call. Topics discussed: diet, sleep, past reports, lifestyle and goals.
-                    </p>
-                  } @else if (i === 1) {
-                    <div class="treat-illustration-card" aria-hidden="true">
-                      <img ngSrc="images/treat-step2-bloodtest.png" fill alt="" class="treat-illustration-img" />
-                    </div>
-                    <p class="sr-only">Illustration: hands holding a blood test vial and a lab result checklist card.</p>
-                  } @else if (i === 2) {
-                    <div class="treat-illustration-card" aria-hidden="true">
-                      <img ngSrc="images/treat-step3-food.png" fill alt="" class="treat-illustration-img" />
-                    </div>
-                    <p class="sr-only">Illustration: hands holding a bowl of whole foods and a supplement bottle — food first, supplements only where needed.</p>
-                  } @else if (i === 3) {
-                    <div class="treat-illustration-card" aria-hidden="true">
-                      <img ngSrc="images/treat-step4-checkins.png" fill alt="" class="treat-illustration-img" />
-                    </div>
-                    <p class="sr-only">Illustration: hands holding an open journal with a checked-off list beside a cup of tea — regular check-ins that keep the plan working.</p>
-                  }
-                    </div>
                   </div>
                 </div>
               </div>
-            }
+              <div class="treat-call-controls">
+                <span class="treat-call-btn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+                  </svg>
+                </span>
+                <span class="treat-call-btn">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3" y="7" width="12" height="10" rx="2" /><path d="M15 10l6-3v10l-6-3z" />
+                  </svg>
+                </span>
+                <span class="treat-call-btn treat-call-btn-end">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M7 2c-.6 0-1 .4-1 1 0 7.7 6.3 14 14 14 .6 0 1-.4 1-1v-3.2c0-.5-.3-.9-.8-1l-3.6-.9c-.4-.1-.9 0-1.1.4l-.9 1.3c-2-.9-3.6-2.5-4.5-4.5l1.3-.9c.4-.3.5-.7.4-1.1L10.9 2.8c-.1-.5-.5-.8-1-.8H7z"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+          <p class="sr-only">
+            Illustration: a video consultation call. Topics discussed: diet, sleep, past reports, lifestyle and goals.
+          </p>
+        } @else if (i === 1) {
+          <div class="treat-illustration-card" aria-hidden="true">
+            <img ngSrc="images/treat-step2-bloodtest.png" fill alt="" class="treat-illustration-img" />
+          </div>
+          <p class="sr-only">Illustration: hands holding a blood test vial and a lab result checklist card.</p>
+        } @else if (i === 2) {
+          <div class="treat-illustration-card" aria-hidden="true">
+            <img ngSrc="images/treat-step3-food.png" fill alt="" class="treat-illustration-img" />
+          </div>
+          <p class="sr-only">Illustration: hands holding a bowl of whole foods and a supplement bottle — food first, supplements only where needed.</p>
+        } @else if (i === 3) {
+          <div class="treat-illustration-card" aria-hidden="true">
+            <img ngSrc="images/treat-step4-checkins.png" fill alt="" class="treat-illustration-img" />
+          </div>
+          <p class="sr-only">Illustration: hands holding an open journal with a checked-off list beside a cup of tea — regular check-ins that keep the plan working.</p>
+        }
+      </ng-template>
+
+      @if (treatHorizontal()) {
+        <!-- Desktop — all four steps laid out left to right. Each one
+             reveals in place (fades/rises up) as its turn in the scroll
+             comes around, and a line grows from its badge toward the
+             next one. Nothing fades back out: by the time the pin
+             releases, the whole 01→02→03→04 chain sits on screen as one
+             finished timeline. -->
+        <div class="treat-pin-desktop" #treatPinDesktop [style.height.vh]="treatSteps.length * treatDesktopVhPerStep">
+          <div class="treat-viewport-desktop">
+            <ng-container *ngTemplateOutlet="treatHeading" />
+            <div class="treat-timeline">
+              @for (step of treatSteps; track step.title; let i = $index) {
+                <div
+                  class="treat-node"
+                  [style.opacity]="treatNodeVisibility(i)"
+                  [style.transform]="treatNodeTransform(i)"
+                >
+                  <div class="treat-node-rail" aria-hidden="true">
+                    <span class="treat-node-badge">{{ '0' + (i + 1) }}</span>
+                    @if (i < treatSteps.length - 1) {
+                      <span class="treat-node-line" [style.transform]="'scaleX(' + treatNodeLineProgress(i) + ')'"></span>
+                    }
+                  </div>
+                  <div class="treat-node-copy">
+                    <h3 class="treat-node-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
+                    @let ctaSplit = i === 0 ? splitBodyAroundCta(step.bodyShort, '30-minute call') : null;
+                    <p class="treat-node-body">
+                      @if (ctaSplit) {
+                        {{ ctaSplit.before
+                        }}<button type="button" class="inline-cta" (click)="bookConsultation()">{{ ctaSplit.link }}</button
+                        >{{ ctaSplit.after }}
+                      } @else {
+                        {{ step.bodyShort }}
+                      }
+                    </p>
+                  </div>
+                  <div class="treat-node-visual">
+                    <!-- No extra frame drawn here — step 1's image already
+                         has its own window chrome (macOS traffic lights,
+                         call controls) baked in, and steps 2-4 carry a
+                         thin border already, so wrapping them in another
+                         frame would double up. -->
+                    <div class="treat-node-image" aria-hidden="true">
+                      <img [ngSrc]="treatDesktopImages[i].src" fill alt="" class="treat-node-img" />
+                    </div>
+                    <p class="sr-only">{{ treatDesktopImages[i].alt }}</p>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
         </div>
-      </div>
+      } @else {
+        <ng-container *ngTemplateOutlet="treatHeading" />
+        <!-- Mobile — a pinned, scroll-scrubbed deck. Each step's content
+             and illustration share one spot and cross-dissolve into the
+             next as you scroll, rather than stacking down the page.
+             Scrolling back up reverses it, same as any pin; scrolling
+             past the last step holds it in place for a beat before the
+             pin releases into Root Map. -->
+        <div class="treat-pin" #treatPin [style.height.vh]="treatSteps.length * treatVhPerStep">
+          <div class="treat-viewport">
+            <div class="treat-deck">
+              @for (step of treatSteps; track step.title; let i = $index) {
+                <div
+                  class="treat-deck-card"
+                  [style.opacity]="treatCardVisibility(i)"
+                  [style.transform]="treatCardTransform(i)"
+                  [style.pointer-events]="treatCardPointerEvents(i)"
+                >
+                  <div class="treat-step-main">
+                    <div class="treat-step-rail" aria-hidden="true" [style.filter]="treatCopyFilter(i)">
+                      <span class="treat-step-badge">{{ '0' + (i + 1) }}</span>
+                      @if (i < treatSteps.length - 1) {
+                        <span class="treat-step-line" [style.transform]="'scaleY(' + treatLineProgress(i) + ')'"></span>
+                      }
+                    </div>
+                    <div class="treat-step-content">
+                      <div class="treat-step-copy" [style.filter]="treatCopyFilter(i)">
+                        <h3 class="treat-step-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
+                        @let ctaSplit = i === 0 ? splitBodyAroundCta(step.body, '30-minute call') : null;
+                        <p class="treat-step-body">
+                          @if (ctaSplit) {
+                            {{ ctaSplit.before
+                            }}<button type="button" class="inline-cta" (click)="bookConsultation()">{{ ctaSplit.link }}</button
+                            >{{ ctaSplit.after }}
+                          } @else {
+                            {{ step.body }}
+                          }
+                        </p>
+                      </div>
+
+                      <div class="treat-step-visual" [style.opacity]="treatIllustrationVisibility(i)">
+                        <ng-container *ngTemplateOutlet="stepIllustration; context: { i: i }" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
     </div>
   </section>
 

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
 import { BookingCtaService } from '../../core/services/booking-cta';
@@ -27,11 +27,28 @@ interface HookPoint {
 interface TreatStep {
   readonly title: string;
   readonly body: string;
+  /** Shorter version used on the desktop timeline only — four columns of
+   *  full mobile-length body copy left no room for the illustration to
+   *  actually read as the focus, so desktop gets the condensed version. */
+  readonly bodyShort: string;
 }
 
 @Component({
   selector: 'app-home',
-  imports: [NgOptimizedImage, CanvasStopDirective, ScrollRevealDirective, Wordmark, CtaPill, EyebrowLabel, EvidenceTick, GutHub, LevelCard, TeamCard, RootMap],
+  imports: [
+    NgOptimizedImage,
+    NgTemplateOutlet,
+    CanvasStopDirective,
+    ScrollRevealDirective,
+    Wordmark,
+    CtaPill,
+    EyebrowLabel,
+    EvidenceTick,
+    GutHub,
+    LevelCard,
+    TeamCard,
+    RootMap,
+  ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -54,8 +71,38 @@ export class Home implements AfterViewInit {
     document.getElementById('root-map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  /**
+   * Carves the booking CTA out of step 1's own body copy (the literal
+   * phrase "30-minute call") instead of tacking on a separate button —
+   * one less element competing for space/height in the node column, and
+   * one less thing that can wrap onto its own line oddly. body/bodyShort
+   * stay the single source of truth for the text; this just finds where
+   * the phrase sits in whichever of the two is showing.
+   */
+  protected splitBodyAroundCta(text: string, phrase: string): { before: string; link: string; after: string } | null {
+    const index = text.indexOf(phrase);
+    if (index === -1) {
+      return null;
+    }
+    return { before: text.slice(0, index), link: phrase, after: text.slice(index + phrase.length) };
+  }
+
   /** How We Treat · Step 1 — topics that surface one by one during the call illustration. */
   protected readonly treatStepOneTags = ['Diet', 'Sleep', 'Past reports', 'Lifestyle', 'Goals'] as const;
+
+  /**
+   * Desktop's landscape (16:9) illustrations — generated separately from
+   * the mobile portrait set, not cropped from them. Step 1's already has
+   * its own window chrome (macOS traffic lights, call controls) baked
+   * into the image itself, so the surrounding markup doesn't draw a
+   * second frame on top of it.
+   */
+  protected readonly treatDesktopImages: readonly { src: string; alt: string }[] = [
+    { src: 'images/treat-step1-laptop.png', alt: 'A nutritionist on a video consultation call.' },
+    { src: 'images/treat-step2-laptop.png', alt: 'Hands holding a blood test vial and a lab result checklist card.' },
+    { src: 'images/treat-step3-laptop.png', alt: 'Hands holding a bowl of whole foods and a supplement bottle.' },
+    { src: 'images/treat-step4-laptop.png', alt: 'Hands holding an open journal with a checked-off list beside a cup of tea.' },
+  ];
 
   /**
    * ---------------- How We Treat · pinned step sequence ----------------
@@ -72,22 +119,37 @@ export class Home implements AfterViewInit {
    * fade) swaps in the next step. So the "wait" is spent watching the line
    * connect forward, not watching two steps smear through each other.
    */
+  /**
+   * bodyShort is deliberately staged shorter from step 1 to step 4, not
+   * just independently trimmed — a visible decrescendo across the row,
+   * with each column's own image sitting a little higher as its text
+   * shrinks, is what reads as "a sequence of steps" on the desktop
+   * timeline, on top of the numbered badges. The title-to-body and
+   * body-to-image gaps stay fixed either way (.treat-node's own gap,
+   * .treat-node-title's reserved height) — it's only each column's overall
+   * height, not its internal spacing, that's meant to vary.
+   */
   protected readonly treatSteps: readonly TreatStep[] = [
     {
       title: 'We start by listening',
       body: "Before anything else, we want your side of the story — your symptoms, your days, what's already been tried. We'll go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
+      bodyShort:
+        "Your symptoms, your days, what's already been tried — we go through all of it together in your first 30-minute call, nothing rushed.",
     },
     {
       title: 'Then we look for proof',
       body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
+      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up.",
     },
     {
       title: 'Food first, then supplements',
       body: 'We use food as medicine first. Supplements only join in where your results and history actually point to them — never by default.',
+      bodyShort: 'Food as medicine first, supplements only where your results point to them.',
     },
     {
       title: 'What makes it last',
       body: 'Sleep, stress and mindset shape recovery as much as food does. Regular check-ins keep the plan working as your life changes.',
+      bodyShort: 'Sleep, stress and mindset matter too.',
     },
   ];
 
@@ -233,6 +295,96 @@ export class Home implements AfterViewInit {
 
     const scrolled = Math.min(Math.max(-rect.top, 0), scrollable);
     this.treatPinProgress.set(scrolled / scrollable);
+  }
+
+  /**
+   * ---------------- How We Treat · desktop horizontal timeline ----------------
+   * Below HOOK_HORIZONTAL_BREAKPOINT, the mobile pinned deck above handles
+   * this (one step fully visible at a time, crossfading into the next).
+   * On a wide screen there's room to lay all four steps out left to right
+   * instead — each one reveals in place as its turn in the scroll comes up,
+   * a connecting line grows from its badge toward the next one, and
+   * (unlike the mobile deck) nothing ever fades back out: by the end all
+   * four sit on screen together as one finished timeline, the line
+   * connecting all of them start to finish.
+   */
+  protected readonly treatHorizontal = signal(false);
+
+  /** Shorter than the mobile per-step budget — a wheel-scroll on desktop
+   *  covers distance faster than a phone swipe, and there's no illustration
+   *  to hold fully visible here the way the mobile deck does (each node
+   *  stays small and simply accumulates), so less scroll is needed per
+   *  node for it to read as deliberate rather than rushed. */
+  protected readonly treatDesktopVhPerStep = 70;
+
+  /** Same trailing-hold idea as TREAT_DRAG_PHASE — the last node finishes
+   *  revealing and the pin holds briefly before releasing into Root Map. */
+  private static readonly TREAT_DESKTOP_DRAG_PHASE = 0.82;
+
+  /** How much of a unit's travel the reveal ramp takes — the rest of the
+   *  unit (after a node is fully visible) is spent just advancing toward
+   *  the next node's own ramp, since this node has nothing left to animate. */
+  private static readonly TREAT_NODE_RISE = 0.6;
+  private static readonly TREAT_NODE_RISE_PX = 24;
+
+  private readonly treatDesktopPin = viewChild<ElementRef<HTMLElement>>('treatPinDesktop');
+  private readonly treatDesktopProgress = signal(0);
+
+  protected readonly treatDesktopDragProgress = computed(() =>
+    Home.clamp01(this.treatDesktopProgress() / Home.TREAT_DESKTOP_DRAG_PHASE),
+  );
+  protected readonly treatDesktopUnits = computed(() => this.treatDesktopDragProgress() * (this.treatSteps.length - 1));
+
+  /**
+   * 0..1, ramping as this node's turn arrives and staying at 1 forever
+   * after — unlike the mobile deck's treatCardVisibility, there's no
+   * departure fade, because nothing here ever needs to make room for
+   * what's next (all four sit side by side, not stacked in the same spot).
+   */
+  protected treatNodeVisibility(i: number): number {
+    const raw = this.treatDesktopUnits() - i;
+    if (raw <= -Home.TREAT_NODE_RISE) {
+      return 0;
+    }
+    if (raw >= 0) {
+      return 1;
+    }
+    return 1 + raw / Home.TREAT_NODE_RISE;
+  }
+
+  protected treatNodeTransform(i: number): string {
+    const rise = (1 - this.treatNodeVisibility(i)) * Home.TREAT_NODE_RISE_PX;
+    return `translateY(${rise}px)`;
+  }
+
+  /**
+   * 0..1 growth of the horizontal line from node i's badge toward node
+   * i+1's — same idea as the mobile deck's treatLineProgress, just read
+   * left-to-right instead of top-to-bottom.
+   */
+  protected treatNodeLineProgress(i: number): number {
+    return Home.clamp01(this.treatDesktopUnits() - i);
+  }
+
+  private updateTreatDesktopScroll(): void {
+    this.treatHorizontal.set(window.innerWidth >= Home.HOOK_HORIZONTAL_BREAKPOINT);
+
+    const pin = this.treatDesktopPin()?.nativeElement;
+    if (!pin) {
+      this.treatDesktopProgress.set(0);
+      return;
+    }
+
+    const rect = pin.getBoundingClientRect();
+    const viewportHeight = document.documentElement.clientHeight;
+    const scrollable = rect.height - viewportHeight;
+    if (scrollable <= 0) {
+      this.treatDesktopProgress.set(0);
+      return;
+    }
+
+    const scrolled = Math.min(Math.max(-rect.top, 0), scrollable);
+    this.treatDesktopProgress.set(scrolled / scrollable);
   }
 
   /**
@@ -676,6 +828,7 @@ export class Home implements AfterViewInit {
     const update = () => {
       this.updateHookScroll();
       this.updateTreatScroll();
+      this.updateTreatDesktopScroll();
       this.updateHeroExitProgress();
       this.updateCloseFill();
       this.updateMobileHeadingReveal();

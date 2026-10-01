@@ -839,52 +839,30 @@
 
 .treat-step-body {
   margin-top: var(--sp-3);
-  margin-bottom: var(--sp-5);
   color: var(--text-quiet-light);
   font-size: clamp(0.94rem, 0.88rem + 0.2vw, 1.02rem);
   line-height: var(--lh-body);
   max-width: 48ch;
 }
 
-/* This copy is long enough to wrap on narrow phones — the base .source-link
-   is an inline-flex row, which on a wrap just centers the arrow against the
-   whole two-line block instead of sitting next to the last word. Going
-   `inline` here instead lets the text flow and wrap normally. Underline
-   switches from border-bottom (which would redraw under every wrapped
-   line) to text-decoration, which stops at the icon's inline-block
-   boundary instead of running under it. */
-.treat-step-copy .source-link {
-  /* `inline` has no vertical margin of its own (ignored on non-replaced
-     inline boxes) — the gap above comes from .treat-step-body's own
-     margin-bottom instead. */
+/* The booking CTA lives inline in step 1's own sentence (see
+   splitBodyAroundCta in home.ts) instead of a separate button — same
+   underline treatment as .source-link, but as plain text flow there's
+   nothing to wrap awkwardly. */
+.inline-cta {
   display: inline;
   background: none;
   border: none;
   padding: 0;
+  font: inherit;
+  color: var(--oxblood);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, var(--oxblood) 45%, transparent);
-  text-underline-offset: 3px;
+  text-underline-offset: 2px;
   cursor: pointer;
 }
 
-/* Adjacent inline-block boxes (the arrow) get their own implicit break
-   opportunity even with zero whitespace between them and the preceding
-   word — which orphaned the arrow alone on its own line at some widths.
-   Wrapping the last word and the arrow in one nowrap inline-block makes
-   them a single unbreakable unit: either both fit on the current line, or
-   both wrap to the next one together. */
-.source-link-tail {
-  display: inline-block;
-  white-space: nowrap;
-}
-
-.treat-step-copy .source-link svg {
-  display: inline-block;
-  vertical-align: -3px;
-  margin-left: var(--sp-2);
-}
-
-.treat-step-copy .source-link:hover {
+.inline-cta:hover {
   text-decoration-color: var(--oxblood);
 }
 
@@ -1211,6 +1189,159 @@
   height: 1px;
   overflow: hidden;
   clip: rect(0 0 0 0);
+}
+
+/* ---------- how we treat · desktop timeline ----------
+   All four steps laid out left to right instead of the mobile deck's
+   stacked crossfade — each reveals in place as its turn comes up and
+   nothing fades back out, so by the end all four sit on screen together
+   as one finished 01→02→03→04 chain. */
+.treat-pin-desktop {
+  position: relative;
+}
+
+.treat-viewport-desktop {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* A real gap between the heading and the node row, not just whatever's
+     left over — matches .hook-viewport's own rhythm instead of the
+     cramped "shrink everything to make it fit" pass this replaced, which
+     only became necessary because the node row itself was carrying more
+     text and bigger images than it needed to (see bodyShort and
+     .treat-node-image's smaller size). */
+  gap: clamp(var(--sp-10), 4vw, var(--sp-12));
+  /* Same clearance as .hook-viewport under the fixed chrome wordmark. */
+  padding-top: var(--sp-16);
+}
+
+/* The heading reuses .treat-heading-row/.treat-heading/.treat-subtext at
+   their normal (Hook-matching) size and spacing — here it's just a direct
+   child of the full-width sticky viewport instead of .treat-inner, so it
+   needs its own horizontal centering. */
+.treat-viewport-desktop .treat-heading-row {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-desktop);
+}
+
+.treat-timeline {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--sp-6);
+  width: 100%;
+  /* Wider than the shared --container-max — four columns need more
+     breathing room per column than a single-column section does. */
+  max-width: 1480px;
+  margin-inline: auto;
+  padding-inline: var(--gutter-desktop);
+}
+
+.treat-node {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  transition:
+    opacity 60ms linear,
+    transform 60ms linear;
+}
+
+.treat-node-rail {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 30px;
+}
+
+.treat-node-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--oxblood);
+  color: var(--ivory);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: var(--ls-eyebrow);
+  z-index: 1;
+}
+
+.treat-node-line {
+  position: absolute;
+  left: 30px;
+  top: 50%;
+  translate: 0 -50%;
+  height: 2px;
+  /* Reaches exactly to where the next node's badge starts: this node's
+     own remaining width past its badge, plus the gap between nodes (must
+     match .treat-timeline's own gap). */
+  width: calc(100% - 30px + var(--sp-6));
+  background: linear-gradient(to right, var(--oxblood), color-mix(in oklab, var(--oxblood) 40%, transparent));
+  transform-origin: left center;
+  transition: transform 60ms linear;
+}
+
+.treat-node-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.15rem, 1rem + 0.5vw, 1.35rem);
+  line-height: 1.25;
+  color: var(--ink);
+  /* Titles wrap to a different number of lines per node ("We start by
+     listening" vs. "Food first, then supplements"), which left the body
+     copy below starting at a different height in every column. Reserving
+     space for 2 lines (in em, so it scales with the clamp) means the body
+     text always starts at the same row regardless of how any one title
+     happens to wrap. */
+  min-height: 2.5em;
+}
+
+.treat-node-body {
+  color: var(--text-quiet-light);
+  font-size: clamp(0.88rem, 0.82rem + 0.2vw, 0.96rem);
+  line-height: var(--lh-body);
+}
+
+.treat-node-visual {
+  display: flex;
+  justify-content: center;
+}
+
+/* No hand-drawn laptop chrome — step 1's image already has its own window
+   frame baked in (macOS traffic lights, call controls), and steps 2-4
+   carry a thin border, so this is just a plain rounded, shadowed card. */
+.treat-node-image {
+  position: relative;
+  width: min(100%, 280px);
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 40px -24px color-mix(in oklab, var(--ink) 35%, transparent);
+}
+
+.treat-node-img {
+  object-fit: contain;
+  background: var(--ivory);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .treat-node,
+  .treat-node-line {
+    transition: none;
+  }
 }
 
 /* ---------- root map · diseases & categories ---------- */
