@@ -10,10 +10,21 @@
             <span class="hero-headline-sub">It's time to <span class="mark">listen</span> &amp; <span class="mark">treat the cause.</span></span>
           </h1>
           <p class="lede">Decide whether you want to treat the cause or manage the symptoms for a lifetime.</p>
-          <a class="source-link" href="#root-map">
-            <span>Take the Quiz</span>
-            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
-          </a>
+          <div class="hero-cta-row">
+            <app-cta-pill
+              label="Book a consultation"
+              durationLabel="30 min"
+              price="₹499"
+              originalPrice="₹999"
+              revealKey="hero"
+              variant="primary"
+              (pressed)="bookConsultation()"
+            />
+            <a class="source-link" href="#root-map">
+              <span>Take the Quiz</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
+            </a>
+          </div>
         </div>
         <div class="hero-visual">
           <app-gut-hub [style.opacity]="heroGutOpacity()" (gutClicked)="jumpToRootMap()" />
@@ -168,6 +179,7 @@
             durationLabel="30 min"
             price="₹499"
             originalPrice="₹999"
+            revealKey="programme"
             variant="primary"
             (pressed)="bookConsultation()"
           />
@@ -285,7 +297,7 @@
         In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
       </p>
       <div class="cta-row">
-        <app-cta-pill label="Book a consultation" durationLabel="30 min" price="₹499" originalPrice="₹999" variant="primary" />
+        <app-cta-pill label="Book a consultation" durationLabel="30 min" price="₹499" originalPrice="₹999" revealKey="close" variant="primary" />
         <app-cta-pill label="Ask the Ease guide first" variant="ghostDark" />
       </div>
       <p class="fine">This page describes common patterns, not a diagnosis. Please speak with a qualified practitioner about your own health.</p>

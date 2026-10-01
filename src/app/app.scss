@@ -78,10 +78,26 @@
 
 .chrome-cta.visible {
   /* Roomier than the collapsed-state cap — the price/duration meta is
-     always shown now (CtaPill's periodic ₹999→₹499 flip), not revealed on
-     hover, so the pill needs its full width reserved from the start. */
+     always shown now, not revealed on hover, so the pill needs its full
+     width reserved from the start. */
   max-width: 340px;
   pointer-events: auto;
+}
+
+/* Above the point where .scene-inner's 1200px max-width container stops
+   touching the viewport edges and starts centering with its own side
+   margins, a fixed `left`/`right` offset no longer lines up with where the
+   page content actually starts — the wordmark/CTA would sit further in
+   from the edge than the hero's headline/visual. This matches .scene-inner
+   exactly: the same centering gap, plus the same --gutter-desktop padding. */
+@media (min-width: 900px) {
+  .chrome-wordmark {
+    left: calc(var(--gutter-desktop) + max(0px, (100vw - var(--container-max)) / 2));
+  }
+
+  .chrome-cta {
+    right: calc(var(--gutter-desktop) + max(0px, (100vw - var(--container-max)) / 2));
+  }
 }
 
 .chrome-cta:not(.visible) {

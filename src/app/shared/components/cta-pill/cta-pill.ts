@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, DestroyRef, inject, input, OnInit, output, signal } from '@angular/core';
 
 /**
@@ -9,6 +10,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
 
 @Component({
   selector: 'app-cta-pill',
+  imports: [NgTemplateOutlet],
   template: `
     <button
       type="button"
@@ -19,32 +21,50 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       [class.meta-open]="metaRevealed()"
       (click)="pressed.emit()"
     >
-      <span class="label">{{ label() }}</span>
-      @if (durationLabel() || price()) {
-        <span class="meta" [class.meta-revealed]="metaRevealed()" aria-hidden="true">
-          @if (durationLabel(); as d) {
-            <span class="meta-duration">{{ d }}</span>
-          }
-          @if (price(); as p) {
-            <span class="meta-sep">·</span>
-            <span class="price-flip">
-              <span class="price-card" [class.is-flipped]="priceFlipped()">
-                <span class="price-face price-front">{{ p }}</span>
-                @if (originalPrice(); as orig) {
-                  <span class="price-face price-back">
-                    <span class="strike-wrap">
-                      {{ orig }}
-                      <span class="strike-line" [class.drawn]="strikeDrawn()"></span>
-                    </span>
-                  </span>
-                }
-              </span>
+      @if (compact()) {
+        <span class="label">{{ label() }}</span>
+        @if (durationLabel() || price()) {
+          <span class="meta" [class.meta-revealed]="metaRevealed()" aria-hidden="true">
+            <ng-container *ngTemplateOutlet="metaContent" />
+          </span>
+          <span class="sr-only">{{ metaAccessibleText() }}</span>
+        }
+      } @else if (durationLabel() || price()) {
+        <span class="cta-flip">
+          <span class="cta-card" [class.is-flipped]="metaRevealed()">
+            <span class="cta-face cta-face-front">{{ label() }}</span>
+            <span class="cta-face cta-face-back" aria-hidden="true">
+              <ng-container *ngTemplateOutlet="metaContent" />
             </span>
-          }
+          </span>
+          <span class="sr-only">{{ metaAccessibleText() }}</span>
         </span>
-        <span class="sr-only">{{ metaAccessibleText() }}</span>
+      } @else {
+        <span class="label">{{ label() }}</span>
       }
     </button>
+
+    <ng-template #metaContent>
+      @if (durationLabel(); as d) {
+        <span class="meta-duration">{{ d }}</span>
+      }
+      @if (price(); as p) {
+        <span class="meta-sep">·</span>
+        <span class="price-flip">
+          <span class="price-card" [class.is-flipped]="priceFlipped()">
+            <span class="price-face price-front">{{ p }}</span>
+            @if (originalPrice(); as orig) {
+              <span class="price-face price-back">
+                <span class="strike-wrap">
+                  {{ orig }}
+                  <span class="strike-line" [class.drawn]="strikeDrawn()"></span>
+                </span>
+              </span>
+            }
+          </span>
+        </span>
+      }
+    </ng-template>
   `,
   styles: `
     .cta {
@@ -81,16 +101,91 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
     .cta:active {
       transform: scale(0.98);
     }
-    .meta {
+    /* Only the compact chrome pill uses this: rests as just the label, and
+       unfurls sideways to show "30 min · ₹499" during its one-time reveal
+       (see scheduleReveal), then collapses back. Every other pill uses the
+       whole-button card-flip below instead, so it never changes width. */
+    .cta.compact .meta {
       display: inline-flex;
       align-items: center;
       gap: var(--sp-2);
       font-family: var(--font-mono);
       font-size: 0.82rem;
       letter-spacing: 0.04em;
+      max-width: 0;
+      padding-left: 0;
+      border-left: 0px solid currentColor;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+      transition:
+        max-width 420ms var(--ease-out-soft),
+        opacity 240ms linear,
+        padding-left 420ms var(--ease-out-soft),
+        border-left-width 420ms var(--ease-out-soft);
+    }
+    .cta.compact .meta.meta-revealed {
+      max-width: 220px;
       padding-left: var(--sp-3);
-      border-left: 1px solid currentColor;
+      border-left-width: 1px;
       opacity: 0.85;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cta.compact .meta {
+        transition: none;
+      }
+    }
+    /* Every other pill: the whole button content flips over, front (label)
+       to back (duration + price) — the button is sized to fit the wider of
+       the two faces and never changes size, so revealing never "grows" it. */
+    .cta-flip {
+      display: inline-grid;
+      perspective: 480px;
+      vertical-align: middle;
+    }
+    .cta-card {
+      grid-area: 1 / 1;
+      display: grid;
+      transform-style: preserve-3d;
+      transition: transform 500ms var(--ease-out-soft);
+    }
+    .cta-card.is-flipped {
+      transform: rotateX(180deg);
+    }
+    .cta-face {
+      grid-area: 1 / 1;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--sp-2);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      backface-visibility: hidden;
+      white-space: nowrap;
+    }
+    .cta-face-front {
+      font-family: inherit;
+      font-size: inherit;
+      letter-spacing: inherit;
+    }
+    .cta-face-back {
+      transform: rotateX(180deg);
+      opacity: 0.85;
+    }
+    /* On a device that actually has hover, hovering/focusing flips the
+       button over on demand — it shows the settled ₹499 plainly (not a
+       replay of the one-time ₹999 scratch, which only ever plays once per
+       visitor regardless of how often this is hovered). */
+    @media (hover: hover) and (pointer: fine) {
+      .cta:hover .cta-card:not(.is-flipped),
+      .cta:focus-visible .cta-card:not(.is-flipped) {
+        transform: rotateX(180deg);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cta-card {
+        transition: none;
+      }
     }
     .meta-sep {
       opacity: 0.6;
@@ -135,7 +230,9 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       background: currentColor;
       transform: scaleX(0);
       transform-origin: left;
-      transition: transform 450ms var(--ease-out-soft);
+      /* Matches CtaPill.STRIKE_DRAW_MS exactly — the scratch is driven by a
+         single shared timing everywhere it appears. */
+      transition: transform 2000ms linear;
     }
     .strike-line.drawn {
       transform: scaleX(1);
@@ -225,12 +322,10 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       }
     }
     /* The compact chrome pill lives permanently in the top corner, so at
-       narrow widths it rests as just "Book now" — small, single line, same
-       size as the logo beside it — and only grows a second line for the
-       few seconds its price-reveal cycle is actually playing (see
-       scheduleCompactCycle). That cycle is what makes the pill "big" for a
-       moment; collapsing fully back down afterwards is what keeps it from
-       looking oddly oversized the rest of the time. */
+       narrow widths its reveal grows a second line underneath instead of
+       widening sideways (there's no room to grow into) — a dedicated
+       vertical-stack layout, rather than the horizontal unfurl every other
+       pill (and this one, above 480px) uses. */
     @media (max-width: 480px) {
       .cta.compact {
         flex-direction: column;
@@ -263,15 +358,9 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       }
       .cta.compact .meta.meta-revealed {
         max-height: 1.4em;
+        max-width: none;
         opacity: 1;
         margin-top: 2px;
-      }
-      /* The scratch-off takes noticeably longer here than the standard
-         cycle's quick flip — it's the whole point of the compact reveal, so
-         it gets room to read as a deliberate "scratching off" motion rather
-         than a snap. */
-      .cta.compact .strike-line {
-        transition: transform 2000ms linear;
       }
       /* Lead with the price — the turnover is the part worth noticing,
          "30 min" is secondary context after it. */
@@ -302,6 +391,10 @@ export class CtaPill implements OnInit {
   readonly durationLabel = input<string | undefined>(undefined);
   readonly price = input<string | undefined>(undefined);
   readonly originalPrice = input<string | undefined>(undefined);
+  /** Distinguishes this pill's one-time reveal from every other pill's on
+   *  the page — required whenever `price`/`originalPrice` are set, since
+   *  several pills can share the same label. */
+  readonly revealKey = input<string | undefined>(undefined);
   readonly variant = input<CtaVariant>('primary');
   readonly compact = input(false);
   readonly floating = input(false);
@@ -309,52 +402,53 @@ export class CtaPill implements OnInit {
 
   protected readonly priceFlipped = signal(false);
   protected readonly strikeDrawn = signal(false);
-  protected readonly metaRevealed = signal(true);
+  protected readonly metaRevealed = signal(false);
 
   protected readonly metaAccessibleText = () => [this.durationLabel(), this.price()].filter(Boolean).join(' · ');
 
   private static readonly CYCLE_MIN_INTERVAL_MS = 10_000;
   private static readonly CYCLE_MAX_INTERVAL_MS = 20_000;
-  private static readonly FLIP_HOLD_MS = 1_100;
   /** Total time the reveal stays on screen, start to collapse. */
-  private static readonly COMPACT_CYCLE_VISIBLE_MS = 5_000;
+  private static readonly CYCLE_VISIBLE_MS = 5_000;
   /** Scratch begins the instant the ₹999 text appears — no pause first. */
-  private static readonly COMPACT_PRE_STRIKE_MS = 0;
-  private static readonly COMPACT_STRIKE_DRAW_MS = 2_000;
-  private static readonly COMPACT_SETTLE_HOLD_MS =
-    CtaPill.COMPACT_CYCLE_VISIBLE_MS - CtaPill.COMPACT_PRE_STRIKE_MS - CtaPill.COMPACT_STRIKE_DRAW_MS;
+  private static readonly PRE_STRIKE_MS = 0;
+  private static readonly STRIKE_DRAW_MS = 2_000;
+  private static readonly SETTLE_HOLD_MS = CtaPill.CYCLE_VISIBLE_MS - CtaPill.PRE_STRIKE_MS - CtaPill.STRIKE_DRAW_MS;
   private flipTimer: ReturnType<typeof setTimeout> | undefined;
+
+  private static readonly STORAGE_PREFIX = 'ed-price-reveal:';
 
   ngOnInit(): void {
     if (!this.price() || !this.originalPrice()) return;
-    if (this.compact()) {
-      this.metaRevealed.set(false);
-      this.scheduleCompactCycle();
-    } else {
-      this.scheduleStandardCycle();
-    }
+    const key = this.revealKey();
+    if (!key || this.hasPlayed(key)) return;
+    this.scheduleReveal(key);
     this.destroyRef.onDestroy(() => clearTimeout(this.flipTimer));
   }
 
-  /** Programme/Close pills: meta is always on screen, so the cycle is just a
-   *  brief, periodic flip to the struck ₹999 and back to ₹499. */
-  private scheduleStandardCycle(): void {
-    const delay = this.randomCycleDelay();
-    this.flipTimer = setTimeout(() => {
-      this.priceFlipped.set(true);
-      this.strikeDrawn.set(true);
-      this.flipTimer = setTimeout(() => {
-        this.priceFlipped.set(false);
-        this.strikeDrawn.set(false);
-        this.scheduleStandardCycle();
-      }, CtaPill.FLIP_HOLD_MS);
-    }, delay);
+  private hasPlayed(key: string): boolean {
+    if (typeof window === 'undefined') return true;
+    try {
+      return window.localStorage.getItem(CtaPill.STORAGE_PREFIX + key) === '1';
+    } catch {
+      return false;
+    }
   }
 
-  /** The compact chrome pill: rests as just the label, then periodically
-   *  reveals "30 min · ₹999", scratches the ₹999 off, settles on ₹499, holds
-   *  a moment, and collapses back down to just the label again. */
-  private scheduleCompactCycle(): void {
+  private markPlayed(key: string): void {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(CtaPill.STORAGE_PREFIX + key, '1');
+    } catch {
+      /* private browsing / quota — not worth failing over, it'll just replay next visit */
+    }
+  }
+
+  /** Every price pill: rests as just the label, then — once, on a visitor's
+   *  first visit only — reveals "30 min · ₹999", scratches the ₹999 off,
+   *  settles on ₹499, holds a moment, and collapses back down to just the
+   *  label again for good. */
+  private scheduleReveal(key: string): void {
     const delay = this.randomCycleDelay();
     this.flipTimer = setTimeout(() => {
       this.metaRevealed.set(true);
@@ -366,10 +460,10 @@ export class CtaPill implements OnInit {
           this.strikeDrawn.set(false);
           this.flipTimer = setTimeout(() => {
             this.metaRevealed.set(false);
-            this.scheduleCompactCycle();
-          }, CtaPill.COMPACT_SETTLE_HOLD_MS);
-        }, CtaPill.COMPACT_STRIKE_DRAW_MS);
-      }, CtaPill.COMPACT_PRE_STRIKE_MS);
+            this.markPlayed(key);
+          }, CtaPill.SETTLE_HOLD_MS);
+        }, CtaPill.STRIKE_DRAW_MS);
+      }, CtaPill.PRE_STRIKE_MS);
     }, delay);
   }
 

@@ -129,7 +129,6 @@
 }
 
 .source-link {
-  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: var(--sp-2);
@@ -164,6 +163,24 @@
 
 .source-link:hover svg {
   transform: translateX(2px);
+}
+
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-5);
+}
+
+/* Mobile keeps just the "Take the Quiz" link, as already approved — the
+   global floating chrome pill (always visible below 640px) is the mobile
+   booking CTA. Desktop's chrome pill is scroll-gated instead (only fades in
+   once the reader has scrolled past the hero), so without a CTA pill here
+   too, a desktop visitor who hasn't scrolled sees no booking CTA at all. */
+@media (max-width: 899px) {
+  .hero-cta-row app-cta-pill {
+    display: none;
+  }
 }
 
 .hero-visual {
