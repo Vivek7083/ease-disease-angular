@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { TeamCard, type TeamMember } from '../team-card/team-card';
 
 /**
@@ -20,8 +20,14 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
   template: `
     <!-- Desktop (≥900px) -->
     <div class="experts-spotlight">
-      @for (member of [members()[activeIndex()]]; track activeIndex()) {
-        <app-team-card class="spotlight-card" [split]="true" [member]="member" (connectRequested)="connectRequested.emit(member)" />
+      @for (member of [members()[spotlightIndex()]]; track spotlightIndex()) {
+        <app-team-card
+          class="spotlight-card"
+          [class.is-fading]="spotlightFading()"
+          [split]="true"
+          [member]="member"
+          (connectRequested)="connectRequested.emit(member)"
+        />
       }
       <div class="spotlight-arrows">
         <button type="button" class="arrow" aria-label="Previous expert" (click)="prev()">
@@ -72,16 +78,24 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
         display: block;
       }
 
+      /* A true cross-fade needs the outgoing card to fade out before it's
+         removed, not just the incoming one fading in — an enter-only
+         animation makes the swap look like a sudden cut. .is-fading is
+         applied (via a transition, not an animation) for a short window
+         while the old card is still mounted, then the index swaps once it's
+         already invisible, and the freshly-mounted card fades back in from
+         that same state. */
       .spotlight-card {
         display: block;
-        animation: spotlight-enter 520ms var(--ease-out-soft);
+        opacity: 1;
+        transform: translateX(0);
+        transition:
+          opacity 260ms var(--ease-out-soft),
+          transform 260ms var(--ease-out-soft);
       }
-
-      @keyframes spotlight-enter {
-        from {
-          opacity: 0;
-          transform: translateX(28px);
-        }
+      .spotlight-card.is-fading {
+        opacity: 0;
+        transform: translateX(14px);
       }
 
       .spotlight-arrows {
@@ -184,9 +198,18 @@ export class ExpertCarousel {
 
   protected readonly activeIndex = signal(0);
 
+  /** Desktop spotlight only: lags activeIndex by a short cross-fade window,
+   *  so the outgoing card fades out before it's swapped out, instead of the
+   *  instant cut you get recreating the element straight off activeIndex. */
+  protected readonly spotlightIndex = signal(0);
+  protected readonly spotlightFading = signal(false);
+
   private readonly destroyRef = inject(DestroyRef);
   private autoTimer: ReturnType<typeof setInterval> | undefined;
   private dragStartX: number | null = null;
+  private spotlightSwapTimer: ReturnType<typeof setTimeout> | undefined;
+  private lastSpotlightSource = 0;
+  private readonly reduceMotion: boolean;
 
   private static readonly AUTO_ADVANCE_MS = 4500;
   private static readonly SWIPE_THRESHOLD_PX = 40;
@@ -194,13 +217,40 @@ export class ExpertCarousel {
   private static readonly SPREAD_PERCENT = 68;
   private static readonly DEPTH_PX = 140;
   private static readonly SIDE_SCALE = 0.82;
+  private static readonly SPOTLIGHT_FADE_MS = 260;
 
   constructor() {
-    const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduceMotion) {
+    this.reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!this.reduceMotion) {
       this.autoTimer = setInterval(() => this.advance(1), ExpertCarousel.AUTO_ADVANCE_MS);
       this.destroyRef.onDestroy(() => clearInterval(this.autoTimer));
     }
+
+    effect(() => {
+      const target = this.activeIndex();
+      if (target === this.lastSpotlightSource) return;
+      this.lastSpotlightSource = target;
+
+      if (this.reduceMotion) {
+        this.spotlightIndex.set(target);
+        return;
+      }
+
+      clearTimeout(this.spotlightSwapTimer);
+      this.spotlightFading.set(true); // fade the outgoing card out while it's still mounted
+      this.spotlightSwapTimer = setTimeout(() => {
+        this.spotlightIndex.set(target); // mount the new card — still "fading" (invisible) at this instant
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            // a forced two-frame gap so the browser paints the invisible
+            // state first; without it, mount + un-fade can coalesce into
+            // one frame and skip the transition entirely.
+            this.spotlightFading.set(false);
+          }),
+        );
+      }, ExpertCarousel.SPOTLIGHT_FADE_MS);
+    });
+    this.destroyRef.onDestroy(() => clearTimeout(this.spotlightSwapTimer));
   }
 
   /** Signed distance from the active card, wrapped the short way round the

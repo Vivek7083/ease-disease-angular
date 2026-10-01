@@ -14,6 +14,7 @@ import { type TeamMember } from '../../shared/components/team-card/team-card';
 import { ExpertCarousel } from '../../shared/components/expert-carousel/expert-carousel';
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
+import { SiteFooter } from '../../shared/components/site-footer/site-footer';
 
 interface RootCause {
   readonly name: string;
@@ -52,6 +53,7 @@ interface TreatStep {
     ExpertCarousel,
     RootMap,
     Results,
+    SiteFooter,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',

@@ -400,7 +400,7 @@
   </section>
 
   <!-- ============ PROGRAMME — packages, picked by depth ============ -->
-  <section class="scene programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
+  <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="How it starts" />
       <h2 id="programme-heading" class="t-display">One conversation is where your plan begins.</h2>
@@ -420,7 +420,7 @@
   </section>
 
   <!-- ============ TEAM — meet the experts ============ -->
-  <section class="scene team" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
+  <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="Meet the experts" />
       <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
@@ -501,3 +501,5 @@
   </section>
   }
 </main>
+
+<app-site-footer (bookRequested)="bookConsultation()" />
