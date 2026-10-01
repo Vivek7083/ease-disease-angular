@@ -398,7 +398,6 @@ export class Home implements AfterViewInit {
    * both are gone and the screen just shows blank canvas in between.
    */
   protected readonly heroGutOpacity = computed(() => 1 - Home.clamp01(this.heroExitProgress()));
-  protected readonly heroCtaOpacity = computed(() => 1 - Home.clamp01(this.heroExitProgress() / 0.45));
 
   private static clamp01(value: number): number {
     return Math.max(0, Math.min(1, value));

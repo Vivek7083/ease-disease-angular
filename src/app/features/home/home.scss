@@ -193,16 +193,6 @@
   max-width: 100%;
 }
 
-/* Below 900px the chrome's own "Book now" pill is always on screen (see
-   app.scss's .chrome-cta mobile override), so the hero's inline copy of
-   the same button is redundant from the start — not just once scrolled
-   past, which is all heroCtaOpacity() otherwise handles. */
-@media (max-width: 899px) {
-  .hero-visual .cta-row {
-    display: none;
-  }
-}
-
 /* ---------- the hook ---------- */
 .hook {
   background: transparent;

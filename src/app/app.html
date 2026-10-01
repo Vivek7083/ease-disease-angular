@@ -9,10 +9,11 @@
   [class.visible]="bookingCta.visible()"
   [style.opacity]="bookingCta.opacity()"
   [label]="bookingCta.label()"
-  meta="30 min · ₹499"
+  durationLabel="30 min"
+  price="₹499"
+  originalPrice="₹999"
   variant="primary"
   [compact]="true"
-  [revealMetaOnHover]="true"
   (pressed)="bookingCta.trigger()"
 />
 

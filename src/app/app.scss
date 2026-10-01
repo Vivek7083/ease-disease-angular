@@ -73,8 +73,9 @@
 }
 
 .chrome-cta.visible {
-  /* Roomier than the collapsed-state cap so the price/time can expand out
-     on hover (see CtaPill's revealMetaOnHover) without being clipped. */
+  /* Roomier than the collapsed-state cap — the price/duration meta is
+     always shown now (CtaPill's periodic ₹999→₹499 flip), not revealed on
+     hover, so the pill needs its full width reserved from the start. */
   max-width: 340px;
   pointer-events: auto;
 }

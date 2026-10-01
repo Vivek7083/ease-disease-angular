@@ -13,16 +13,13 @@
             Skin flares, cycle changes, fatigue that won't lift — they often trace back to one place.
             Thirty minutes is enough to start finding out.
           </p>
-          <a class="source-link" href="#hook">
-            <span>Find your source</span>
+          <a class="source-link" href="#root-map">
+            <span>Take the Quiz</span>
             <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
           </a>
         </div>
         <div class="hero-visual">
           <app-gut-hub [style.opacity]="heroGutOpacity()" />
-          <div class="cta-row" [style.opacity]="heroCtaOpacity()" [style.visibility]="heroCtaOpacity() < 0.03 ? 'hidden' : 'visible'">
-            <app-cta-pill label="Book a consultation" meta="30 min · ₹499" variant="primary" (pressed)="bookConsultation()" />
-          </div>
         </div>
       </div>
     </div>
@@ -152,7 +149,7 @@
        symptom → condition → root-cause trace. Stays on the same ivory
        canvas as every other section — oxblood/ink carry the "seriousness"
        here, not an inverted dark panel. ============ -->
-  <section class="scene root-map-scene" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
+  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
     <div class="scene-inner">
       <app-root-map (bookRequested)="bookConsultation()" />
     </div>
@@ -169,7 +166,14 @@
           understand what's going on and leave with a clear, personal starting point.
         </p>
         <div class="cta-row">
-          <app-cta-pill label="Book your first consultation" meta="30 min · ₹499" variant="primary" (pressed)="bookConsultation()" />
+          <app-cta-pill
+            label="Book your first consultation"
+            durationLabel="30 min"
+            price="₹499"
+            originalPrice="₹999"
+            variant="primary"
+            (pressed)="bookConsultation()"
+          />
         </div>
       </div>
 
@@ -284,7 +288,7 @@
         In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
       </p>
       <div class="cta-row">
-        <app-cta-pill label="Book a consultation" meta="30 min · ₹499" variant="primary" />
+        <app-cta-pill label="Book a consultation" durationLabel="30 min" price="₹499" originalPrice="₹999" variant="primary" />
         <app-cta-pill label="Ask the Ease guide first" variant="ghostDark" />
       </div>
       <p class="fine">This page describes common patterns, not a diagnosis. Please speak with a qualified practitioner about your own health.</p>
