@@ -195,7 +195,7 @@ export class Home implements AfterViewInit {
    * ground: a real, readable hold per step without turning the section
    * into a long haul.
    */
-  protected readonly treatVhPerStep = 95;
+  protected readonly treatVhPerStep = 118.75; // 95 × 1.25 — 25% longer hold per step
 
   /**
    * Same trailing-hold trick as HOOK_DRAG_PHASE: the drag through all steps
@@ -346,7 +346,7 @@ export class Home implements AfterViewInit {
    *  to hold fully visible here the way the mobile deck does (each node
    *  stays small and simply accumulates), so less scroll is needed per
    *  node for it to read as deliberate rather than rushed. */
-  protected readonly treatDesktopVhPerStep = 70;
+  protected readonly treatDesktopVhPerStep = 87.5; // 70 × 1.25 — 25% longer hold per step
 
   /** Same trailing-hold idea as TREAT_DRAG_PHASE — the last node finishes
    *  revealing and the pin holds briefly before releasing into Root Map. */
