@@ -26,6 +26,8 @@ interface HookPoint {
   readonly title: string;
   readonly body: string;
   readonly icon: 'doctor' | 'root' | 'ai' | 'balance';
+  readonly image: string;
+  readonly imageAlt: string;
 }
 
 interface TreatStep {
@@ -918,21 +920,29 @@ export class Home implements AfterViewInit {
       title: 'What is functional medicine?',
       body: 'We nourish the roots, not the leaves. Food as medicine first, supplements only when truly needed.',
       icon: 'root',
+      image: 'images/hook/root-cause.png',
+      imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',
     },
     {
       title: 'What you will not get from an AI chat',
       body: "AI gives generic answers. It can't read your history, labs and symptoms like a clinician actually looking at you can.",
       icon: 'ai',
+      image: 'images/hook/ai-chat.png',
+      imageAlt: 'A clinician studying a patient chart closely, with a generic chat-bubble icon faded in the background.',
     },
     {
       title: 'Why root-cause healing?',
       body: 'Conventional care asks "what stops this now?" Root-cause care asks "why did this start?" That\'s why it doesn\'t come back.',
       icon: 'balance',
+      image: 'images/hook/root-cause-balance.png',
+      imageAlt: 'A balanced scale weighing a pill against a sprouting plant.',
     },
     {
       title: 'Why not just another consultation?',
       body: "A 10–15 minute appointment treats the symptom, with no time to ask why it showed up. That's the gap root-cause care closes.",
       icon: 'doctor',
+      image: 'images/hook/short-consultation.png',
+      imageAlt: 'An hourglass running low next to an empty chair at a desk, suggesting a rushed, too-short appointment.',
     },
   ];
 

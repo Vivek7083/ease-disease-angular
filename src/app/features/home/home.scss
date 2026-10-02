@@ -400,7 +400,7 @@
   justify-content: center;
 }
 
-/* Specificity bump (not plain `.hook-card`/`.hook-image-placeholder`) is
+/* Specificity bump (not plain `.hook-card`/`.hook-image`) is
    deliberate — the shared base rules further down this file are equal
    specificity and later in source, so a plain selector here would have its
    width/height silently overridden right back to the base values. */
@@ -419,7 +419,7 @@
   box-shadow: var(--shadow-soft);
 }
 
-.hook-carousel-slide .hook-image-placeholder {
+.hook-carousel-slide .hook-image {
   height: clamp(130px, 20vh, 170px);
   min-height: 0;
 }
@@ -514,7 +514,7 @@
 /* Blur lives on the image only — blurring the copy meant two overlapping
    paragraphs of blurred text mid-crossfade, which read as noise rather than
    depth. The image tolerates it fine as a decorative cue. */
-.hook-pin.is-horizontal .hook-image-placeholder {
+.hook-pin.is-horizontal .hook-image {
   transition:
     transform 60ms linear,
     filter 60ms linear;
@@ -526,7 +526,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .hook-deck-card,
-  .hook-pin.is-horizontal .hook-image-placeholder,
+  .hook-pin.is-horizontal .hook-image,
   .hook-pin.is-horizontal .hook-copy {
     transition: none;
   }
@@ -554,50 +554,43 @@
   color: var(--terracotta);
 }
 
-.hook-image-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-3);
+.hook-image {
+  position: relative;
   width: 100%;
   min-height: 160px;
-  border: 1px dashed color-mix(in oklab, var(--terracotta) 40%, transparent);
+  overflow: hidden;
   border-radius: var(--r-md, 10px);
-  color: color-mix(in oklab, var(--ink) 55%, var(--terracotta));
+  border: 1px solid color-mix(in oklab, var(--terracotta) 22%, transparent);
+  background: var(--parchment);
 }
 
-.hook-card.icon-root .hook-image-placeholder {
-  border-color: color-mix(in oklab, var(--oxblood) 35%, transparent);
-  color: color-mix(in oklab, var(--ink) 55%, var(--oxblood));
+.hook-image img {
+  object-fit: cover;
+  object-position: center;
 }
 
-.hook-card.icon-ai .hook-image-placeholder {
-  border-color: color-mix(in oklab, var(--ink) 26%, transparent);
-  color: color-mix(in oklab, var(--ink) 60%, var(--ivory));
+/* These two illustrations (the plant's root system, the clinician's profile)
+   have their meaningful detail toward the top of the square source image.
+   On the mobile carousel the image tile is cropped short/wide, and a dead
+   center crop there clips too much of that detail — nudge toward the top
+   without going all the way, so it's still a centered-feeling crop.
+   Small screens only: the desktop pinned deck gives the image a tall
+   4:3 tile with room to show the whole illustration, so it stays centered. */
+.hook-carousel-slide .hook-card.icon-root .hook-image img,
+.hook-carousel-slide .hook-card.icon-ai .hook-image img {
+  object-position: center 30%;
 }
 
-.hook-card.icon-balance .hook-image-placeholder {
-  border-color: color-mix(in oklab, var(--sage-soft) 65%, transparent);
-  color: color-mix(in oklab, var(--ink) 50%, var(--sage-soft));
+.hook-card.icon-root .hook-image {
+  border-color: color-mix(in oklab, var(--oxblood) 22%, transparent);
 }
 
-.hook-image-placeholder svg {
-  width: 26px;
-  height: 26px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  opacity: 0.7;
+.hook-card.icon-ai .hook-image {
+  border-color: color-mix(in oklab, var(--ink) 16%, transparent);
 }
 
-.hook-image-placeholder span {
-  font-family: var(--font-mono);
-  font-size: 0.74rem;
-  letter-spacing: var(--ls-eyebrow);
-  opacity: 0.8;
+.hook-card.icon-balance .hook-image {
+  border-color: color-mix(in oklab, var(--sage-soft) 45%, transparent);
 }
 
 .hook-copy h3 {
@@ -635,20 +628,11 @@
     flex-direction: row-reverse;
   }
 
-  .hook-pin.is-horizontal .hook-image-placeholder {
+  .hook-pin.is-horizontal .hook-image {
     flex: 0 1 420px;
     max-width: 420px;
     aspect-ratio: 4 / 3;
     min-height: 0;
-  }
-
-  .hook-pin.is-horizontal .hook-image-placeholder svg {
-    width: 44px;
-    height: 44px;
-  }
-
-  .hook-pin.is-horizontal .hook-image-placeholder span {
-    font-size: 0.85rem;
   }
 
   .hook-pin.is-horizontal .hook-copy {
