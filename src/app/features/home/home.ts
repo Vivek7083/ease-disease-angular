@@ -127,10 +127,10 @@ export class Home implements AfterViewInit {
    * second frame on top of it.
    */
   protected readonly treatDesktopImages: readonly { src: string; alt: string }[] = [
-    { src: 'images/treat-step1-laptop.png', alt: 'A nutritionist on a video consultation call.' },
-    { src: 'images/treat-step2-laptop.png', alt: 'Hands holding a blood test vial and a lab result checklist card.' },
-    { src: 'images/treat-step3-laptop.png', alt: 'Hands holding a bowl of whole foods and a supplement bottle.' },
-    { src: 'images/treat-step4-laptop.png', alt: 'Hands holding an open journal with a checked-off list beside a cup of tea.' },
+    { src: 'images/treat-step1-laptop.webp', alt: 'A nutritionist on a video consultation call.' },
+    { src: 'images/treat-step2-laptop.webp', alt: 'Hands holding a blood test vial and a lab result checklist card.' },
+    { src: 'images/treat-step3-laptop.webp', alt: 'Hands holding a bowl of whole foods and a supplement bottle.' },
+    { src: 'images/treat-step4-laptop.webp', alt: 'Hands holding an open journal with a checked-off list beside a cup of tea.' },
   ];
 
   /**
@@ -1158,28 +1158,28 @@ export class Home implements AfterViewInit {
       body: 'The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission.',
       more: "The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission. If a plant or tree isn't flourishing, we nourish the roots, not the leaves. In the same way, to heal the disease, we at FM look for what is causing the Dis-ease.",
       icon: 'root',
-      image: 'images/hook/root-cause.png',
+      image: 'images/hook/root-cause.webp',
       imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',
     },
     {
       title: 'What you will not get from an AI chat',
       body: "AI gives generic answers. It can't read your history, labs and symptoms like a clinician actually looking at you can.",
       icon: 'ai',
-      image: 'images/hook/ai-chat.png',
+      image: 'images/hook/ai-chat.webp',
       imageAlt: 'A clinician studying a patient chart closely, with a generic chat-bubble icon faded in the background.',
     },
     {
       title: 'Why root-cause healing?',
       body: 'Conventional care asks "what stops this now?" Root-cause care asks "why did this start?" That\'s why it doesn\'t come back.',
       icon: 'balance',
-      image: 'images/hook/root-cause-balance.png',
+      image: 'images/hook/root-cause-balance.webp',
       imageAlt: 'A balanced scale weighing a pill against a sprouting plant.',
     },
     {
       title: 'Why not just another consultation?',
       body: "A 10–15 minute appointment treats the symptom, with no time to ask why it showed up. That's the gap root-cause care closes.",
       icon: 'doctor',
-      image: 'images/hook/short-consultation.png',
+      image: 'images/hook/short-consultation.webp',
       imageAlt: 'An hourglass running low next to an empty chair at a desk, suggesting a rushed, too-short appointment.',
     },
   ];
