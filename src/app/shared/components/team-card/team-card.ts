@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, input, output } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
 import { CtaPill } from '../cta-pill/cta-pill';
 
 export interface TeamMember {
@@ -31,19 +31,21 @@ export interface TeamMember {
         <path d="M108 78C98 82 90 75 92 63" />
       </svg>
       <span class="card-energy" aria-hidden="true"></span>
-      <div class="portrait">
-        @if (member().photo; as photo) {
-          <img [ngSrc]="photo" fill alt="" />
-        } @else {
-          <span class="portrait-fallback" aria-hidden="true">{{ member().initials }}</span>
-        }
-      </div>
-      <div class="info">
-        <h3>{{ member().name }}</h3>
-        <p class="role">{{ member().role }}</p>
-        <p class="credential">{{ member().credential }}</p>
-        <p class="bio">{{ member().bio }}</p>
-        <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
+      <div class="content" [style.opacity]="contentOpacity()">
+        <div class="portrait">
+          @if (member().photo; as photo) {
+            <img [ngSrc]="photo" fill alt="" />
+          } @else {
+            <span class="portrait-fallback" aria-hidden="true">{{ member().initials }}</span>
+          }
+        </div>
+        <div class="info">
+          <h3>{{ member().name }}</h3>
+          <p class="role">{{ member().role }}</p>
+          <p class="credential">{{ member().credential }}</p>
+          <p class="bio">{{ member().bio }}</p>
+          <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
+        </div>
       </div>
     </article>
   `,
@@ -52,15 +54,18 @@ export interface TeamMember {
        used everywhere else dark. A translucent olive-tinted pane over the
        canvas behind it, blurred like frosted glass, with a soft top
        highlight to read as a physical surface catching light. Falls back to
-       a flat tinted panel on browsers without backdrop-filter support. */
+       a flat tinted panel on browsers without backdrop-filter support.
+       The tint itself is kept strong enough (not a faint wash) that its own
+       color dominates over whatever's behind the blur — a thin tint lets
+       the backdrop's own color show through and visibly shift as that
+       backdrop changes (the page scrolling behind it, a neighboring card
+       momentarily overlapping it mid-transition), which read as the glass
+       itself "changing color". A more opaque tint stays visually the same
+       regardless of what's behind it. */
     .team-card {
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: color-mix(in oklab, var(--olive) 24%, var(--ivory) 76%);
+      background: color-mix(in oklab, var(--olive) 38%, var(--ivory) 62%);
       color: var(--ink);
       border-radius: var(--r-lg);
       padding: var(--sp-8) var(--sp-6) var(--sp-6);
@@ -72,10 +77,29 @@ export interface TeamMember {
 
     @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
       .team-card {
-        background: color-mix(in oklab, var(--olive) 16%, transparent);
-        backdrop-filter: blur(18px) saturate(150%);
-        -webkit-backdrop-filter: blur(18px) saturate(150%);
+        background: color-mix(in oklab, var(--olive) 34%, transparent);
+        backdrop-filter: blur(18px) saturate(110%);
+        -webkit-backdrop-filter: blur(18px) saturate(110%);
       }
+    }
+
+    /* Content fades independently of the card shell above — the shell
+       (background, border, foliage, energy dot) never remounts or
+       re-renders when the active expert changes, so its color never has a
+       "before" and "after" state to snap between. Only this inner layer
+       swaps, and its opacity is driven frame-by-frame from the component
+       (see contentOpacity) rather than a CSS class+transition: a transition
+       toggled via class on an element inside a backdrop-filter ancestor
+       measurably stalls for ~200ms before it starts animating in this
+       browser, then has to cram the rest into whatever time is left —
+       reading as a stall-then-snap instead of a smooth fade. Driving the
+       numeric value directly sidesteps that engage delay entirely. */
+    .content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
     /* Sprouting branches in the corners — decorative only, well behind the
@@ -199,11 +223,13 @@ export interface TeamMember {
        used for the large-screen spotlight, where there's width to spare and
        centering everything would waste it. */
     .team-card.is-split {
+      padding: var(--sp-10);
+    }
+    .team-card.is-split .content {
       flex-direction: row;
       align-items: center;
       text-align: left;
       gap: var(--sp-10);
-      padding: var(--sp-10);
     }
     .team-card.is-split .portrait {
       flex: none;
@@ -229,5 +255,50 @@ export interface TeamMember {
 export class TeamCard {
   readonly member = input.required<TeamMember>();
   readonly split = input(false);
+  /** Desktop spotlight only — fades the inner content out and back in while
+   *  the glass shell itself stays mounted and unchanged. */
+  readonly fading = input(false);
   readonly connectRequested = output<void>();
+
+  protected readonly contentOpacity = signal(1);
+
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly reduceMotion: boolean;
+  private rafId: number | undefined;
+
+  private static readonly FADE_MS = 260;
+
+  constructor() {
+    this.reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    effect(() => {
+      this.animateOpacityTo(this.fading() ? 0 : 1);
+    });
+    this.destroyRef.onDestroy(() => {
+      if (this.rafId !== undefined) {
+        cancelAnimationFrame(this.rafId);
+      }
+    });
+  }
+
+  private animateOpacityTo(target: number): void {
+    if (this.rafId !== undefined) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = undefined;
+    }
+    if (this.reduceMotion || this.contentOpacity() === target) {
+      this.contentOpacity.set(target);
+      return;
+    }
+
+    const start = this.contentOpacity();
+    const startTime = performance.now();
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - startTime) / TeamCard.FADE_MS);
+      const eased = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2; // ease-in-out
+      this.contentOpacity.set(start + (target - start) * eased);
+      this.rafId = t < 1 ? requestAnimationFrame(tick) : undefined;
+    };
+    this.rafId = requestAnimationFrame(tick);
+  }
 }

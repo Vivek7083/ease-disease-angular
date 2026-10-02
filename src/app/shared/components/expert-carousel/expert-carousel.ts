@@ -18,17 +18,18 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
   selector: 'app-expert-carousel',
   imports: [TeamCard],
   template: `
-    <!-- Desktop (≥900px) -->
+    <!-- Desktop (≥900px). One persistent app-team-card — its [member] input
+         just changes value, so the glass shell never destroys/remounts and
+         never has a "before" and "after" look to snap between; only the
+         inner content (TeamCard's own [fading] input) fades. -->
     <div class="experts-spotlight">
-      @for (member of [members()[spotlightIndex()]]; track spotlightIndex()) {
-        <app-team-card
-          class="spotlight-card"
-          [class.is-fading]="spotlightFading()"
-          [split]="true"
-          [member]="member"
-          (connectRequested)="connectRequested.emit(member)"
-        />
-      }
+      <app-team-card
+        class="spotlight-card"
+        [split]="true"
+        [fading]="spotlightFading()"
+        [member]="members()[spotlightIndex()]"
+        (connectRequested)="connectRequested.emit(members()[spotlightIndex()])"
+      />
       <div class="spotlight-arrows">
         <button type="button" class="arrow" aria-label="Previous expert" (click)="prev()">
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M12 4l-6 6 6 6" /></svg>
@@ -78,34 +79,12 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
         display: block;
       }
 
-      /* A true cross-fade needs the outgoing card to fade out before it's
-         removed, not just the incoming one fading in — an enter-only
-         animation makes the swap look like a sudden cut. .is-fading is
-         applied (via a transition, not an animation) for a short window
-         while the old card is still mounted, then the index swaps once it's
-         already invisible, and the freshly-mounted card fades back in from
-         that same state. */
       .spotlight-card {
         display: block;
-        opacity: 1;
-        transform: translateX(0);
-        transition:
-          opacity 260ms var(--ease-out-soft),
-          transform 260ms var(--ease-out-soft);
-      }
-      .spotlight-card.is-fading {
-        opacity: 0;
-        transform: translateX(14px);
       }
 
       .spotlight-arrows {
         margin-top: var(--sp-6);
-      }
-    }
-
-    @media (min-width: 900px) and (prefers-reduced-motion: reduce) {
-      .spotlight-card {
-        animation: none;
       }
     }
 
@@ -136,9 +115,15 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
         top: 0;
         left: 50%;
         width: min(76vw, 300px);
+        /* --ease-out-soft is an expo-out curve (cubic-bezier(.16,1,.3,1)) —
+           great for a card's position settling into place, but on opacity it
+           front-loads almost the entire fade into the first ~30% of the
+           duration and then barely moves, which reads as a sudden dim/
+           brighten rather than a smooth one. Opacity gets a gentler,
+           symmetric ease instead so the dimming reads as continuous. */
         transition:
           transform 480ms var(--ease-out-soft),
-          opacity 480ms var(--ease-out-soft);
+          opacity 480ms ease-in-out;
       }
 
       .carousel-arrows {
@@ -198,9 +183,10 @@ export class ExpertCarousel {
 
   protected readonly activeIndex = signal(0);
 
-  /** Desktop spotlight only: lags activeIndex by a short cross-fade window,
-   *  so the outgoing card fades out before it's swapped out, instead of the
-   *  instant cut you get recreating the element straight off activeIndex. */
+  /** Desktop spotlight only: lags activeIndex by a short cross-fade window —
+   *  spotlightFading tells the single persistent app-team-card to fade its
+   *  content out, spotlightIndex swaps the member while it's invisible, then
+   *  fading clears so the new content fades back in on the same element. */
   protected readonly spotlightIndex = signal(0);
   protected readonly spotlightFading = signal(false);
 
@@ -237,17 +223,10 @@ export class ExpertCarousel {
       }
 
       clearTimeout(this.spotlightSwapTimer);
-      this.spotlightFading.set(true); // fade the outgoing card out while it's still mounted
+      this.spotlightFading.set(true); // fade the current content out in place
       this.spotlightSwapTimer = setTimeout(() => {
-        this.spotlightIndex.set(target); // mount the new card — still "fading" (invisible) at this instant
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => {
-            // a forced two-frame gap so the browser paints the invisible
-            // state first; without it, mount + un-fade can coalesce into
-            // one frame and skip the transition entirely.
-            this.spotlightFading.set(false);
-          }),
-        );
+        this.spotlightIndex.set(target); // swap member while content is invisible
+        this.spotlightFading.set(false); // fade the new content back in, same element
       }, ExpertCarousel.SPOTLIGHT_FADE_MS);
     });
     this.destroyRef.onDestroy(() => clearTimeout(this.spotlightSwapTimer));

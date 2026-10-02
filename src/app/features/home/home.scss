@@ -9,7 +9,7 @@
    compact, consistent margin). */
 .scene {
   position: relative;
-  padding-block: clamp(var(--sp-8), 4vw, var(--sp-12));
+  padding-block: clamp(var(--sp-6), 3vw, var(--sp-10));
 }
 
 .scene-inner {
@@ -222,7 +222,7 @@
      than a new section starting. The bottom keeps the same fixed margin
      every other section boundary uses (.scene), so the hook-to-root-map
      gap stays consistent with the rest of the page. */
-  padding-block: 0 clamp(var(--sp-8), 4vw, var(--sp-12));
+  padding-block: 0 clamp(var(--sp-6), 3vw, var(--sp-10));
 }
 
 .hook-heading-row {
@@ -1399,15 +1399,6 @@
 .programme .lede {
   margin-top: var(--sp-4);
   color: var(--text-quiet-light);
-}
-
-/* Mobile: this section has no scroll-linked reveal to fill space for it —
-   it's a plain stacked block, so every bit of top/bottom padding reads as
-   literal dead air while scrolling past it on a small screen. */
-@media (max-width: 899px) {
-  .programme {
-    padding-block: clamp(var(--sp-8), 10vw, var(--sp-12));
-  }
 }
 
 app-expert-carousel {
