@@ -1,4 +1,5 @@
 import { Service, signal } from '@angular/core';
+import { MAIN_PLAN } from '../config/booking';
 
 /**
  * Bridges the homepage's scroll-driven "mini booking CTA" into the app-level
@@ -11,6 +12,8 @@ export class BookingCtaService {
   readonly visible = signal(false);
   readonly opacity = signal(0);
   readonly label = signal('Book now');
+  /** The main offer the chrome pill's reveal shows. */
+  readonly plan = MAIN_PLAN;
 
   private handler: (() => void) | null = null;
 

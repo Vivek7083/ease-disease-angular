@@ -47,36 +47,31 @@
     </h3>
     <p
       class="hook-body"
+      [class.hook-body--paged]="isCardPaged(i)"
       [class.is-typing]="isCardTyping(i)"
       [class.is-erasing]="isCardErasing(i)"
       [class.is-more]="isCardExpanded(i)"
-      [class.is-clamped]="!!point.more && !isCardExpanded(i)"
-      [style.--n]="words(isCardExpanded(i) ? moreText(point.more) : point.body).length"
+      [class.is-clamped]="isCardPaged(i) && !isCardExpanded(i)"
+      [style.--n]="words(cardText(point)).length"
     >
-      <span class="sr-only">{{ isCardExpanded(i) ? moreText(point.more) : point.body }}</span>
-      @if (isCardExpanded(i)) {
+      <span class="sr-only">{{ cardText(point) }}</span>
+      @for (key of [isCardPaged(i) ? copyKey() : 0]; track key) {
         <span aria-hidden="true">
-          @for (word of words(moreText(point.more)); track $index; let w = $index) {
-            <span class="tw-word" [style.--i]="w" [class.tw-last]="$last">{{ word }}</span>{{ ' ' }}
-          }
-        </span>
-      } @else {
-        <span aria-hidden="true">
-          @for (word of words(point.body); track $index; let w = $index) {
+          @for (word of words(cardText(point)); track $index; let w = $index) {
             <span class="tw-word" [style.--i]="bodyLead(point.title) + w" [class.tw-last]="$last">{{ word }}</span>{{ ' ' }}
           }
         </span>
       }
     </p>
-    @if (point.more) {
+    @if (showMoreButton(i)) {
       <button
         type="button"
         class="hook-more"
         [attr.aria-expanded]="isCardExpanded(i)"
-        [disabled]="isCardErasing(i)"
-        (click)="toggleCardExpanded(i, point.more)"
+        [disabled]="isCardErasing(i) || copyFitting()"
+        (click)="advanceCopy()"
       >
-        {{ isCardExpanded(i) ? 'Read less' : 'Read more' }}
+        {{ moreButtonLabel() }}
       </button>
     }
   </ng-template>

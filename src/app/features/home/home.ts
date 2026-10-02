@@ -76,16 +76,16 @@ export class Home implements AfterViewInit {
   constructor() {
     this.bookingCta.registerHandler(() => this.bookConsultation());
 
-    // Desktop deck: leaving a card puts its "Read more" copy back to the
-    // initial state (the mobile paths reset explicitly where the card changes).
+    // Mobile: measure and set the paged card's first page once it is in view
+    // (and again after it has been reset by leaving it).
     effect(() => {
-      if (!this.hookHorizontal()) {
+      const idx = this.pagedCardIndex();
+      if (this.hookHorizontal() || idx < 0 || !this.isCardTyping(idx)) {
         return;
       }
-      const active = Math.round(this.hookDragUnits());
       untracked(() => {
-        if (this.expandedCardState() !== null && this.expandedCardState() !== active) {
-          this.resetCardCopy();
+        if (this.copyPageText() === null) {
+          this.fitPage(0);
         }
       });
     });
@@ -628,45 +628,98 @@ export class Home implements AfterViewInit {
     return this.hookHorizontal() ? this.cardVisibility(i) > 0.5 : this.mobileActiveCard() === i && this.mobileHeadingRevealProgress() > 0.5;
   }
 
-  /** Which card's "Read more" copy is open; it renders collapsed whenever that card isn't the one in front. */
-  private readonly expandedCardState = signal<number | null>(null);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  protected isCardExpanded(i: number): boolean {
-    return this.expandedCardState() === i && this.isCardTyping(i);
+  /**
+   * "Read more" paging (mobile only). The one card whose copy is longer than
+   * its box shows it a page at a time: each page is as many whole sentences as
+   * fit, measured in the DOM, so it always ends on a full stop. Read more
+   * erases the page and types in the next one, inside the same card; after the
+   * last page the button reads "Read less" and goes back to the first.
+   * Desktop has the room, so it shows the full text with no button.
+   */
+  private pagedCardIndex(): number {
+    return this.hookPoints.findIndex((p) => !!p.more);
   }
 
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  /** The "Read more" copy cut back to its last full stop that fits the card; null = untrimmed. */
-  private readonly trimmedMore = signal<string | null>(null);
+  private sentences(text: string): string[] {
+    return text.match(/[^.!?]+[.!?]+(\s|$)/g)?.map((s) => s.trim()) ?? [text];
+  }
 
-  protected moreText(more: string): string {
-    return this.trimmedMore() ?? more;
+  /** Text on the paged card right now; null until its first fit. */
+  protected readonly copyPageText = signal<string | null>(null);
+  /** Bumped per page swap so the words are re-created and type in afresh. */
+  protected readonly copyKey = signal(0);
+  protected readonly copyPageIndex = signal(0);
+  protected readonly copyHasMore = signal(true);
+  protected readonly copyFitting = signal(false);
+  private copyEnd = 0;
+  private fitRun = 0;
+
+  protected isCardPaged(i: number): boolean {
+    return i === this.pagedCardIndex() && !this.hookHorizontal();
+  }
+
+  /** Later pages: the illustration folds away to give the text room. */
+  protected isCardExpanded(i: number): boolean {
+    return this.isCardPaged(i) && this.copyPageIndex() > 0;
+  }
+
+  protected showMoreButton(i: number): boolean {
+    return this.isCardPaged(i) && (this.copyHasMore() || this.copyPageIndex() > 0);
+  }
+
+  protected moreButtonLabel(): string {
+    return this.copyHasMore() ? 'Read more' : 'Read less';
+  }
+
+  protected cardText(point: HookPoint): string {
+    if (!point.more) {
+      return point.body;
+    }
+    return this.hookHorizontal() ? point.more : (this.copyPageText() ?? point.body);
+  }
+
+  /** Puts the paged card back on its first page. */
+  private resetCardCopy(): void {
+    this.fitRun++;
+    this.copyPageText.set(null);
+    this.copyPageIndex.set(0);
+    this.copyHasMore.set(true);
+    this.copyFitting.set(false);
+    this.copyEnd = 0;
   }
 
   /**
-   * After the expanded copy renders, if it overflows its box, drop trailing
-   * sentences until it fits — so it always ends on a full stop, never mid-way
-   * or behind a scrollbar.
+   * Shows sentences from `start`, then drops trailing ones until the text
+   * fits its box (the 5-line clamp on page one, the max-height after).
    */
-  private fitMoreText(more: string): void {
-    const sentences = more.match(/[^.!?]+[.!?]+(s|$)/g)?.map((s) => s.trim()) ?? [more];
-    let keep = sentences.length;
+  private fitPage(start: number): void {
+    const point = this.hookPoints[this.pagedCardIndex()];
+    const all = this.sentences(point.more ?? point.body);
+    const run = ++this.fitRun;
+    let keep = all.length - start;
+    this.copyFitting.set(true);
+    this.copyPageText.set(all.slice(start, start + keep).join(' '));
+
+    // Two frames after each text change, so the DOM has rendered before it is measured.
+    const afterRender = (fn: () => void) => requestAnimationFrame(() => requestAnimationFrame(fn));
     const step = () => {
-      const el = this.host.nativeElement.querySelector<HTMLElement>(".hook-body.is-more");
-      if (!el || el.scrollHeight <= el.clientHeight + 1 || keep <= 1) {
+      if (run !== this.fitRun) {
         return;
       }
-      keep -= 1;
-      this.trimmedMore.set(sentences.slice(0, keep).join(" "));
-      requestAnimationFrame(step);
+      const el = this.host.nativeElement.querySelector<HTMLElement>('.hook-body--paged');
+      if (el && el.scrollHeight > el.clientHeight + 1 && keep > 1) {
+        keep -= 1;
+        this.copyPageText.set(all.slice(start, start + keep).join(' '));
+        afterRender(step);
+        return;
+      }
+      this.copyEnd = start + keep;
+      this.copyHasMore.set(this.copyEnd < all.length);
+      this.copyFitting.set(false);
     };
-    requestAnimationFrame(step);
-  }
-
-  /** Puts any opened "Read more" copy back to its initial collapsed state. */
-  private resetCardCopy(): void {
-    this.expandedCardState.set(null);
-    this.trimmedMore.set(null);
+    afterRender(step);
   }
 
   private readonly erasingCard = signal<number | null>(null);
@@ -678,32 +731,31 @@ export class Home implements AfterViewInit {
     return this.erasingCard() === i;
   }
 
-  /** Title words type first, so the body waits for them — except once the reader has toggled, when the title is long done. */
+  /** Title words type first, so the body waits for them — except once the reader has paged, when the title is long done. */
   protected bodyLead(title: string): number {
     return this.hasToggledCopy ? 0 : this.words(title).length;
   }
 
   /**
-   * "Read more" / "Read less": the current copy erases back-to-front (words
-   * fade out in reverse, caret running backwards), then the other copy types
-   * in with the same fill — the card keeps its size, only the text swaps.
+   * "Read more" / "Read less": the current page erases back-to-front (words
+   * fade out in reverse, caret running backwards), then the next page types
+   * in with the same fill — the card keeps its size, only the text changes.
    */
-  protected toggleCardExpanded(i: number, more: string | undefined): void {
-    if (this.erasingCard() !== null || !more) {
+  protected advanceCopy(): void {
+    const i = this.pagedCardIndex();
+    if (i < 0 || this.erasingCard() !== null || this.copyFitting()) {
       return;
     }
-    const point = this.hookPoints[i];
-    const current = this.expandedCardState() === i ? more : point.body;
+    const current = this.copyPageText() ?? this.hookPoints[i].body;
     const eraseMs = Math.min(700, this.words(current).length * Home.HOOK_ERASE_STEP_MS + Home.HOOK_ERASE_TAIL_MS);
     this.erasingCard.set(i);
     setTimeout(() => {
       this.hasToggledCopy = true;
-      this.expandedCardState.update((open) => (open === i ? null : i));
+      const forward = this.copyHasMore();
+      this.copyPageIndex.set(forward ? this.copyPageIndex() + 1 : 0);
+      this.copyKey.update((k) => k + 1);
       this.erasingCard.set(null);
-      this.trimmedMore.set(null);
-      if (this.expandedCardState() === i) {
-        this.fitMoreText(more);
-      }
+      this.fitPage(forward ? this.copyEnd : 0);
     }, eraseMs);
   }
 
