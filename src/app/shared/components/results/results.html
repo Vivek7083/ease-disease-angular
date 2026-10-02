@@ -6,9 +6,9 @@
   </p>
 </div>
 
-<ul class="results-list">
+<ul class="results-list" #list [style.--stem-progress]="stemProgress()">
   @for (outcome of outcomes; track outcome.title; let i = $index) {
-    <li class="results-item reveal" [appScrollReveal]="(i % 2) * 90">
+    <li class="results-item reveal" [appScrollReveal]="(i % 3) * 120">
       <span class="results-num" aria-hidden="true">{{ '0' + (i + 1) }}</span>
       <h3 class="results-title">{{ outcome.title }}</h3>
       <p class="results-body">{{ outcome.body }}</p>

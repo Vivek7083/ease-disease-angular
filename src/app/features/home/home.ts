@@ -15,6 +15,7 @@ import { type TeamMember } from '../../shared/components/team-card/team-card';
 import { ExpertCarousel } from '../../shared/components/expert-carousel/expert-carousel';
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
+import { SectionTransition } from '../../shared/components/section-transition/section-transition';
 import { SiteFooter } from '../../shared/components/site-footer/site-footer';
 
 interface RootCause {
@@ -58,6 +59,7 @@ interface TreatStep {
     ExpertCarousel,
     RootMap,
     Results,
+    SectionTransition,
     SiteFooter,
   ],
   templateUrl: './home.html',
@@ -266,7 +268,8 @@ export class Home implements AfterViewInit {
 
   protected treatCardTransform(i: number): string {
     const delta = Home.clampSigned(this.treatCardDistance(i), -1, 1);
-    return `translateY(${delta * Home.TREAT_CARD_PARALLAX_PX}px)`;
+    // Whole pixels only: a fractional translate re-samples the text every frame, which shimmers on a slow scroll.
+    return `translate3d(0, ${Math.round(delta * Home.TREAT_CARD_PARALLAX_PX)}px, 0)`;
   }
 
   /**
@@ -281,8 +284,9 @@ export class Home implements AfterViewInit {
   private static readonly TREAT_COPY_MAX_BLUR_PX = 6;
 
   protected treatCopyFilter(i: number): string {
-    const blur = (1 - this.treatCardVisibility(i)) * Home.TREAT_COPY_MAX_BLUR_PX;
-    return blur > 0.05 ? `blur(${blur}px)` : 'none';
+    // Stepped to half-pixels so the blur isn't re-rendered at a new radius on every scroll frame.
+    const blur = Math.round((1 - this.treatCardVisibility(i)) * Home.TREAT_COPY_MAX_BLUR_PX * 2) / 2;
+    return blur > 0 ? `blur(${blur}px)` : 'none';
   }
 
   /**
@@ -317,7 +321,7 @@ export class Home implements AfterViewInit {
     }
 
     const rect = pin.getBoundingClientRect();
-    const viewportHeight = document.documentElement.clientHeight;
+    const viewportHeight = Home.stickyViewportHeight(pin);
     const scrollable = rect.height - viewportHeight;
     if (scrollable <= 0) {
       this.treatPinProgress.set(0);
@@ -384,8 +388,8 @@ export class Home implements AfterViewInit {
   }
 
   protected treatNodeTransform(i: number): string {
-    const rise = (1 - this.treatNodeVisibility(i)) * Home.TREAT_NODE_RISE_PX;
-    return `translateY(${rise}px)`;
+    const rise = Math.round((1 - this.treatNodeVisibility(i)) * Home.TREAT_NODE_RISE_PX);
+    return `translate3d(0, ${rise}px, 0)`;
   }
 
   /**
@@ -407,7 +411,7 @@ export class Home implements AfterViewInit {
     }
 
     const rect = pin.getBoundingClientRect();
-    const viewportHeight = document.documentElement.clientHeight;
+    const viewportHeight = Home.stickyViewportHeight(pin);
     const scrollable = rect.height - viewportHeight;
     if (scrollable <= 0) {
       this.treatDesktopProgress.set(0);
@@ -997,6 +1001,18 @@ export class Home implements AfterViewInit {
 
   private static clamp01(value: number): number {
     return Math.max(0, Math.min(1, value));
+  }
+
+  /**
+   * The pin releases when its bottom meets the bottom of the sticky child,
+   * which is a fixed 100svh. Reading that child's own height keeps the scroll
+   * math locked to it; documentElement.clientHeight instead changes while a
+   * phone's address bar slides in or out mid-scroll, nudging the progress
+   * back and forth — visible as jitter on a slow scroll.
+   */
+  private static stickyViewportHeight(pin: HTMLElement): number {
+    const sticky = pin.firstElementChild as HTMLElement | null;
+    return sticky?.offsetHeight || document.documentElement.clientHeight;
   }
 
   private static clampSigned(value: number, min: number, max: number): number {

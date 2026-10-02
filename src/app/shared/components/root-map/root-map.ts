@@ -47,7 +47,7 @@ const CONDITIONS: readonly MapNode[] = [
 ];
 
 // One root for everything — the point of the map is that the lines converge.
-const ROOTS: readonly MapNode[] = [{ id: 'deficiency', label: 'Minerals & vitamin deficiencies' }];
+const ROOTS: readonly MapNode[] = [{ id: 'deficiency', label: 'Minerals & Vitamin deficiencies' }];
 
 // Each family traces to a single mechanism.
 const SYMPTOM_TO_CONDITION: Readonly<Record<string, readonly string[]>> = {
@@ -261,7 +261,7 @@ const NOTES_STEP = 0.14;
     <section class="rm-fact" aria-labelledby="rm-fact-heading">
       <div class="reveal" [appScrollReveal]="0" [revealRepeat]="true"><app-eyebrow-label text="The common thread" /></div>
       <h3 id="rm-fact-heading" class="rm-fact-heading reveal" [appScrollReveal]="120" [revealRepeat]="true">Every path leads to the same root.</h3>
-      <p class="rm-fact-root reveal" [appScrollReveal]="360" [revealRepeat]="true"><span class="mark">Minerals</span> &amp; <span class="mark">vitamin deficiencies</span></p>
+      <p class="rm-fact-root reveal" [appScrollReveal]="360" [revealRepeat]="true"><span class="mark">Minerals</span> &amp; <span class="mark">Vitamin deficiencies</span></p>
       <p class="rm-fact-copy reveal" [appScrollReveal]="560" [revealRepeat]="true">
         When the body runs short of what it needs, it can show up differently in everyone. The 7-day plan finds out which ones are yours.
       </p>

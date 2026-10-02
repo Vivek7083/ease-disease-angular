@@ -210,6 +210,8 @@
     </div>
   </section>
 
+  <app-section-transition variant="dots" />
+
   <!-- ============ HOW WE TREAT (process steps) — mobile-first, step 1 only
        for now. Normal document flow, no scroll-jacking, each beat revealed
        once via appScrollReveal as it enters view (same primitive the rest
@@ -424,6 +426,8 @@
     }
   </section>
 
+  <app-section-transition variant="sprout" />
+
   <!-- ============ RESULTS — how you feel after the work, plus the large
        client quote (PRD §4 + §5). Plain stacked flow with a light
        appScrollReveal, deliberately NOT pinned: it follows two pinned
@@ -434,6 +438,8 @@
     </div>
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
        symptom → condition → root-cause trace. Stays on the same ivory
        canvas as every other section — oxblood/ink carry the "seriousness"
@@ -443,6 +449,8 @@
       <app-root-map (bookRequested)="bookConsultation()" />
     </div>
   </section>
+
+  <app-section-transition variant="curtain" />
 
   <!-- ============ PROGRAMME — packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
@@ -462,6 +470,8 @@
       </p>
     </div>
   </section>
+
+  <app-section-transition variant="wave" />
 
   <!-- ============ TEAM — meet the experts ============ -->
   <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">

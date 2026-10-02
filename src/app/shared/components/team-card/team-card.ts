@@ -50,37 +50,27 @@ export interface TeamMember {
     </article>
   `,
   styles: `
-    /* Liquid glass, tinted olive — not the oxblood/ivory solid-panel pattern
-       used everywhere else dark. A translucent olive-tinted pane over the
-       canvas behind it, blurred like frosted glass, with a soft top
-       highlight to read as a physical surface catching light. Falls back to
-       a flat tinted panel on browsers without backdrop-filter support.
-       The tint itself is kept strong enough (not a faint wash) that its own
-       color dominates over whatever's behind the blur — a thin tint lets
-       the backdrop's own color show through and visibly shift as that
-       backdrop changes (the page scrolling behind it, a neighboring card
-       momentarily overlapping it mid-transition), which read as the glass
-       itself "changing color". A more opaque tint stays visually the same
-       regardless of what's behind it. */
+    /* Hospitality look: a warm champagne-to-parchment card with a honey-gold
+       hairline and a fine inner frame, like a welcome card at a good hotel
+       or spa — warm and inviting rather than clinical. Solid (no blur), so
+       the colour never shifts with whatever scrolls behind it. */
     .team-card {
       position: relative;
       overflow: hidden;
-      background: color-mix(in oklab, var(--olive) 38%, var(--ivory) 62%);
+      background: linear-gradient(
+        158deg,
+        color-mix(in oklab, var(--honey) 18%, var(--ivory)) 0%,
+        color-mix(in oklab, var(--honey) 8%, var(--parchment)) 100%
+      );
       color: var(--ink);
       border-radius: var(--r-lg);
       padding: var(--sp-8) var(--sp-6) var(--sp-6);
-      border: 1px solid color-mix(in oklab, var(--olive) 35%, white 65%);
+      border: 1px solid color-mix(in oklab, var(--honey) 60%, var(--parchment));
+      outline: 1px solid color-mix(in oklab, var(--honey) 45%, transparent);
+      outline-offset: -9px;
       box-shadow:
         var(--shadow-lift),
-        inset 0 1px 0 color-mix(in oklab, white 70%, transparent);
-    }
-
-    @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-      .team-card {
-        background: color-mix(in oklab, var(--olive) 34%, transparent);
-        backdrop-filter: blur(18px) saturate(110%);
-        -webkit-backdrop-filter: blur(18px) saturate(110%);
-      }
+        inset 0 1px 0 color-mix(in oklab, white 75%, transparent);
     }
 
     /* Content fades independently of the card shell above — the shell

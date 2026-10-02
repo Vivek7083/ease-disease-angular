@@ -200,7 +200,8 @@ export class ExpertCarousel {
   private lastSpotlightSource = 0;
   private readonly reduceMotion: boolean;
 
-  private static readonly AUTO_ADVANCE_MS = 4500;
+  /** Each expert stays up at least this long, so the bio can be read. */
+  private static readonly AUTO_ADVANCE_MS = 10_000;
   private static readonly SWIPE_THRESHOLD_PX = 40;
   private static readonly ROTATE_DEG = 28;
   private static readonly SPREAD_PERCENT = 68;
@@ -210,7 +211,7 @@ export class ExpertCarousel {
   constructor() {
     this.reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!this.reduceMotion) {
-      this.autoTimer = setInterval(() => this.advance(1), ExpertCarousel.AUTO_ADVANCE_MS);
+      this.startAutoTimer();
       this.destroyRef.onDestroy(() => clearInterval(this.autoTimer));
     }
 
@@ -226,6 +227,19 @@ export class ExpertCarousel {
 
       this.spotlightFading.set(true); // fade the current content out in place; onSpotlightContentHidden takes it from here
     });
+  }
+
+  private startAutoTimer(): void {
+    clearInterval(this.autoTimer);
+    this.autoTimer = setInterval(() => this.advance(1), ExpertCarousel.AUTO_ADVANCE_MS);
+  }
+
+  /** A manual change restarts the countdown, so the card just chosen also gets its full time. */
+  private advanceManually(delta: number): void {
+    this.advance(delta);
+    if (!this.reduceMotion) {
+      this.startAutoTimer();
+    }
   }
 
   protected onSpotlightContentHidden(): void {
@@ -267,11 +281,11 @@ export class ExpertCarousel {
   }
 
   protected prev(): void {
-    this.advance(-1);
+    this.advanceManually(-1);
   }
 
   protected next(): void {
-    this.advance(1);
+    this.advanceManually(1);
   }
 
   private advance(delta: number): void {
@@ -289,9 +303,9 @@ export class ExpertCarousel {
     const deltaX = event.clientX - this.dragStartX;
     this.dragStartX = null;
     if (deltaX <= -ExpertCarousel.SWIPE_THRESHOLD_PX) {
-      this.advance(1);
+      this.advanceManually(1);
     } else if (deltaX >= ExpertCarousel.SWIPE_THRESHOLD_PX) {
-      this.advance(-1);
+      this.advanceManually(-1);
     }
   }
 

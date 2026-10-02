@@ -329,3 +329,61 @@
     padding-top: var(--sp-3);
   }
 }
+
+/* ---------- leaf transitions ---------- */
+/* The stem grows down the page with the reader (mobile — on large screens
+   each row's own stem segment arrives with its leaves). Each leaf then
+   unfurls from its twig: it starts as a small, rounded bud and sweeps out
+   into its leaf shape as it settles, with a slight spring. The twig and stem
+   segments ride along with the leaf, so the branch seems to grow outward. */
+@media (prefers-reduced-motion: no-preference) {
+  .results-list::before {
+    transform: scaleY(var(--stem-progress, 0));
+    transform-origin: top;
+  }
+
+  .results-item.reveal {
+    --leaf-sweep: 6px;
+    opacity: 0;
+    transform: translateY(22px) scale(0.86) rotate(-3deg);
+    transform-origin: 0 0;
+    transition:
+      opacity 600ms var(--ease-out-soft),
+      transform 900ms cubic-bezier(0.34, 1.4, 0.64, 1),
+      border-radius 900ms cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+
+  .results-item.reveal.is-visible {
+    --leaf-sweep: 56px;
+    opacity: 1;
+    transform: none;
+  }
+
+  .results-quote.reveal .results-quote-mark {
+    opacity: 0;
+    transform: scale(0.4) rotate(-14deg);
+    transform-origin: 0 100%;
+    transition:
+      opacity 500ms ease-out 250ms,
+      transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 250ms;
+  }
+
+  .results-quote.reveal.is-visible .results-quote-mark {
+    opacity: 0.8;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+  .results-list::before {
+    transform: none;
+  }
+
+  .results-item.reveal.is-visible {
+    --leaf-sweep: 52px;
+  }
+
+  .results-quote.reveal.is-visible .results-quote-mark {
+    opacity: 0.9;
+  }
+}

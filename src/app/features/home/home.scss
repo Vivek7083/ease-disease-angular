@@ -821,12 +821,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Frame-smoothing only (see the same convention on .hook-deck-card) — the
-     opacity itself is already a continuous, scroll-bound value recomputed
-     every frame; this just smooths between those frames. */
-  transition:
-    opacity 60ms linear,
-    transform 60ms linear;
+  /* No CSS transition here: opacity/transform are already recomputed every
+     scroll frame, and a transition re-targeted on each of those frames never
+     settles — it trails the scroll and stutters on a slow one. */
+  will-change: opacity, transform;
 }
 
 /* The rail is what makes this read as "step 1 of a sequence" rather than a
@@ -882,11 +880,12 @@
      scrolls through this step's hold — scaleY instead of height so it's a
      cheap transform, not a layout-triggering resize every frame. */
   transform-origin: top;
-  transition: transform 60ms linear;
+  will-change: transform;
 }
 
-.treat-step-copy {
-  transition: filter 60ms linear;
+.treat-step-copy,
+.treat-step-rail {
+  will-change: filter;
 }
 
 .treat-step-title {
@@ -933,7 +932,7 @@
 .treat-step-visual {
   display: flex;
   justify-content: center;
-  transition: opacity 60ms linear;
+  will-change: opacity;
 }
 
 .treat-phone {
@@ -1334,9 +1333,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  transition:
-    opacity 60ms linear,
-    transform 60ms linear;
+  /* Scroll-driven every frame — no transition (see .treat-deck-card). */
+  will-change: opacity, transform;
 }
 
 .treat-node-rail {
@@ -1375,7 +1373,7 @@
   width: calc(100% - 30px + var(--sp-6));
   background: linear-gradient(to right, var(--oxblood), color-mix(in oklab, var(--oxblood) 40%, transparent));
   transform-origin: left center;
-  transition: transform 60ms linear;
+  will-change: transform;
 }
 
 .treat-node-copy {
