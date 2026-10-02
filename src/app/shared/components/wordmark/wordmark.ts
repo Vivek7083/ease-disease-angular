@@ -1,17 +1,14 @@
+import { NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, input, signal } from '@angular/core';
 
 const MINIMIZE_THRESHOLD = 64;
 
 @Component({
   selector: 'app-wordmark',
+  imports: [NgOptimizedImage],
   template: `
-    <a class="wordmark" href="#top" [class.on-dark]="onDark()" [class.minimized]="minimized()">
-      <span class="wordmark-glyph" aria-hidden="true">
-        <svg viewBox="0 0 18 18" fill="none" stroke="#fff4ec" stroke-width="1.6" stroke-linecap="round">
-          <path d="M9 3C5 3 3 6 3 9s2 6 6 6 6-2.7 6-6-2-6-6-6Z" opacity="0.7" />
-          <path d="M9 6c-2 0-3 2-3 3s1 4 3 4" />
-        </svg>
-      </span>
+    <a class="wordmark" href="#top" aria-label="Ease Disease — back to top" [class.on-dark]="onDark()" [class.minimized]="collapse() && minimized()">
+      <img class="wordmark-logo" [ngSrc]="onDark() ? 'images/logo/logo-white.png' : 'images/logo/logo-transparent.png'" width="36" height="36" priority alt="" />
       <span class="wordmark-text-group">
         <span class="wordmark-text">Ease Disease</span>
         @if (tagline(); as t) {
@@ -26,12 +23,16 @@ const MINIMIZE_THRESHOLD = 64;
     </a>
   `,
   styles: `
+    /* On the light canvas the transparent logo sits straight on the page
+       beside the name. On the dark footer the logo's dark reds would sink into
+       the background, so it is set as a round ivory badge instead (its own
+       white background, clipped to a circle) with the name in ivory beside it. */
     .wordmark {
       display: inline-flex;
-      align-items: flex-start;
+      align-items: center;
       gap: var(--sp-2);
-      text-decoration: none;
       color: var(--ink);
+      text-decoration: none;
       transition: gap var(--dur-base) var(--ease);
     }
     .wordmark.on-dark {
@@ -40,24 +41,24 @@ const MINIMIZE_THRESHOLD = 64;
     .wordmark.minimized {
       gap: 0;
     }
-    .wordmark-glyph {
+    .wordmark:focus-visible {
+      outline: 2px solid var(--oxblood);
+      outline-offset: 2px;
+      border-radius: var(--r-sm);
+    }
+    .wordmark-logo {
+      flex: none;
       width: 36px;
       height: 36px;
-      flex: none;
-      border-radius: var(--r-sm);
-      display: grid;
-      place-items: center;
-      background: var(--gradient-ember);
-      background-size: 180% 180%;
-      animation: ember-drift var(--drift-ember) var(--drift-ease) infinite;
+      display: block;
       transition: transform var(--dur-base) var(--ease);
     }
-    .wordmark.minimized .wordmark-glyph {
-      transform: scale(0.92);
+    .wordmark.on-dark .wordmark-logo {
+      border-radius: 50%;
+      box-shadow: 0 0 0 1px rgba(251, 247, 240, 0.3);
     }
-    .wordmark-glyph svg {
-      width: 18px;
-      height: 18px;
+    .wordmark.minimized .wordmark-logo {
+      transform: scale(0.92);
     }
     .wordmark-text-group {
       display: flex;
@@ -69,6 +70,7 @@ const MINIMIZE_THRESHOLD = 64;
       white-space: nowrap;
       transition:
         max-width var(--dur-base) var(--ease),
+        padding var(--dur-base) var(--ease),
         opacity var(--dur-micro) var(--ease);
     }
     .wordmark.minimized .wordmark-text-group {
@@ -78,14 +80,15 @@ const MINIMIZE_THRESHOLD = 64;
     .wordmark-text {
       font-family: var(--font-display);
       font-weight: var(--wt-display-bold);
-      font-size: 1.05rem;
+      font-size: 1rem;
       letter-spacing: var(--ls-display);
       line-height: 1;
     }
     .wordmark-tagline {
       font-family: var(--font-mono);
-      font-size: 0.62rem;
+      font-size: 0.58rem;
       letter-spacing: 0.08em;
+      line-height: 1;
       text-transform: uppercase;
       color: var(--text-quiet-light);
     }
@@ -96,7 +99,6 @@ const MINIMIZE_THRESHOLD = 64;
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-top: 2px;
     }
     .wordmark-rule .line {
       width: 16px;
@@ -115,7 +117,7 @@ const MINIMIZE_THRESHOLD = 64;
 
     @media (prefers-reduced-motion: reduce) {
       .wordmark,
-      .wordmark-glyph,
+      .wordmark-logo,
       .wordmark-text-group {
         transition: none;
       }
@@ -126,6 +128,8 @@ export class Wordmark {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly onDark = input(false);
+  /** Shrinks to just the logo once the page scrolls — off for the footer, which is only ever seen scrolled. */
+  readonly collapse = input(true);
   readonly tagline = input<string | undefined>('Functional Medicine');
 
   readonly minimized = signal(false);

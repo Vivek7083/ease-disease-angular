@@ -24,7 +24,7 @@ interface FooterLink {
     <footer class="site-footer">
       <div class="footer-top">
         <div class="footer-brand">
-          <app-wordmark [onDark]="true" />
+          <app-wordmark [onDark]="true" [collapse]="false" />
           <p class="footer-tagline">Digestion-first, root-cause care — not a replacement for your doctor.</p>
           <app-cta-pill label="Book now" variant="ghostLight" (pressed)="bookRequested.emit()" />
         </div>
