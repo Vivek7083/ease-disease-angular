@@ -28,6 +28,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
         [split]="true"
         [fading]="spotlightFading()"
         [member]="members()[spotlightIndex()]"
+        (contentHidden)="onSpotlightContentHidden()"
         (connectRequested)="connectRequested.emit(members()[spotlightIndex()])"
       />
       <div class="spotlight-arrows">
@@ -185,15 +186,17 @@ export class ExpertCarousel {
 
   /** Desktop spotlight only: lags activeIndex by a short cross-fade window —
    *  spotlightFading tells the single persistent app-team-card to fade its
-   *  content out, spotlightIndex swaps the member while it's invisible, then
-   *  fading clears so the new content fades back in on the same element. */
+   *  content out; TeamCard reports back via (contentHidden) once that fade
+   *  actually reaches 0 (not a guessed timer, which can race the real
+   *  animation and swap the member while it's still partway visible), at
+   *  which point spotlightIndex swaps and fading clears so the new content
+   *  fades back in on the same element. */
   protected readonly spotlightIndex = signal(0);
   protected readonly spotlightFading = signal(false);
 
   private readonly destroyRef = inject(DestroyRef);
   private autoTimer: ReturnType<typeof setInterval> | undefined;
   private dragStartX: number | null = null;
-  private spotlightSwapTimer: ReturnType<typeof setTimeout> | undefined;
   private lastSpotlightSource = 0;
   private readonly reduceMotion: boolean;
 
@@ -203,7 +206,6 @@ export class ExpertCarousel {
   private static readonly SPREAD_PERCENT = 68;
   private static readonly DEPTH_PX = 140;
   private static readonly SIDE_SCALE = 0.82;
-  private static readonly SPOTLIGHT_FADE_MS = 260;
 
   constructor() {
     this.reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -222,14 +224,14 @@ export class ExpertCarousel {
         return;
       }
 
-      clearTimeout(this.spotlightSwapTimer);
-      this.spotlightFading.set(true); // fade the current content out in place
-      this.spotlightSwapTimer = setTimeout(() => {
-        this.spotlightIndex.set(target); // swap member while content is invisible
-        this.spotlightFading.set(false); // fade the new content back in, same element
-      }, ExpertCarousel.SPOTLIGHT_FADE_MS);
+      this.spotlightFading.set(true); // fade the current content out in place; onSpotlightContentHidden takes it from here
     });
-    this.destroyRef.onDestroy(() => clearTimeout(this.spotlightSwapTimer));
+  }
+
+  protected onSpotlightContentHidden(): void {
+    if (!this.spotlightFading()) return;
+    this.spotlightIndex.set(this.activeIndex()); // swap member while content is invisible
+    this.spotlightFading.set(false); // fade the new content back in, same element
   }
 
   /** Signed distance from the active card, wrapped the short way round the

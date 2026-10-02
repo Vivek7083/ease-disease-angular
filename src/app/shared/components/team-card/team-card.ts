@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, effect, inject, input, output, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { CtaPill } from '../cta-pill/cta-pill';
 
 export interface TeamMember {
@@ -259,6 +259,10 @@ export class TeamCard {
    *  the glass shell itself stays mounted and unchanged. */
   readonly fading = input(false);
   readonly connectRequested = output<void>();
+  /** Fires once the fade-out tween actually reaches 0 — the caller swaps
+   *  member data on this, not on a guessed timer, so the swap never happens
+   *  while the old content is still partway visible. */
+  readonly contentHidden = output<void>();
 
   protected readonly contentOpacity = signal(1);
 
@@ -272,7 +276,15 @@ export class TeamCard {
     this.reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     effect(() => {
-      this.animateOpacityTo(this.fading() ? 0 : 1);
+      const target = this.fading() ? 0 : 1;
+      // animateOpacityTo reads/writes contentOpacity() internally (to find
+      // the tween's starting value and to step it every frame) — without
+      // untracked, those reads register as extra dependencies of THIS
+      // effect, so every single .set() during the tween re-triggers the
+      // whole effect and restarts the tween from wherever it just got to.
+      // The result is a self-sustaining loop that keeps approaching the
+      // target in ever-smaller steps instead of ever actually reaching it.
+      untracked(() => this.animateOpacityTo(target));
     });
     this.destroyRef.onDestroy(() => {
       if (this.rafId !== undefined) {
@@ -288,6 +300,9 @@ export class TeamCard {
     }
     if (this.reduceMotion || this.contentOpacity() === target) {
       this.contentOpacity.set(target);
+      if (target === 0) {
+        this.contentHidden.emit();
+      }
       return;
     }
 
@@ -297,7 +312,14 @@ export class TeamCard {
       const t = Math.min(1, (now - startTime) / TeamCard.FADE_MS);
       const eased = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2; // ease-in-out
       this.contentOpacity.set(start + (target - start) * eased);
-      this.rafId = t < 1 ? requestAnimationFrame(tick) : undefined;
+      if (t < 1) {
+        this.rafId = requestAnimationFrame(tick);
+      } else {
+        this.rafId = undefined;
+        if (target === 0) {
+          this.contentHidden.emit();
+        }
+      }
     };
     this.rafId = requestAnimationFrame(tick);
   }
