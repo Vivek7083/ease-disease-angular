@@ -9,6 +9,7 @@ import { AfterViewInit, Directive, DestroyRef, ElementRef, inject, input, signal
   selector: '[appScrollReveal]',
   host: {
     '[class.is-visible]': 'revealed()',
+    '[class.reveal-repeat]': 'revealRepeat()',
   },
 })
 export class ScrollRevealDirective implements AfterViewInit {

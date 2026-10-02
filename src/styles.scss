@@ -108,6 +108,15 @@ a {
   transform: none;
 }
 
+/* Elements that fade out and back in as they cross the viewport fade ONLY —
+   no rise. A hidden state that sits lower than the shown one moves the element
+   itself, which at the screen's edge shifts it back across the very line that
+   just hid it, so it flickered ("bounced"). With no movement there is nothing
+   to feed back. */
+.reveal.reveal-repeat {
+  transform: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal {
     opacity: 1;
