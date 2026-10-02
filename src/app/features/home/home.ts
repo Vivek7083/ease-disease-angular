@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { AfterViewInit, Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
@@ -25,6 +25,8 @@ interface RootCause {
 interface HookPoint {
   readonly title: string;
   readonly body: string;
+  /** Extra copy tucked behind a "Read more" toggle; omitted when the body is short enough. */
+  readonly more?: string;
   readonly icon: 'doctor' | 'root' | 'ai' | 'balance';
   readonly image: string;
   readonly imageAlt: string;
@@ -593,9 +595,148 @@ export class Home implements AfterViewInit {
   /** Keep in sync with .hook-carousel-track's own `gap` in home.scss — baked into the step distance so each index still lands exactly on the next slide. */
   private static readonly HOOK_CARD_GAP_PX = 12;
 
-  protected readonly carouselTransform = computed(
-    () => `translateX(calc(${-this.mobileActiveCard()} * (100% + ${Home.HOOK_CARD_GAP_PX}px) + ${this.mobileDragOffset()}px))`,
-  );
+  /**
+   * Typewriter fill: copy is split into words, each one filling from faint to
+   * full colour in sequence (a caret trails the word being "typed"). The
+   * animation only runs while a card is `is-typing`, so it replays every time
+   * a card comes to the front.
+   */
+  protected words(text: string): string[] {
+    return text.split(' ');
+  }
+
+  protected isCardTyping(i: number): boolean {
+    return this.hookHorizontal() ? this.cardVisibility(i) > 0.5 : this.mobileActiveCard() === i && this.mobileHeadingRevealProgress() > 0.5;
+  }
+
+  /** Which card's "Read more" copy is open; it renders collapsed whenever that card isn't the one in front. */
+  private readonly expandedCardState = signal<number | null>(null);
+
+  protected isCardExpanded(i: number): boolean {
+    return this.expandedCardState() === i && this.isCardTyping(i);
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  /** The "Read more" copy cut back to its last full stop that fits the card; null = untrimmed. */
+  private readonly trimmedMore = signal<string | null>(null);
+
+  protected moreText(more: string): string {
+    return this.trimmedMore() ?? more;
+  }
+
+  /**
+   * After the expanded copy renders, if it overflows its box, drop trailing
+   * sentences until it fits — so it always ends on a full stop, never mid-way
+   * or behind a scrollbar.
+   */
+  private fitMoreText(more: string): void {
+    const sentences = more.match(/[^.!?]+[.!?]+(s|$)/g)?.map((s) => s.trim()) ?? [more];
+    let keep = sentences.length;
+    const step = () => {
+      const el = this.host.nativeElement.querySelector<HTMLElement>(".hook-body.is-more");
+      if (!el || el.scrollHeight <= el.clientHeight + 1 || keep <= 1) {
+        return;
+      }
+      keep -= 1;
+      this.trimmedMore.set(sentences.slice(0, keep).join(" "));
+      requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  /** Puts any opened "Read more" copy back to its initial collapsed state. */
+  private resetCardCopy(): void {
+    this.expandedCardState.set(null);
+    this.trimmedMore.set(null);
+  }
+
+  private readonly erasingCard = signal<number | null>(null);
+  private hasToggledCopy = false;
+  private static readonly HOOK_ERASE_STEP_MS = 14;
+  private static readonly HOOK_ERASE_TAIL_MS = 220;
+
+  protected isCardErasing(i: number): boolean {
+    return this.erasingCard() === i;
+  }
+
+  /** Title words type first, so the body waits for them — except once the reader has toggled, when the title is long done. */
+  protected bodyLead(title: string): number {
+    return this.hasToggledCopy ? 0 : this.words(title).length;
+  }
+
+  /**
+   * "Read more" / "Read less": the current copy erases back-to-front (words
+   * fade out in reverse, caret running backwards), then the other copy types
+   * in with the same fill — the card keeps its size, only the text swaps.
+   */
+  protected toggleCardExpanded(i: number, more: string | undefined): void {
+    if (this.erasingCard() !== null || !more) {
+      return;
+    }
+    const point = this.hookPoints[i];
+    const current = this.expandedCardState() === i ? more : point.body;
+    const eraseMs = Math.min(700, this.words(current).length * Home.HOOK_ERASE_STEP_MS + Home.HOOK_ERASE_TAIL_MS);
+    this.erasingCard.set(i);
+    setTimeout(() => {
+      this.hasToggledCopy = true;
+      this.expandedCardState.update((open) => (open === i ? null : i));
+      this.erasingCard.set(null);
+      this.trimmedMore.set(null);
+      if (this.expandedCardState() === i) {
+        this.fitMoreText(more);
+      }
+    }, eraseMs);
+  }
+
+  /** Flips on the first touch/tap/key on the stack — the "swipe / tap" hint then fades away. */
+  protected readonly hookHintDismissed = signal(false);
+
+  /** How far each card behind the front one peeks out to the right, px. */
+  private static readonly HOOK_STACK_PEEK_PX = 18;
+  /** Each step deeper in the stack shrinks the card by this much. */
+  private static readonly HOOK_STACK_SHRINK = 0.045;
+  /** Card width + gap, px — captured on pointerdown so a drag follows the finger 1:1. */
+  private carouselStep = 320;
+
+  /**
+   * Stacked-deck layout: card `i` sits at a continuous offset `e` from the
+   * front (0 = front, 1 = next behind it, ...; negative = already swiped
+   * away to the left). `e` folds in the live drag fraction, so a swipe is a
+   * smooth, interruptible blend between resting states.
+   */
+  protected cardStackStyle(i: number): Record<string, string> {
+    const e = i - this.mobileActiveCard() + this.mobileDragOffset() / this.carouselStep;
+    const gap = Home.HOOK_CARD_GAP_PX;
+    if (e < 0) {
+      const away = Home.clamp01(-e);
+      return {
+        transform: `translateX(calc(${e} * (100% + ${gap}px)))`,
+        opacity: String(1 - Math.max(0, away - 0.85) / 0.15),
+        'z-index': '60',
+      };
+    }
+    const depth = Math.min(e, 3);
+    return {
+      transform: `translateX(${depth * Home.HOOK_STACK_PEEK_PX}px) scale(${1 - depth * Home.HOOK_STACK_SHRINK})`,
+      opacity: String(e > 2 ? Math.max(0, 3 - e) : 1),
+      'z-index': String(Math.round(50 - e * 10)),
+    };
+  }
+
+  protected onCarouselKeydown(event: KeyboardEvent): void {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (step === 0) {
+      return;
+    }
+    event.preventDefault();
+    this.hookHintDismissed.set(true);
+    this.goToCard(this.mobileActiveCard() + step);
+  }
+
+  private goToCard(index: number): void {
+    this.resetCardCopy();
+    this.mobileActiveCard.set(Math.max(0, Math.min(this.hookPoints.length - 1, index)));
+  }
 
   private readonly carouselTrack = viewChild<ElementRef<HTMLElement>>('carouselTrack');
   private carouselPointerId: number | null = null;
@@ -610,8 +751,16 @@ export class Home implements AfterViewInit {
   private static readonly HOOK_SWIPE_VELOCITY_COMMIT = 0.5;
   /** Dragging past the first/last card still "gives" a little instead of stopping dead. */
   private static readonly HOOK_RUBBER_BAND_FACTOR = 0.35;
+  /** Finger travel under this (px) counts as a tap rather than a swipe. */
+  private static readonly HOOK_TAP_MAX_MOVE_PX = 8;
+  /** A tap in the left this-fraction of the stack goes back a card; the rest goes forward. */
+  private static readonly HOOK_TAP_BACK_ZONE = 0.3;
 
   protected onCarouselPointerDown(event: PointerEvent): void {
+    // Let the "Read more" button receive its own click instead of being swallowed as a card tap.
+    if ((event.target as HTMLElement).closest('button')) {
+      return;
+    }
     (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
     this.carouselPointerId = event.pointerId;
     this.isCarouselDragging.set(true);
@@ -620,6 +769,9 @@ export class Home implements AfterViewInit {
     this.carouselLastTime = performance.now();
     this.carouselVelocity = 0;
     this.mobileDragOffset.set(0);
+    this.hookHintDismissed.set(true);
+    const card = (event.currentTarget as HTMLElement).querySelector<HTMLElement>('.hook-card');
+    this.carouselStep = (card?.offsetWidth ?? 300) + Home.HOOK_CARD_GAP_PX;
   }
 
   protected onCarouselPointerMove(event: PointerEvent): void {
@@ -655,12 +807,22 @@ export class Home implements AfterViewInit {
     const index = this.mobileActiveCard();
 
     let next = index;
-    if (dx <= -commitDistance || this.carouselVelocity <= -Home.HOOK_SWIPE_VELOCITY_COMMIT) {
+    if (event.type === 'pointercancel') {
+      // The browser took the gesture (e.g. a vertical page scroll) — spring back.
+    } else if (Math.abs(dx) < Home.HOOK_TAP_MAX_MOVE_PX) {
+      // A tap, not a swipe: left side steps back, anywhere else steps forward.
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+      const fromLeft = (event.clientX - rect.left) / rect.width;
+      next = Math.max(0, Math.min(count - 1, index + (fromLeft < Home.HOOK_TAP_BACK_ZONE ? -1 : 1)));
+    } else if (dx <= -commitDistance || this.carouselVelocity <= -Home.HOOK_SWIPE_VELOCITY_COMMIT) {
       next = Math.min(count - 1, index + 1);
     } else if (dx >= commitDistance || this.carouselVelocity >= Home.HOOK_SWIPE_VELOCITY_COMMIT) {
       next = Math.max(0, index - 1);
     }
 
+    if (next !== index) {
+      this.resetCardCopy();
+    }
     this.mobileActiveCard.set(next);
     this.mobileDragOffset.set(0);
   }
@@ -713,7 +875,11 @@ export class Home implements AfterViewInit {
     const fraction = Home.clamp01((event.clientX - rect.left) / rect.width);
     this.pillDragFraction.set(fraction);
     const count = this.hookPoints.length;
-    this.mobileActiveCard.set(Math.round(fraction * (count - 1)));
+    const target = Math.round(fraction * (count - 1));
+    if (target !== this.mobileActiveCard()) {
+      this.resetCardCopy();
+    }
+    this.mobileActiveCard.set(target);
   }
 
   /**
@@ -918,7 +1084,8 @@ export class Home implements AfterViewInit {
   protected readonly hookPoints: readonly HookPoint[] = [
     {
       title: 'What is functional medicine?',
-      body: 'We nourish the roots, not the leaves. Food as medicine first, supplements only when truly needed.',
+      body: 'The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission.',
+      more: "The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission. If a plant or tree isn't flourishing, we nourish the roots, not the leaves. In the same way, to heal the disease, we at FM look for what is causing the Dis-ease.",
       icon: 'root',
       image: 'images/hook/root-cause.png',
       imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',

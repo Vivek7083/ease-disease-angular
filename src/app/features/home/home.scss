@@ -66,7 +66,7 @@
      of section padding, so the headline needs enough clearance to start
      below them instead of rendering underneath. */
   padding-top: max(calc(var(--sp-16) + env(safe-area-inset-top, 0px)), calc(var(--sp-6) + 6vh));
-  padding-bottom: calc(clamp(var(--sp-6), 6vh, var(--sp-10)) - 1rem);
+  padding-bottom: calc(clamp(var(--sp-6), 6vh, var(--sp-10)) / 2);
 }
 
 @media (min-width: 900px) {
@@ -74,7 +74,7 @@
     /* Equal columns — symmetric visual weight left and right. */
     grid-template-columns: 1fr 1fr;
     gap: clamp(var(--sp-12), 6vw, var(--sp-20));
-    padding-block: clamp(var(--sp-20), 14vh, var(--sp-32));
+    padding-block: clamp(var(--sp-10), 7vh, var(--sp-16));
     align-items: center;
   }
 }
@@ -293,7 +293,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--sp-6);
-  padding-bottom: var(--sp-10);
+  padding-bottom: var(--sp-5);
   /* This is desktop-only content (mobile never renders .hook-viewport), so
      the fixed chrome wordmark/CTA (~56-60px tall incl. its own top offset)
      is always above it — centering the heading+deck block with only
@@ -320,7 +320,7 @@
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--gutter-mobile);
-  padding-top: calc(env(safe-area-inset-top, 0px) + 72px);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 36px);
   /* Fills the whole screen, like the hero before it — one section per
      screen, rather than the hook heading already being visible in the same
      first viewport as the hero on taller screens. */
@@ -331,8 +331,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-10);
-  padding-bottom: var(--sp-10);
+  gap: var(--sp-5);
+  padding-bottom: var(--sp-5);
 }
 
 .hook-mobile .hook-heading-row {
@@ -363,41 +363,57 @@
 
 .hook-carousel-viewport {
   width: 100%;
-  overflow: hidden;
+  /* Clip sideways only — swiped-away cards slide out of view at the edges,
+     while the card shadows and the stack's peek on the right stay visible. */
+  overflow-x: clip;
+  overflow-y: visible;
+  padding-bottom: var(--sp-2);
 }
 
+/* Stacked deck: every card shares one grid cell, so the stage is as tall as
+   the tallest card and all cards match. Each card's transform/opacity comes
+   from cardStackStyle() in home.ts — the front card at rest, the others
+   peeking out to the right, slightly smaller each step back. */
 .hook-carousel-track {
-  display: flex;
+  display: grid;
   width: 100%;
-  /* Keep in sync with HOOK_CARD_GAP_PX in home.ts — carouselTransform bakes
-     this exact value into its per-card step distance. */
-  gap: 12px;
   /* pan-y (not none/auto) — the browser keeps handling vertical scroll
      natively so scrolling the page still works everywhere on the card, but
      leaves horizontal gestures free for the carousel's own pointer
      handlers instead of trying to pan the page sideways too. */
   touch-action: pan-y;
-  cursor: grab;
-  transition: transform 420ms var(--ease-out-soft);
+  cursor: pointer;
   /* A horizontal drag on body copy otherwise highlights the text it passes
      over mid-swipe, which reads as a selection bug rather than a gesture. */
   user-select: none;
   -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.hook-carousel-track.dragging {
-  /* The reader's finger IS the animation during a drag — no transition to
-     fight against it mid-gesture, only once they let go and it snaps. */
-  transition: none;
-  cursor: grabbing;
+.hook-carousel-track:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 4px;
+  border-radius: var(--r-lg);
 }
 
 .hook-carousel-slide {
-  flex: 0 0 100%;
-  width: 100%;
-  min-width: 0;
+  grid-area: 1 / 1;
+  /* Leaves room on the right for the cards stacked behind to peek out. */
+  width: calc(100% - 40px);
+  max-width: 460px;
   display: flex;
-  justify-content: center;
+  /* Shrinks toward the right edge so the peek strips stay a constant width. */
+  transform-origin: right center;
+  transition:
+    transform 420ms var(--ease-out-soft),
+    opacity 420ms var(--ease-out-soft);
+  will-change: transform;
+}
+
+.hook-carousel-track.dragging .hook-carousel-slide {
+  /* The reader's finger IS the animation during a drag — no transition to
+     fight against it mid-gesture, only once they let go and it snaps. */
+  transition: none;
 }
 
 /* Specificity bump (not plain `.hook-card`/`.hook-image`) is
@@ -405,12 +421,9 @@
    specificity and later in source, so a plain selector here would have its
    width/height silently overridden right back to the base values. */
 .hook-carousel-slide .hook-card {
-  /* Inset 4px on every side (8px off the full width/height) — a bit more
-     breathing room from the screen edges, and a visible sliver of canvas
-     between adjacent cards' edges as one slides past another mid-swipe. */
-  width: calc(100% - 8px);
-  max-width: 420px;
-  height: calc(clamp(360px, 52vh, 440px) - 8px);
+  flex: 1;
+  width: 100%;
+  max-width: none;
   overflow: hidden;
   background: var(--surface-card-light);
   border: 1px solid var(--rule-on-light);
@@ -422,6 +435,63 @@
 .hook-carousel-slide .hook-image {
   height: clamp(130px, 20vh, 170px);
   min-height: 0;
+  flex: none;
+}
+
+/* Mobile type — larger than the shared base sizes, which are tuned for the
+   desktop deck. */
+.hook-mobile .hook-heading {
+  font-size: clamp(2rem, 1.55rem + 2.2vw, 2.7rem);
+  line-height: 1.12;
+}
+
+.hook-carousel-slide .hook-copy h3 {
+  font-size: clamp(1.4rem, 1.2rem + 1vw, 1.7rem);
+}
+
+.hook-carousel-slide .hook-copy p {
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.15rem);
+}
+
+/* One-time usage hint under the stack — fades out on first touch. */
+.hook-hint {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: var(--text-quiet-light);
+  transition: opacity 300ms var(--ease-out-soft);
+}
+
+.hook-hint.is-hidden {
+  opacity: 0;
+}
+
+.hook-hint-arrow {
+  display: inline-block;
+  color: var(--oxblood);
+  animation: hook-hint-nudge 1.6s var(--ease-out-soft) infinite;
+}
+
+@keyframes hook-hint-nudge {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-hint-arrow {
+    animation: none;
+  }
 }
 
 /* The single pill-shaped progress/scrub control — a loading-bar style fill
@@ -471,7 +541,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hook-carousel-track,
+  .hook-carousel-slide,
   .hook-pill-fill {
     transition: none;
   }
@@ -1426,3 +1496,192 @@ app-expert-carousel {
 }
 
 
+
+/* ---------- hook cards · typewriter fill + "Read more" ---------- */
+/* Each word starts faint and fills to full colour in sequence once its card
+   is in front (.is-typing), with a thin caret trailing the word being typed.
+   Per-word delay comes from the --i index set in the template. */
+.hook-copy h3 {
+  --tw-full: var(--ink);
+}
+
+.hook-copy p {
+  --tw-full: var(--text-quiet-light);
+  --tw-step: 85ms;
+}
+
+.hook-copy h3 {
+  --tw-step: 110ms;
+}
+
+.tw-word {
+  position: relative;
+  color: transparent;
+}
+
+.tw-word::after {
+  content: '';
+  position: absolute;
+  top: 0.12em;
+  bottom: 0.1em;
+  right: -0.2em;
+  width: 3px;
+  border-radius: 1px;
+  background: var(--oxblood);
+  opacity: 0;
+}
+
+.is-typing .tw-word {
+  /* Each word pops in on its own beat, with the caret sitting on it. */
+  animation: tw-fill calc(var(--tw-step) * 1.6) cubic-bezier(0.22, 0.61, 0.36, 1) calc(var(--i) * var(--tw-step)) both;
+}
+
+.is-typing .tw-word::after {
+  animation: tw-caret calc(var(--tw-step) * 1.1) linear calc(var(--i) * var(--tw-step));
+}
+
+/* The last word's caret lingers and blinks a few times, then goes. */
+.is-typing .tw-last::after {
+  animation: tw-caret-end 2.4s linear calc(var(--i) * var(--tw-step));
+}
+
+/* "Read more" swap: the old copy erases back-to-front, last word first. */
+.is-typing.is-erasing .tw-word {
+  animation: tw-erase 200ms ease-in calc((var(--n) - 1 - var(--i)) * 14ms) both;
+}
+
+.is-typing.is-erasing .tw-word::after,
+.is-typing.is-erasing .tw-last::after {
+  animation: tw-caret 14ms linear calc((var(--n) - 1 - var(--i)) * 14ms);
+}
+
+@keyframes tw-erase {
+  from {
+    color: var(--tw-full);
+  }
+  to {
+    color: transparent;
+  }
+}
+
+@keyframes tw-fill {
+  from {
+    color: transparent;
+  }
+  to {
+    color: var(--tw-full);
+  }
+}
+
+@keyframes tw-caret {
+  from,
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes tw-caret-end {
+  0%,
+  30%,
+  60% {
+    opacity: 1;
+  }
+  15%,
+  45%,
+  75%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tw-word,
+  .is-typing .tw-word {
+    animation: none;
+    color: var(--tw-full);
+  }
+
+  .tw-word::after,
+  .is-typing .tw-word::after {
+    display: none;
+  }
+}
+
+.hook-more:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.hook-more {
+  margin-top: var(--sp-3);
+  padding: var(--sp-2) 0;
+  min-height: 44px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.94rem;
+  color: var(--oxblood);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-color: color-mix(in oklab, var(--oxblood) 45%, transparent);
+}
+
+.hook-more:hover {
+  text-decoration-color: var(--oxblood);
+}
+
+.hook-more:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ---------- mobile cards · compact ---------- */
+/* Short cards sized to the shortest copy: body clamped to 4 lines, and the
+   "Read more" copy (card 1) swaps in with the illustration folded away to
+   make room, so the card never has to grow. */
+.hook-carousel-slide .hook-card {
+  padding: var(--sp-5) var(--sp-4);
+  gap: var(--sp-3);
+}
+
+.hook-carousel-slide .hook-image {
+  height: clamp(92px, 13vh, 116px);
+  transition:
+    height 420ms var(--ease-out-soft),
+    opacity 300ms var(--ease-out-soft),
+    margin 420ms var(--ease-out-soft);
+}
+
+.hook-carousel-slide .hook-card:has(.hook-body.is-more) .hook-image {
+  height: 0;
+  opacity: 0;
+  margin-bottom: calc(-1 * var(--sp-3));
+  border-width: 0;
+}
+
+.hook-carousel-slide .hook-body {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  overflow: hidden;
+}
+
+.hook-carousel-slide .hook-body.is-more {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  /* No scrolling — whatever does not fit is trimmed to the last full stop (fitMoreText in home.ts). */
+  max-height: 9.5lh;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-carousel-slide .hook-image {
+    transition: none;
+  }
+}

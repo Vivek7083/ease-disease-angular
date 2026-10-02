@@ -33,6 +33,53 @@
     </div>
   </section>
 
+  <!-- Shared card copy (desktop deck + mobile stack): title and body typed in
+       word by word, with an optional "Read more" for long bodies. -->
+  <ng-template #hookCopy let-point let-i="i">
+    <span class="hook-index" aria-hidden="true">{{ '0' + (i + 1) }}</span>
+    <h3 [class.is-typing]="isCardTyping(i)">
+      <span class="sr-only">{{ point.title }}</span>
+      <span aria-hidden="true">
+        @for (word of words(point.title); track $index; let w = $index) {
+          <span class="tw-word" [style.--i]="w">{{ word }}</span>{{ ' ' }}
+        }
+      </span>
+    </h3>
+    <p
+      class="hook-body"
+      [class.is-typing]="isCardTyping(i)"
+      [class.is-erasing]="isCardErasing(i)"
+      [class.is-more]="isCardExpanded(i)"
+      [style.--n]="words(isCardExpanded(i) ? moreText(point.more) : point.body).length"
+    >
+      <span class="sr-only">{{ isCardExpanded(i) ? moreText(point.more) : point.body }}</span>
+      @if (isCardExpanded(i)) {
+        <span aria-hidden="true">
+          @for (word of words(moreText(point.more)); track $index; let w = $index) {
+            <span class="tw-word" [style.--i]="w" [class.tw-last]="$last">{{ word }}</span>{{ ' ' }}
+          }
+        </span>
+      } @else {
+        <span aria-hidden="true">
+          @for (word of words(point.body); track $index; let w = $index) {
+            <span class="tw-word" [style.--i]="bodyLead(point.title) + w" [class.tw-last]="$last">{{ word }}</span>{{ ' ' }}
+          }
+        </span>
+      }
+    </p>
+    @if (point.more) {
+      <button
+        type="button"
+        class="hook-more"
+        [attr.aria-expanded]="isCardExpanded(i)"
+        [disabled]="isCardErasing(i)"
+        (click)="toggleCardExpanded(i, point.more)"
+      >
+        {{ isCardExpanded(i) ? 'Read less' : 'Read more' }}
+      </button>
+    }
+  </ng-template>
+
   <!-- ============ THE HOOK ============ -->
   <section class="scene hook" id="hook" appCanvasStop from="var(--canvas-hook-from)" to="var(--canvas-hook-to)" aria-labelledby="hook-heading">
     @if (hookHorizontal()) {
@@ -72,9 +119,7 @@
                     </div>
                     <p class="sr-only">Illustration: {{ point.imageAlt }}</p>
                     <div class="hook-copy" [style.transform]="cardCopyTransform(i)">
-                      <span class="hook-index" aria-hidden="true">{{ '0' + (i + 1) }}</span>
-                      <h3>{{ point.title }}</h3>
-                      <p>{{ point.body }}</p>
+                      <ng-container *ngTemplateOutlet="hookCopy; context: { $implicit: point, i: i }" />
                     </div>
                   </div>
                 </div>
@@ -103,30 +148,42 @@
             <div
               class="hook-carousel-track"
               #carouselTrack
+              tabindex="0"
+              role="group"
+              aria-roledescription="carousel"
+              aria-label="Why functional medicine — use left and right arrow keys to change card"
               [class.dragging]="isCarouselDragging()"
-              [style.transform]="carouselTransform()"
               (pointerdown)="onCarouselPointerDown($event)"
               (pointermove)="onCarouselPointerMove($event)"
               (pointerup)="onCarouselPointerUp($event)"
               (pointercancel)="onCarouselPointerUp($event)"
+              (keydown)="onCarouselKeydown($event)"
             >
               @for (point of hookPoints; track point.title; let i = $index) {
-                <div class="hook-carousel-slide">
+                <div
+                  class="hook-carousel-slide"
+                  [style]="cardStackStyle(i)"
+                  [attr.aria-hidden]="i === mobileActiveCard() ? null : 'true'"
+                >
                   <div class="hook-card" [class]="'icon-' + point.icon">
                     <div class="hook-image">
                       <img [ngSrc]="point.image" fill alt="" />
                     </div>
                     <p class="sr-only">Illustration: {{ point.imageAlt }}</p>
                     <div class="hook-copy">
-                      <span class="hook-index" aria-hidden="true">{{ '0' + (i + 1) }}</span>
-                      <h3>{{ point.title }}</h3>
-                      <p>{{ point.body }}</p>
+                      <ng-container *ngTemplateOutlet="hookCopy; context: { $implicit: point, i: i }" />
                     </div>
                   </div>
                 </div>
               }
             </div>
           </div>
+
+          <p class="hook-hint" [class.is-hidden]="hookHintDismissed()" aria-hidden="true">
+            <span class="hook-hint-item"><span class="hook-hint-arrow">→</span> Swipe to see more</span>
+            <span class="hook-hint-dot">·</span>
+            <span class="hook-hint-item">Tap to reveal next</span>
+          </p>
 
           <div
             class="hook-pill"
