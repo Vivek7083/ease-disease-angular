@@ -1513,11 +1513,11 @@ app-expert-carousel {
 
 .hook-copy p {
   --tw-full: var(--text-quiet-light);
-  --tw-step: 85ms;
+  --tw-step: 81ms;
 }
 
 .hook-copy h3 {
-  --tw-step: 110ms;
+  --tw-step: 105ms;
 }
 
 .tw-word {
@@ -1646,7 +1646,7 @@ app-expert-carousel {
 }
 
 /* ---------- mobile cards · compact ---------- */
-/* Short cards sized to the shortest copy: body clamped to 4 lines, and the
+/* Compact cards: only a card with Read more copy is clamped, and the
    "Read more" copy (card 1) swaps in with the illustration folded away to
    make room, so the card never has to grow. */
 .hook-carousel-slide .hook-card {
@@ -1669,11 +1669,13 @@ app-expert-carousel {
   border-width: 0;
 }
 
-.hook-carousel-slide .hook-body {
+/* Short copy always shows in full; only a card with extra copy behind
+   "Read more" is cut off, after 5 lines. */
+.hook-carousel-slide .hook-body.is-clamped {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
   overflow: hidden;
 }
 

@@ -50,6 +50,7 @@
       [class.is-typing]="isCardTyping(i)"
       [class.is-erasing]="isCardErasing(i)"
       [class.is-more]="isCardExpanded(i)"
+      [class.is-clamped]="!!point.more && !isCardExpanded(i)"
       [style.--n]="words(isCardExpanded(i) ? moreText(point.more) : point.body).length"
     >
       <span class="sr-only">{{ isCardExpanded(i) ? moreText(point.more) : point.body }}</span>
