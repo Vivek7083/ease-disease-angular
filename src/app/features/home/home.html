@@ -7,21 +7,21 @@
           <h1 id="hero-heading" class="hero-headline">
             Your body has been<br />
             <em>speaking in symptoms.</em><br />
-            <span class="hero-headline-sub">It's time to <span class="mark">listen</span> &amp; <span class="mark">treat the cause.</span></span>
+            <span class="hero-headline-sub">It's time to <span class="mark">listen</span></span>
           </h1>
           <p class="lede">Decide whether you want to treat the cause or manage the symptoms for a lifetime.</p>
           <div class="hero-cta-row">
             <app-cta-pill
-              label="Book a consultation"
-              durationLabel="30 min"
-              price="₹499"
-              originalPrice="₹999"
+              [label]="plan.label"
+              [durationLabel]="plan.duration"
+              [price]="plan.price"
+              [originalPrice]="plan.originalPrice"
               revealKey="hero"
               variant="primary"
               (pressed)="bookConsultation()"
             />
             <a class="source-link" href="#root-map">
-              <span>Take the Quiz</span>
+              <span>Find your root cause</span>
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
             </a>
           </div>
@@ -452,16 +452,15 @@
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="How it starts" />
-      <h2 id="programme-heading" class="t-display">One conversation is where your plan begins.</h2>
+      <h2 id="programme-heading" class="t-display">Your plan begins with seven days.</h2>
       <p class="t-body lede">
-        Step 1 is a single, one-time consultation — no programme to commit to yet. Go as deep as you need from
-        there: drag to see what each step covers.
+        Level 1 is a 7-day plan — start there. Level 2 unlocks once Level 1 is done: drag to see what each level covers.
       </p>
       <app-level-selector [levels]="levels" (booked)="bookConsultation()" />
       <p class="levels-fallback">
-        <span>Not sure which one?</span>
+        <span>Not sure where to start?</span>
         <a class="source-link" href="#root-map">
-          <span>Take the Digestion Quiz</span>
+          <span>Find your root cause</span>
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
         </a>
       </p>
@@ -542,7 +541,7 @@
         In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
       </p>
       <div class="cta-row">
-        <app-cta-pill label="Book a consultation" durationLabel="30 min" price="₹499" originalPrice="₹999" revealKey="close" variant="primary" />
+        <app-cta-pill [label]="plan.label" [durationLabel]="plan.duration" [price]="plan.price" [originalPrice]="plan.originalPrice" revealKey="close" variant="primary" (pressed)="bookConsultation()" />
         <app-cta-pill label="Ask the Ease guide first" variant="ghostDark" />
       </div>
       <p class="fine">This page describes common patterns, not a diagnosis. Please speak with a qualified practitioner about your own health.</p>

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, DestroyRef, ElementRef, computed, effect, inj
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
+import { MAIN_PLAN, openBookingForm } from '../../core/config/booking';
 import { BookingCtaService } from '../../core/services/booking-cta';
 import { Wordmark } from '../../shared/components/wordmark/wordmark';
 import { CtaPill } from '../../shared/components/cta-pill/cta-pill';
@@ -69,12 +70,30 @@ export class Home implements AfterViewInit {
   /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
   protected readonly showRemainingSections = false;
 
+  /** The main offer every primary CTA shows — Level 1. */
+  protected readonly plan = MAIN_PLAN;
+
   constructor() {
     this.bookingCta.registerHandler(() => this.bookConsultation());
+
+    // Desktop deck: leaving a card puts its "Read more" copy back to the
+    // initial state (the mobile paths reset explicitly where the card changes).
+    effect(() => {
+      if (!this.hookHorizontal()) {
+        return;
+      }
+      const active = Math.round(this.hookDragUnits());
+      untracked(() => {
+        if (this.expandedCardState() !== null && this.expandedCardState() !== active) {
+          this.resetCardCopy();
+        }
+      });
+    });
   }
 
+  /** Phase 1: every booking CTA opens the Google Form. */
   protected bookConsultation(): void {
-    document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    openBookingForm();
   }
 
   protected jumpToRootMap(): void {
@@ -1138,11 +1157,13 @@ export class Home implements AfterViewInit {
 
   protected readonly levels: readonly Level[] = [
     {
-      tag: 'Step 1',
-      name: 'One-time consultation',
-      price: '₹499',
-      priceNote: '30 minutes · ₹599 to be confirmed',
-      ctaLabel: 'Book a Consultation',
+      tag: 'Level 1',
+      name: '7-day plan',
+      price: MAIN_PLAN.price,
+      originalPrice: MAIN_PLAN.originalPrice,
+      priceNote: '7 days',
+      ctaLabel: MAIN_PLAN.label,
+      recommended: true,
       features: [
         'We listen to your concerns, history and health goals',
         'We explain what may be behind your dis-ease, in plain words',
@@ -1151,45 +1172,35 @@ export class Home implements AfterViewInit {
       ],
     },
     {
-      tag: 'Digest with Ease',
+      // Static for now — stays locked until Level 1 completion can be tracked (needs a backend).
+      tag: 'Level 2',
       name: 'Digest with Ease',
-      price: 'Scope, duration & price to be confirmed',
-      ctaLabel: 'Book This Program',
+      ctaLabel: 'Unlock Level 1 first',
       description: 'Guided support if your main concern starts in digestion: bloating, acidity, irregular bowels, food sensitivities.',
-    },
-    {
-      tag: 'Transform with Ease',
-      name: 'Transform with Ease',
-      price: 'Scope, duration & price to be confirmed',
-      ctaLabel: 'Book This Program',
-      description: 'Whole-person support if your symptoms show up in many places: skin, hormones, energy, sleep, mood, weight.',
+      locked: true,
+      lockedNote: 'Complete Level 1 to unlock Level 2.',
     },
   ];
 
   protected readonly team: readonly TeamMember[] = [
     {
-      name: 'Dr. Akshai Kolagani',
-      role: 'Clinical Expert',
-      credential: 'Bio and credentials pending founder confirmation',
-      initials: 'AK',
-      bio: 'Reviews every programme for clinical soundness before it reaches a client.',
-      ctaLabel: 'Talk to Dr. Akshai',
-    },
-    {
       name: 'Carol',
-      role: 'Founding Expert',
-      credential: 'Credentials pending founder confirmation',
+      role: 'Functional Nutritionist',
+      credential: 'iCFN certified · Hospital operations background',
       initials: 'C',
-      bio: 'Leads the practice side of Ease Disease — how the programme actually runs, week to week.',
+      bio: "Helps people find the root cause of chronic conditions — with a focus on women's health, pregnancy and sports nutrition.",
       ctaLabel: 'Connect with Carol',
+      photo: 'images/team/carol.jpg',
     },
     {
-      name: 'Deepa',
-      role: 'Founding Expert',
-      credential: 'Credentials pending founder confirmation',
+      name: 'Deepa Rajani',
+      role: 'Gut Health Coach',
+      credential: 'IFM (USA) certified · Author',
       initials: 'D',
-      bio: 'Brings the functional-nutrition framework the practice is built on.',
+      bio: 'Wellness mindset and gut health coach, event curator, and author of The Magic In You and Healing Begins in the Gut.',
       ctaLabel: 'Connect with Deepa',
+      photo: 'images/team/deepa.jpg',
     },
   ];
+
 }

@@ -64,7 +64,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
              horizontal drag past the threshold changes the selection. -->
         <div class="gauge-panel-wrap" (pointerdown)="onPanelPointerDown($event)" (pointerup)="onPanelPointerUp($event)">
           @for (level of [levels()[activeIndex()]]; track activeIndex()) {
-            <app-level-card class="gauge-panel" [level]="level" (booked)="booked.emit()" />
+            <app-level-card class="gauge-panel" [level]="level" (booked)="booked.emit()" (unlockRequested)="selectIndex(0)" />
           }
         </div>
       </div>
@@ -106,7 +106,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
         <div class="gauge-stack">
           @for (level of levels(); track level.name; let i = $index) {
             <div #stackCard class="gauge-stack-card" [class.is-first]="i === 0">
-              <app-level-card [level]="level" (booked)="booked.emit()" />
+              <app-level-card [level]="level" (booked)="booked.emit()" (unlockRequested)="selectIndex(0)" />
             </div>
           }
         </div>

@@ -6,6 +6,8 @@ import { EyebrowLabel } from '../eyebrow-label/eyebrow-label';
 interface FooterLink {
   readonly label: string;
   readonly href: string;
+  /** Opens the booking form instead of navigating. */
+  readonly book?: boolean;
 }
 
 /**
@@ -24,14 +26,14 @@ interface FooterLink {
         <div class="footer-brand">
           <app-wordmark [onDark]="true" />
           <p class="footer-tagline">Digestion-first, root-cause care — not a replacement for your doctor.</p>
-          <app-cta-pill label="Book a consultation" variant="ghostLight" (pressed)="bookRequested.emit()" />
+          <app-cta-pill label="Book now" variant="ghostLight" (pressed)="bookRequested.emit()" />
         </div>
 
         <nav class="footer-col" aria-label="Section shortcuts">
           <app-eyebrow-label text="Explore" tone="dark" />
           <ul>
             @for (link of exploreLinks; track link.label) {
-              <li><a [href]="link.href">{{ link.label }}</a></li>
+              <li><a [href]="link.href" (click)="onExploreClick($event, link)">{{ link.label }}</a></li>
             }
           </ul>
         </nav>
@@ -227,8 +229,15 @@ export class SiteFooter {
     { label: 'Conditions we treat', href: '#root-map' },
     { label: 'Packages', href: '#programme' },
     { label: 'Meet the experts', href: '#experts' },
-    { label: 'Book a consultation', href: '#book' },
+    { label: 'Book now', href: '#', book: true },
   ];
+
+  protected onExploreClick(event: Event, link: FooterLink): void {
+    if (link.book) {
+      event.preventDefault();
+      this.bookRequested.emit();
+    }
+  }
 
   protected readonly connectLinks: readonly FooterLink[] = [
     { label: 'Email us', href: '#' },

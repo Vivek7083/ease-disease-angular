@@ -111,12 +111,18 @@
 
 .hero-headline-sub {
   font-size: calc(1em - 3px);
+  /* A step heavier than the 300-weight headline so "It's time to listen" reads as the call to action. */
+  font-weight: 500;
 }
 
 .hero-headline .mark {
   font-style: normal;
-  background: linear-gradient(transparent 62%, color-mix(in oklab, var(--evidence-blue) 55%, transparent) 62%);
-  padding: 0 2px;
+  /* Yellow highlighter swipe (honey) behind the key word. */
+  font-weight: 600;
+  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  padding: 0 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .lede {
@@ -172,7 +178,7 @@
   gap: var(--sp-5);
 }
 
-/* Mobile keeps just the "Take the Quiz" link, as already approved — the
+/* Mobile keeps just the "Find your root cause" link, as already approved — the
    global floating chrome pill (always visible below 640px) is the mobile
    booking CTA. Desktop's chrome pill is scroll-gated instead (only fades in
    once the reader has scrolled past the hero), so without a CTA pill here

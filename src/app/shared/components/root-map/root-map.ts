@@ -129,6 +129,8 @@ const NOTES_STEP = 0.14;
                   [attr.data-id]="node.id"
                   [class.lit]="isLit(node.id)"
                   [class.selected]="selected().has(node.id)"
+                  [class.nudge]="!rootsRevealed() && !reducedMotion()"
+                  [style.--nudge-delay]="i * 140 + 'ms'"
                   [attr.aria-pressed]="selected().has(node.id)"
                   (click)="toggleSymptom(node.id)"
                 >
@@ -146,6 +148,10 @@ const NOTES_STEP = 0.14;
                 </button>
               }
             </div>
+            <p class="root-map-prompt" [class.is-gone]="rootsRevealed()" [attr.aria-hidden]="rootsRevealed() ? 'true' : null">
+              <span class="root-map-prompt-arrow" aria-hidden="true">↑</span>
+              Tap any condition to trace it down to its root
+            </p>
           </div>
 
           <div class="root-map-layer" [class.layer-hidden]="!showConditions()">
@@ -257,10 +263,10 @@ const NOTES_STEP = 0.14;
       <h3 id="rm-fact-heading" class="rm-fact-heading reveal" [appScrollReveal]="120" [revealRepeat]="true">Every path leads to the same root.</h3>
       <p class="rm-fact-root reveal" [appScrollReveal]="360" [revealRepeat]="true"><span class="mark">Minerals</span> &amp; <span class="mark">vitamin deficiencies</span></p>
       <p class="rm-fact-copy reveal" [appScrollReveal]="560" [revealRepeat]="true">
-        When the body runs short of what it needs, it can show up differently in everyone. A consultation finds out which ones are yours.
+        When the body runs short of what it needs, it can show up differently in everyone. The 7-day plan finds out which ones are yours.
       </p>
       <div class="rm-fact-cta reveal" [appScrollReveal]="720" [revealRepeat]="true">
-        <app-cta-pill label="Find my root in a consultation" variant="primary" (pressed)="bookRequested.emit()" />
+        <app-cta-pill label="Start the 7-day plan" variant="primary" (pressed)="bookRequested.emit()" />
       </div>
       <p class="root-map-fine reveal" [appScrollReveal]="860" [revealRepeat]="true">
         This map shows common patterns, not a diagnosis. Please speak to our qualified practitioner for your diagnosis.
@@ -313,7 +319,7 @@ const NOTES_STEP = 0.14;
        length, so one dashoffset transition draws every link in evenly. */
     .root-map-links path {
       fill: none;
-      stroke: color-mix(in oklab, var(--oxblood) 26%, transparent);
+      stroke: color-mix(in oklab, var(--oxblood) 13%, transparent);
       stroke-width: 1.4;
       stroke-dasharray: 1;
       stroke-dashoffset: 1;
@@ -342,7 +348,7 @@ const NOTES_STEP = 0.14;
     }
 
     .root-map.focus .root-map-links path.visible:not(.lit) {
-      opacity: 0.3;
+      opacity: 0.4;
     }
 
     .root-map.focus .root-map-node:not(.lit):not(.selected) {
@@ -484,6 +490,55 @@ const NOTES_STEP = 0.14;
     button.root-map-node {
       cursor: pointer;
       min-height: 44px;
+    }
+
+    /* Until the reader taps a top-level condition the deeper layer stays
+       hidden, so the condition pills breathe with a soft ring to say "tap me",
+       staggered left to right. */
+    button.root-map-node.nudge:not(.selected) {
+      animation: root-map-nudge 2.6s ease-in-out infinite;
+      animation-delay: var(--nudge-delay, 0ms);
+    }
+    @keyframes root-map-nudge {
+      0%,
+      60%,
+      100% {
+        box-shadow: 0 0 0 0 transparent;
+      }
+      30% {
+        box-shadow: 0 0 0 5px color-mix(in oklab, var(--oxblood) 18%, transparent);
+      }
+    }
+
+    .root-map-prompt {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--sp-2);
+      margin: var(--sp-4) 0 0;
+      max-height: 3em;
+      overflow: hidden;
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      color: var(--oxblood);
+      transition:
+        opacity var(--dur-base) var(--ease),
+        max-height var(--dur-scene) var(--ease-out-soft),
+        margin var(--dur-scene) var(--ease-out-soft);
+    }
+    .root-map-prompt.is-gone {
+      opacity: 0;
+      max-height: 0;
+      margin-top: 0;
+    }
+    .root-map-prompt-arrow {
+      display: inline-block;
+      animation: root-map-prompt-bob 1.6s ease-in-out infinite;
+    }
+    @keyframes root-map-prompt-bob {
+      50% {
+        transform: translateY(-3px);
+      }
     }
 
     button.root-map-node:hover {
@@ -826,6 +881,10 @@ const NOTES_STEP = 0.14;
     }
 
     @media (prefers-reduced-motion: reduce) {
+      button.root-map-node.nudge,
+      .root-map-prompt-arrow {
+        animation: none;
+      }
       .root-map-links path,
       .root-map-layer,
       .root-map-node,
@@ -927,9 +986,9 @@ export class RootMap implements AfterViewInit {
   protected readonly showConditions = computed(
     () => this.selected().size > 0 || (this.isDesktop() ? this.deskStage() >= 1 : this.mobileConditionsVisible()),
   );
-  protected readonly showRoots = computed(
-    () => this.selected().size > 0 || (this.isDesktop() ? this.deskStage() >= 2 : this.mobileRootsVisible()),
-  );
+  /** The deepest layer (the root) stays hidden until the reader first taps a top-level condition, then stays revealed. */
+  protected readonly rootsRevealed = signal(false);
+  protected readonly showRoots = computed(() => this.rootsRevealed());
 
   private readonly mapBox = viewChild<ElementRef<HTMLElement>>('mapBox');
   private readonly linksSvg = viewChild<ElementRef<SVGSVGElement>>('linksSvg');
@@ -966,6 +1025,9 @@ export class RootMap implements AfterViewInit {
       next.add(id);
     }
     this.selected.set(next);
+    if (next.size > 0) {
+      this.rootsRevealed.set(true);
+    }
     this.queueLayout();
   }
 

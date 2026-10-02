@@ -6,6 +6,7 @@ import { Wordmark } from './shared/components/wordmark/wordmark';
 import { ScrollProgress } from './shared/components/scroll-progress/scroll-progress';
 import { CtaPill } from './shared/components/cta-pill/cta-pill';
 import { FlowLines } from './shared/components/flow-lines/flow-lines';
+import { MAIN_PLAN } from './core/config/booking';
 
 @Component({
   selector: 'app-root',
@@ -19,6 +20,7 @@ export class App {
 
   protected readonly canvasColor = this.canvasStory.canvasColor;
   protected readonly bookingCta = inject(BookingCtaService);
+  protected readonly plan = MAIN_PLAN;
 
   constructor() {
     this.canvasStory.start(this.destroyRef);
