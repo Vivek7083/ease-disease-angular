@@ -806,6 +806,14 @@
   justify-content: center;
   /* Clears the fixed chrome wordmark, same clearance as .hook-viewport. */
   padding-top: var(--sp-16);
+  /* The strip of each older step left showing as the stack builds. */
+  --treat-tab: 44px;
+}
+
+@media (max-height: 700px) {
+  .treat-viewport {
+    --treat-tab: 36px;
+  }
 }
 
 .treat-deck {
@@ -815,16 +823,62 @@
   min-height: 0;
 }
 
+/* A card in the stack: an opaque sheet, so a step sliding up really covers the
+   one beneath it and only its top strip (badge + title) is left showing. It is
+   placed purely by transform (treatStackTransform) — no CSS transition: the
+   value is already recomputed every scroll frame, and a transition retargeted
+   on each of them trails the scroll and stutters on a slow one. */
 .treat-deck-card {
   position: absolute;
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  /* No CSS transition here: opacity/transform are already recomputed every
-     scroll frame, and a transition re-targeted on each of those frames never
-     settles — it trails the scroll and stutters on a slow one. */
-  will-change: opacity, transform;
+  justify-content: flex-start;
+  padding: var(--sp-3) var(--sp-4) var(--sp-5);
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+  border-bottom: 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  box-shadow: 0 -12px 28px -18px color-mix(in oklab, var(--oxblood) 45%, transparent);
+  will-change: transform;
+}
+
+/* A step that has been covered — its strip stays readable but quieter. */
+.treat-deck-card:not(.is-active) .treat-step-title {
+  color: color-mix(in oklab, var(--ink) 70%, var(--parchment));
+}
+
+.treat-scroll-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: var(--sp-4);
+  z-index: 10;
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--oxblood);
+  pointer-events: none;
+}
+
+.treat-scroll-hint-arrow {
+  display: inline-block;
+  animation: treat-hint-bob 1.4s ease-in-out infinite;
+}
+
+@keyframes treat-hint-bob {
+  50% {
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .treat-scroll-hint-arrow {
+    animation: none;
+  }
 }
 
 /* The rail is what makes this read as "step 1 of a sequence" rather than a
@@ -849,7 +903,7 @@
 .treat-step-content {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-10);
+  gap: var(--sp-4);
   flex: 1;
   min-width: 0;
 }
@@ -946,7 +1000,7 @@
      constraint — width or height — is tighter actually wins, and the
      illustration keeps shrinking proportionally as the viewport gets
      shorter instead of hitting a floor and clipping anyway. */
-  width: clamp(150px, min(50vw, calc(44vh * 0.4615)), 230px);
+  width: clamp(130px, min(46vw, calc(36vh * 0.4615)), 210px);
   aspect-ratio: 9 / 19.5;
   border: 2px solid color-mix(in oklab, var(--ink) 22%, transparent);
   border-radius: 34px;
@@ -1214,7 +1268,7 @@
   position: relative;
   /* Same height-aware sizing as .treat-phone, ratio adjusted for this
      frame's own 9:16.125 aspect ratio (9/16.125 = 0.5581). */
-  width: clamp(150px, min(50vw, calc(44vh * 0.5581)), 230px);
+  width: clamp(130px, min(46vw, calc(36vh * 0.5581)), 210px);
   aspect-ratio: 9 / 16.125;
   border-radius: 24px;
   overflow: hidden;

@@ -323,19 +323,17 @@
               @for (step of treatSteps; track step.title; let i = $index) {
                 <div
                   class="treat-deck-card"
-                  [style.opacity]="treatCardVisibility(i)"
-                  [style.transform]="treatCardTransform(i)"
-                  [style.pointer-events]="treatCardPointerEvents(i)"
+                  [class.is-active]="treatStackActive(i)"
+                  [style.z-index]="i + 1"
+                  [style.transform]="treatStackTransform(i)"
+                  [style.pointer-events]="treatStackActive(i) ? 'auto' : 'none'"
                 >
                   <div class="treat-step-main">
-                    <div class="treat-step-rail" aria-hidden="true" [style.filter]="treatCopyFilter(i)">
+                    <div class="treat-step-rail" aria-hidden="true">
                       <span class="treat-step-badge">{{ '0' + (i + 1) }}</span>
-                      @if (i < treatSteps.length - 1) {
-                        <span class="treat-step-line" [style.transform]="'scaleY(' + treatLineProgress(i) + ')'"></span>
-                      }
                     </div>
                     <div class="treat-step-content">
-                      <div class="treat-step-copy" [style.filter]="treatCopyFilter(i)">
+                      <div class="treat-step-copy">
                         <h3 class="treat-step-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
                         @let ctaSplit = i === 0 ? splitBodyAroundCta(step.body, '30-minute call') : null;
                         <p class="treat-step-body">
@@ -349,7 +347,7 @@
                         </p>
                       </div>
 
-                      <div class="treat-step-visual" [style.opacity]="treatIllustrationVisibility(i)">
+                      <div class="treat-step-visual">
                         <ng-container *ngTemplateOutlet="stepIllustration; context: { i: i }" />
                       </div>
                     </div>
@@ -357,6 +355,9 @@
                 </div>
               }
             </div>
+            <p class="treat-scroll-hint" aria-hidden="true" [style.opacity]="treatHintOpacity()">
+              Keep scrolling <span class="treat-scroll-hint-arrow">↓</span>
+            </p>
           </div>
         </div>
       }
