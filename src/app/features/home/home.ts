@@ -164,25 +164,24 @@ export class Home implements AfterViewInit {
    */
   protected readonly treatSteps: readonly TreatStep[] = [
     {
-      title: 'We start by listening',
-      body: "Before anything else, we want your side of the story — your symptoms, your days, what's already been tried. We'll go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
-      bodyShort:
-        "Your symptoms, your days, what's already been tried — we go through it together in your first 30-minute call, nothing rushed.",
+      title: 'You speak, we listen',
+      body: 'A full conversation about your symptoms, your current diet, sleep, stress, past reports and lifestyle — and your goals. Nothing is rushed, nothing assumed.',
+      bodyShort: 'Your symptoms, diet, sleep, stress and past reports — we go through all of it together.',
     },
     {
-      title: 'Then we look for proof',
-      body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
-      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up.",
+      title: 'Getting to the Root Cause',
+      body: "Tests chosen for you to find what's driving your dis-ease, with a full root-cause analysis. We also start you on a simple anti-inflammatory, elimination diet right away, so healing begins before results even come back.",
+      bodyShort: "Tests chosen for you to find what's driving your dis-ease, not just what's showing up.",
     },
     {
-      title: 'Food first, then supplements',
-      body: 'We use food as medicine first. Supplements only join in where your results and history actually point to them — never by default.',
-      bodyShort: 'Food first, supplements only when results call for it.',
+      title: 'Digest with Ease',
+      body: "We use food as medicine, and nutrient supplements where your results show a need, to support your body through dis-ease. When your body gets the nutrition it's been missing, it can begin to recover. Food comes first — supplements only when your tests and history point to them.",
+      bodyShort: 'Food as medicine first. Supplements added only when your results and history call for them.',
     },
     {
-      title: 'What makes it last',
+      title: 'Food that truly nourishes, nutrients that bridge the gap',
       body: 'Sleep, stress and mindset shape recovery as much as food does. Regular check-ins keep the plan working as your life changes.',
-      bodyShort: 'Sleep and stress matter too.',
+      bodyShort: 'Sleep, stress and mindset matter too. Check-ins keep the change lasting.',
     },
   ];
 
@@ -971,7 +970,7 @@ export class Home implements AfterViewInit {
    */
   private static readonly WORD_FILL_SPAN = 1.6;
 
-  protected readonly hookCloseWords = 'Underneath, fewer things are actually going on than it feels like.'.split(' ');
+  protected readonly hookCloseWords = 'You are what you think, what you eat, and how well you digest it.'.split(' ');
 
   private readonly closeQuote = viewChild<ElementRef<HTMLElement>>('closeQuote');
   private readonly closeFillProgress = signal(0);
@@ -1106,31 +1105,17 @@ export class Home implements AfterViewInit {
     {
       title: 'What is functional medicine?',
       body: 'The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission.',
-      more: "The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission. If a plant or tree isn't flourishing, we nourish the roots, not the leaves. In the same way, to heal the disease, we at FM look for what is causing the Dis-ease.",
+      more: "The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission. If a plant or tree isn't flourishing, we nourish the roots, not the leaves. In the same way, to heal the dis-ease, we look for what is causing it — your digestion, food, stress, sleep and history.",
       icon: 'root',
       image: 'images/hook/root-cause.webp',
       imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',
     },
     {
-      title: 'What you will not get from an AI chat',
-      body: "AI gives generic answers. It can't read your history, labs and symptoms like a clinician actually looking at you can.",
-      icon: 'ai',
-      image: 'images/hook/ai-chat.webp',
-      imageAlt: 'A clinician studying a patient chart closely, with a generic chat-bubble icon faded in the background.',
-    },
-    {
       title: 'Why root-cause healing?',
-      body: 'Conventional care asks "what stops this now?" Root-cause care asks "why did this start?" That\'s why it doesn\'t come back.',
+      body: "Conventional care asks what makes this stop right now. Root-cause care asks why it started. Both matter — but we lead with the second question, because that's the one that actually closes the loop.",
       icon: 'balance',
       image: 'images/hook/root-cause-balance.webp',
       imageAlt: 'A balanced scale weighing a pill against a sprouting plant.',
-    },
-    {
-      title: 'Why not just another consultation?',
-      body: "A 10–15 minute appointment treats the symptom, with no time to ask why it showed up. That's the gap root-cause care closes.",
-      icon: 'doctor',
-      image: 'images/hook/short-consultation.webp',
-      imageAlt: 'An hourglass running low next to an empty chair at a desk, suggesting a rushed, too-short appointment.',
     },
   ];
 
@@ -1159,11 +1144,11 @@ export class Home implements AfterViewInit {
 
   protected readonly levels: readonly Level[] = [
     {
-      tag: 'Level 1',
-      name: '7-day plan',
+      tag: 'Start here',
+      name: 'One-time Consultation',
       price: MAIN_PLAN.price,
       originalPrice: MAIN_PLAN.originalPrice,
-      priceNote: '7 days',
+      priceNote: '30 minutes',
       ctaLabel: MAIN_PLAN.label,
       recommended: true,
       features: [
@@ -1174,13 +1159,22 @@ export class Home implements AfterViewInit {
       ],
     },
     {
-      // Static for now — stays locked until Level 1 completion can be tracked (needs a backend).
-      tag: 'Level 2',
+      // Stays locked until first consultation is tracked (needs a backend).
+      tag: '3 months',
       name: 'Digest with Ease',
-      ctaLabel: 'Unlock Level 1 first',
+      ctaLabel: 'Unlock with consultation first',
       description: 'Guided support if your main concern starts in digestion: bloating, acidity, irregular bowels, food sensitivities.',
       locked: true,
-      lockedNote: 'Complete Level 1 to unlock Level 2.',
+      lockedNote: 'Complete your first consultation to unlock.',
+    },
+    {
+      // Stays locked until Digest with Ease is tracked (needs a backend).
+      tag: '6 months',
+      name: 'Ease Dis-ease',
+      ctaLabel: 'Unlock Digest with Ease first',
+      description: 'Whole-person support if your symptoms show up in many places: skin, hormones, energy, sleep, mood, weight.',
+      locked: true,
+      lockedNote: 'Complete Digest with Ease to unlock.',
     },
   ];
 

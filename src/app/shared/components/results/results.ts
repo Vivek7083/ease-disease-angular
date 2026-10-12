@@ -19,12 +19,11 @@ interface Testimonial {
 // same softening the content doc applies to the remission line. The
 // medication line explicitly keeps the doctor in the loop.
 const OUTCOMES: readonly Outcome[] = [
-  { title: 'Steadier energy', body: 'Fewer afternoon crashes, and more in the tank by evening.' },
-  { title: 'Better sleep', body: 'Falling asleep easier, and staying asleep.' },
-  { title: 'Balanced mood and hormones', body: 'A calmer baseline, and cycles that settle.' },
-  { title: 'Less reliance on medication', body: 'With your doctor, many people can step down what they once thought was for life.' },
-  { title: 'Numbers in their optimal range', body: 'Labs judged against optimal ranges, not just "normal".' },
-  { title: 'Confidence in your own health', body: 'You understand your body and how to manage stress, so the change lasts.' },
+  { title: 'Steadier energy', body: 'Fewer afternoon crashes, more in the tank by evening.' },
+  { title: 'Better sleep', body: 'Falling asleep easier, and staying asleep through the night.' },
+  { title: 'A calmer mood', body: 'A steadier baseline and fewer emotional swings.' },
+  { title: 'Balanced hormones', body: 'Cycles that settle, and blood sugar and energy that hold steady.' },
+  { title: 'Confidence in your health', body: 'You understand your body and how to manage stress, so the change lasts.' },
 ];
 
 // STAND-IN, NOT A REAL TESTIMONIAL — no client testimonials have been
