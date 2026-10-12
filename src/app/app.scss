@@ -2,6 +2,14 @@
   display: block;
 }
 
+/* Easter egg: the "ease" in every "dis-ease" carries a whisper of the brand
+   colour — only visible if you're really looking. font-style: normal so it
+   stays upright in italic contexts (e.g. the inter-section quote). */
+.ease-mark {
+  color: color-mix(in oklab, var(--oxblood) 55%, currentColor);
+  font-style: normal;
+}
+
 .canvas-root {
   position: fixed;
   inset: 0;

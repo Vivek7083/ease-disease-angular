@@ -376,7 +376,7 @@ export class Home implements AfterViewInit {
    * touching the shape of the crossfade curve itself (still smooth either
    * way — this only stretches it out).
    */
-  protected readonly hookVhPerCard = 160;
+  protected readonly hookVhPerCard = 125;
 
   /**
    * On desktop, the drag through all cards uses only this fraction of the
@@ -476,30 +476,21 @@ export class Home implements AfterViewInit {
    * cross-dissolve through each other rather than handing off with a cut.
    */
   /**
-   * A bigger plateau (and correspondingly narrower fade) than a literal
-   * 50/50 split — each card spends most of its turn fully legible, with only
-   * a brief, smooth window where it's actually crossfading into its
-   * neighbor. This is purely a reshaping of the opacity curve, not the
-   * motion: position/scale keep moving continuously throughout regardless,
-   * so narrowing the fade doesn't bring back the old sprint-then-freeze
-   * abruptness — it just means less time where nothing on screen is clearly
-   * readable.
+   * Adjacent cards sit 1 unit apart, so plateau + fade must not exceed 0.5 —
+   * otherwise both neighbors are still within each other's plateau/fade
+   * range at the midpoint and briefly sit at (or near) full opacity at the
+   * same time, reading as two cards' text stacked on top of each other
+   * instead of one handing off to the next. Keeping the sum at exactly 0.5
+   * means a card reaches zero right as its neighbor starts rising from zero
+   * — a clean, quick swap with no double-exposure — while still giving each
+   * card the bulk of its turn (the plateau) fully legible and still.
    */
-  private static readonly HOOK_CARD_PLATEAU = 0.5;
-  private static readonly HOOK_CARD_FADE = 0.2;
-  /** Subtle drift, not a full-screen throw — this is parallax, not a slide carousel. */
-  private static readonly HOOK_CARD_PARALLAX_PX = 90;
+  private static readonly HOOK_CARD_PLATEAU = 0.35;
+  private static readonly HOOK_CARD_FADE = 0.15;
   /** Blur is only ever applied to the image (see cardImageFilter) — blurring
    *  the copy made two overlapping paragraphs of blurred text during a
    *  crossfade, which read as noise, not depth. */
   private static readonly HOOK_CARD_MAX_BLUR_PX = 5;
-  /** Image and copy drift at slightly different rates for a layered, dimensional feel within each card. */
-  private static readonly HOOK_IMAGE_PARALLAX_FACTOR = 0.5;
-  private static readonly HOOK_COPY_PARALLAX_FACTOR = 1.15;
-
-  private cardDelta(i: number): number {
-    return Home.clampSigned(this.hookDragUnits() - i, -1, 1);
-  }
 
   protected cardVisibility(i: number): number {
     const distance = Math.abs(this.hookDragUnits() - i);
@@ -512,14 +503,14 @@ export class Home implements AfterViewInit {
     return 1 - (distance - Home.HOOK_CARD_PLATEAU) / Home.HOOK_CARD_FADE;
   }
 
-  protected cardDeckTransform(i: number): string {
-    const translate = this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX;
-    const scale = 0.96 + 0.04 * this.cardVisibility(i);
-    return `translateX(${translate}px) scale(${scale})`;
+  protected cardDeckTransform(_i: number): string {
+    return 'none';
   }
 
+  /** Incoming/outgoing card's image settles in with a gentle scale (0.96 → 1) rather than a flat dissolve — physical weight instead of a slideshow cut. */
   protected cardImageTransform(i: number): string {
-    return `translateX(${this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX * Home.HOOK_IMAGE_PARALLAX_FACTOR}px)`;
+    const scale = 0.96 + 0.04 * this.cardVisibility(i);
+    return `scale3d(${scale}, ${scale}, 1)`;
   }
 
   protected cardImageFilter(i: number): string {
@@ -527,8 +518,10 @@ export class Home implements AfterViewInit {
     return blur > 0.05 ? `blur(${blur}px)` : 'none';
   }
 
+  /** The copy rises a short distance into place as its card becomes active, instead of appearing flat in its final spot. */
   protected cardCopyTransform(i: number): string {
-    return `translateX(${this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX * Home.HOOK_COPY_PARALLAX_FACTOR}px)`;
+    const rise = (1 - this.cardVisibility(i)) * 10;
+    return `translate3d(0, ${rise}px, 0)`;
   }
 
   protected cardPointerEvents(i: number): 'auto' | 'none' {
@@ -950,10 +943,6 @@ export class Home implements AfterViewInit {
     return sticky?.offsetHeight || document.documentElement.clientHeight;
   }
 
-  private static clampSigned(value: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, value));
-  }
-
   private static easeOutQuad(t: number): number {
     return 1 - (1 - t) * (1 - t);
   }
@@ -1109,19 +1098,32 @@ export class Home implements AfterViewInit {
 
   protected readonly hookPoints: readonly HookPoint[] = [
     {
-      title: 'What is functional medicine?',
-      body: 'The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission.',
-      more: "The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission. If a plant or tree isn't flourishing, we nourish the roots, not the leaves. In the same way, to heal the dis-ease, we look for what is causing it — your digestion, food, stress, sleep and history.",
+      title: 'Why root-cause healing?',
+      body: 'Every dis-ease has a cause. Have you ever asked — why do I have this dis-ease?',
       icon: 'root',
       image: 'images/hook/root-cause.webp',
       imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',
     },
     {
-      title: 'Why root-cause healing?',
-      body: "Conventional care asks what makes this stop right now. Root-cause care asks why it started. Both matter — but we lead with the second question, because that's the one that actually closes the loop.",
+      title: 'Why functional medicine is the answer?',
+      body: 'Functional medicine is a science-based approach of healing from the root cause of the dis-ease.',
       icon: 'balance',
       image: 'images/hook/root-cause-balance.webp',
       imageAlt: 'A balanced scale weighing a pill against a sprouting plant.',
+    },
+    {
+      title: 'Your personal health guide',
+      body: 'The Ease guide is available around the clock — ask it anything about your symptoms, your food, or your results. It connects the dots between what you are experiencing and what your body may be telling you.',
+      icon: 'ai',
+      image: 'images/hook/ai-chat.webp',
+      imageAlt: 'A chat interface showing a guided health conversation.',
+    },
+    {
+      title: 'A doctor can only guide you',
+      body: 'Only you can heal yourself. When you gain the right knowledge and take the right actions you can once again start living in optimum health.',
+      icon: 'doctor',
+      image: 'images/hook/short-consultation.webp',
+      imageAlt: 'A practitioner in a consultation, sharing knowledge with a patient.',
     },
   ];
 

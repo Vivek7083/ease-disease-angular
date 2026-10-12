@@ -69,7 +69,7 @@ interface FooterLink {
       </div>
 
       <div class="footer-bottom">
-        <p class="footer-copyright">&copy; {{ year }} Ease Disease. All rights reserved.</p>
+        <p class="footer-copyright">&copy; {{ year }} Ease Dis-<span class="ease-mark">ease</span>. All rights reserved.</p>
         <ul class="footer-legal">
           @for (link of legalLinks; track link.label) {
             <li><a [href]="link.href">{{ link.label }}</a></li>

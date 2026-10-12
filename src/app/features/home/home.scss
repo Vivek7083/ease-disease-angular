@@ -256,7 +256,7 @@
 
 .hook-heading {
   margin-top: var(--sp-3);
-  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  font-size: clamp(1.76rem, 1.43rem + 1.32vw, 2.42rem);
   font-weight: 400;
   line-height: 1.15;
   /* Plain --ink read as just another line of body copy once it's sitting
@@ -298,14 +298,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-6);
-  padding-bottom: var(--sp-5);
-  /* This is desktop-only content (mobile never renders .hook-viewport), so
-     the fixed chrome wordmark/CTA (~56-60px tall incl. its own top offset)
-     is always above it — centering the heading+deck block with only
-     --sp-10 (40px) of top padding let the heading's top edge land right
-     under/behind the logo on shorter laptop screens. */
-  padding-top: var(--sp-16);
+  gap: 20px;
+  padding-block: 77px;
 }
 
 /* Dissolves on desktop (default) so .hook-heading-row and .hook-deck stay
@@ -447,7 +441,7 @@
 /* Mobile type — larger than the shared base sizes, which are tuned for the
    desktop deck. */
 .hook-mobile .hook-heading {
-  font-size: clamp(2rem, 1.55rem + 2.2vw, 2.7rem);
+  font-size: clamp(2.2rem, 1.705rem + 2.42vw, 2.97rem);
   line-height: 1.12;
 }
 
@@ -585,6 +579,7 @@
 
 .hook-pin.is-horizontal .hook-deck-card {
   padding-inline: var(--gutter-desktop);
+  align-items: center;
 }
 
 /* Blur lives on the image only — blurring the copy meant two overlapping
@@ -628,6 +623,62 @@
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
   color: var(--terracotta);
+}
+
+/* The desktop deck has its own step rail (below, next to the heading) that
+   already carries the 01/02/03/04 — showing it again per-card would just be
+   noise. Mobile has no rail, so it keeps this inline index. */
+.hook-pin.is-horizontal .hook-index {
+  display: none;
+}
+
+/* ---------- the hook · step rail (desktop) ----------
+   A persistent "01 — 02 — 03 — 04" progress stepper between the heading and
+   the deck, each number filling in (scale + weight + color) as its card
+   becomes active via the same cardVisibility() driving the card crossfade —
+   this is what actually reads as scrollytelling rather than a slideshow:
+   always a sense of where you are and how much is left. */
+.hook-rail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  flex: 0 0 auto;
+}
+
+.hook-rail-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.hook-rail-num {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: var(--ls-eyebrow);
+  color: color-mix(in oklab, var(--oxblood) calc(var(--fill, 0) * 100%), var(--text-quiet-light));
+  opacity: calc(0.45 + var(--fill, 0) * 0.55);
+  transform: scale(calc(1 + var(--fill, 0) * 0.25));
+  transition:
+    color 60ms linear,
+    opacity 60ms linear,
+    transform 60ms linear;
+}
+
+.hook-rail-line {
+  width: 28px;
+  height: 1px;
+  background: color-mix(in oklab, var(--ink) 16%, transparent);
+}
+
+.hook-rail-step:last-child .hook-rail-line {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-rail-num {
+    transition: none;
+  }
 }
 
 .hook-image {
@@ -697,12 +748,12 @@
     text-align: left;
     gap: clamp(var(--sp-8), 5vw, var(--sp-12));
     width: 100%;
-    max-width: 1040px;
+    max-width: calc(var(--container-max) - 2 * var(--gutter-desktop));
   }
 
-  .hook-pin.is-horizontal .hook-deck-card:nth-child(even) .hook-card {
-    flex-direction: row-reverse;
-  }
+  /* Every card keeps image-left/copy-right, deliberately not alternating —
+     the composition stays fixed as you scroll so the section reads as one
+     continuous scene advancing, not a slideshow flipping sides each slide. */
 
   .hook-pin.is-horizontal .hook-image {
     flex: 0 1 420px;
@@ -714,16 +765,19 @@
   .hook-pin.is-horizontal .hook-copy {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
   }
 
   .hook-pin.is-horizontal .hook-copy h3 {
-    font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem);
-    max-width: 16ch;
+    margin-top: 0;
+    font-size: clamp(1.2rem, 0.825rem + 1.2vw, 1.8rem);
   }
 
   .hook-pin.is-horizontal .hook-copy p {
     margin-top: var(--sp-5);
-    font-size: clamp(1rem, 0.9rem + 0.4vw, 1.15rem);
+    font-size: clamp(0.88rem, 0.8rem + 0.3vw, 1rem);
     max-width: 42ch;
   }
 }
@@ -779,7 +833,7 @@
 
 .treat-heading {
   margin-top: var(--sp-3);
-  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  font-size: clamp(1.76rem, 1.43rem + 1.32vw, 2.42rem);
   font-weight: 400;
   line-height: 1.15;
   color: var(--ink);

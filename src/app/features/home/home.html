@@ -104,7 +104,16 @@
               [style.clip-path]="'inset(0 ' + (100 - headingRevealProgress() * 100) + '% 0 0)'"
             >
               <app-eyebrow-label text="Root-cause, not symptoms" />
-              <h2 id="hook-heading" class="hook-heading">Why functional medicine?</h2>
+              <h2 id="hook-heading" class="hook-heading">Our philosophy</h2>
+            </div>
+
+            <div class="hook-rail" [style.opacity]="cardsOpacity()" aria-hidden="true">
+              @for (point of hookPoints; track point.title; let i = $index) {
+                <span class="hook-rail-step" [style.--fill]="cardVisibility(i)">
+                  <span class="hook-rail-num">{{ '0' + (i + 1) }}</span>
+                  <span class="hook-rail-line"></span>
+                </span>
+              }
             </div>
 
             <div class="hook-deck" [style.opacity]="cardsOpacity()">
@@ -146,7 +155,7 @@
           [style.transform]="'translateY(' + (1 - mobileHeadingRevealProgress()) * 24 + 'px)'"
         >
           <app-eyebrow-label text="Root-cause, not symptoms" />
-          <h2 id="hook-heading" class="hook-heading">Why functional medicine?</h2>
+          <h2 id="hook-heading" class="hook-heading">Our philosophy</h2>
         </div>
 
         <div class="hook-carousel reveal" [appScrollReveal]="150">
