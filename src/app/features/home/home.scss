@@ -653,6 +653,13 @@
 }
 
 .hook-rail-num {
+  /* Reset button chrome — this is a small text control, not a UI button. */
+  appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 2px 2px;
+  cursor: pointer;
   font-family: var(--font-mono);
   font-size: 0.8rem;
   letter-spacing: var(--ls-eyebrow);
@@ -663,6 +670,17 @@
     color 60ms linear,
     opacity 60ms linear,
     transform 60ms linear;
+}
+
+.hook-rail-num:hover {
+  color: var(--oxblood);
+  opacity: 1;
+}
+
+.hook-rail-num:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 3px;
+  border-radius: var(--r-sm, 4px);
 }
 
 .hook-rail-line {
@@ -678,6 +696,55 @@
 @media (prefers-reduced-motion: reduce) {
   .hook-rail-num {
     transition: none;
+  }
+}
+
+/* "Scroll to explore" cue — pinned to the bottom of the viewport so it
+   doesn't participate in the heading/rail/deck's own vertical centering; it
+   fades out (hookScrollHintOpacity, home.ts) the moment the reader starts
+   actually progressing through the cards. */
+.hook-scroll-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 28px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: var(--text-quiet-light);
+  pointer-events: none;
+  transition: opacity 300ms var(--ease-out-soft);
+}
+
+.hook-scroll-hint-arrow {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--oxblood);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: hook-scroll-hint-nudge 1.6s var(--ease-out-soft) infinite;
+}
+
+@keyframes hook-scroll-hint-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-scroll-hint-arrow {
+    animation: none;
   }
 }
 

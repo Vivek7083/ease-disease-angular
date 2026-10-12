@@ -529,6 +529,62 @@ export class Home implements AfterViewInit {
   }
 
   /**
+   * Clicking a rail number scrolls the page to the exact scroll position
+   * where that card sits at the centre of its plateau (cardVisibility = 1) —
+   * worked out by inverting the same chain updateHookScroll uses to go the
+   * other way (scroll position -> hookDragUnits). The pin itself never
+   * moves; what moves is the page scroll position underneath it.
+   */
+  protected jumpToHookCard(i: number): void {
+    const pin = this.hookPin()?.nativeElement;
+    if (!pin) {
+      return;
+    }
+    const rect = pin.getBoundingClientRect();
+    const viewportHeight = Home.stickyViewportHeight(pin);
+    const scrollable = rect.height - viewportHeight;
+    if (scrollable <= 0) {
+      return;
+    }
+    const pinDocTop = window.scrollY + rect.top;
+    const targetDragProgress = i / (this.hookPoints.length - 1);
+    const targetHookProgress = targetDragProgress * Home.HOOK_DRAG_PHASE;
+    const targetY = pinDocTop + targetHookProgress * scrollable;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  }
+
+  /**
+   * "Scroll to explore" cue for the desktop deck — visible once the heading
+   * and first card have faded in, then fades away itself as soon as the
+   * reader starts actually progressing through the cards. Mirrors the
+   * mobile carousel's own swipe hint, just for the scroll-driven track.
+   * It reappears (reworded) once the last card has arrived, since the pin's
+   * own trailing hold (HOOK_DRAG_PHASE) means there's still real scroll
+   * distance left before the next section begins — without this, that hold
+   * reads as "the page is stuck" rather than "keep scrolling".
+   */
+  private readonly hookHintAtStart = computed(() => 1 - Home.clamp01(this.hookDragUnits() / 0.35));
+  /**
+   * Rises to full as the last card settles into place (right as the pin's
+   * trailing hold begins), then fades back out over the first ~60% of that
+   * hold itself — so continuing to scroll through the hold visibly
+   * dismisses the hint, instead of it sitting at full opacity, static, for
+   * the entire hold and only disappearing in a cut when the section ends.
+   */
+  private readonly hookHintAtEnd = computed(() => {
+    const rise = Home.clamp01((this.hookDragUnits() - (this.hookPoints.length - 1 - 0.35)) / 0.35);
+    const holdProgress = Home.clamp01((this.cardsPhaseProgress() - Home.HOOK_DRAG_PHASE) / (1 - Home.HOOK_DRAG_PHASE));
+    const fadeOut = Home.clamp01(holdProgress / 0.6);
+    return rise * (1 - fadeOut);
+  });
+  protected readonly hookScrollHintOpacity = computed(
+    () => this.cardsOpacity() * Math.max(this.hookHintAtStart(), this.hookHintAtEnd()),
+  );
+  protected readonly hookScrollHintLabel = computed(() =>
+    this.hookHintAtEnd() > this.hookHintAtStart() ? 'Scroll for more' : 'Scroll to explore',
+  );
+
+  /**
    * ---------------- Mobile · swipeable card carousel ----------------
    * Touch users reach for a swipe gesture on a stacked card, not a scroll
    * gesture — a pinned scroll-hijacked track reads as broken/stuck on a
