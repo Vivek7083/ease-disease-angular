@@ -437,7 +437,9 @@ export class Home implements AfterViewInit {
    * stretch of scroll producing barely-visible progress, which read as a
    * plain blank section for a beat before anything seemed to happen.
    */
-  protected readonly headingRevealProgress = computed(() => Home.easeOutQuad(this.hookEntryProgress()));
+  protected readonly headingRevealProgress = computed(() =>
+    this.closeFillProgress() < 1 ? 0 : Home.easeOutQuad(this.hookEntryProgress()),
+  );
   /**
    * The card track's own fade-in used to key off hookProgress, which only
    * starts moving once the pin is fully stuck — but the pin's sticky child
@@ -449,7 +451,7 @@ export class Home implements AfterViewInit {
    * fully opaque by the moment the pin locks — the first card is "already
    * loaded" the instant its viewport is reached, exactly like the heading.
    */
-  protected readonly cardsOpacity = computed(() => this.headingRevealProgress());
+  protected readonly cardsOpacity = computed(() => (this.headingRevealProgress() < 0.95 ? 0 : 1));
   protected readonly hookDragProgress = computed(() => {
     if (!this.hookHorizontal()) {
       return Math.min(1, this.cardsPhaseProgress() / Home.HOOK_DRAG_PHASE);
@@ -1008,6 +1010,10 @@ export class Home implements AfterViewInit {
   protected readonly mobileHeadingRevealProgress = signal(0);
 
   private updateMobileHeadingReveal(): void {
+    if (this.closeFillProgress() < 1) {
+      this.mobileHeadingRevealProgress.set(0);
+      return;
+    }
     const el = this.mobileHookHeading()?.nativeElement;
     if (!el) {
       this.mobileHeadingRevealProgress.set(0);

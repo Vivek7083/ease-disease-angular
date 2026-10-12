@@ -33,6 +33,16 @@
     </div>
   </section>
 
+  <!-- ============ INTER-QUOTE — sits in the 20px gap between hero and hook,
+       fills in word by word as it scrolls into view. ============ -->
+  <div class="inter-quote">
+    <p class="hook-close" #closeQuote>
+      @for (word of hookCloseWords; track $index; let i = $index) {
+        <span class="hook-close-word" [style.--fill]="closeWordFill(i)">{{ word }}{{ $last ? '' : ' ' }}</span>
+      }
+    </p>
+  </div>
+
   <!-- Shared card copy (desktop deck + mobile stack): title and body typed in
        word by word, with an optional "Read more" for long bodies. -->
   <ng-template #hookCopy let-point let-i="i">
@@ -200,14 +210,6 @@
       </div>
     }
 
-    <div class="scene-inner">
-      <p class="hook-close" #closeQuote>
-        @for (word of hookCloseWords; track $index; let i = $index) {
-          <span class="hook-close-word" [style.--fill]="closeWordFill(i)">{{ word }}</span
-          >{{ ' ' }}
-        }
-      </p>
-    </div>
   </section>
 
   <app-section-transition variant="dots" />

@@ -567,7 +567,7 @@
   width: 100%;
   flex: 1;
   min-height: 0;
-  transition: opacity 60ms linear;
+  transition: opacity 360ms var(--ease-out-soft);
 }
 
 .hook-deck-card {
@@ -728,36 +728,42 @@
   }
 }
 
-.hook-close {
-  margin-top: 16px;
-  margin-bottom: clamp(var(--sp-10), 6vw, var(--sp-16));
-  text-align: center;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.3rem);
-  line-height: 1.35;
+/* Inter-section quote: sits in the 20px gap between hero and hook. */
+.inter-quote {
+  padding-block: 20px;
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--gutter-mobile);
 }
 
-@media (max-width: 899px) {
-  .hook-close {
-    /* Reads as a short transitional beat between the hook and root-map
-       sections — a "post-credit" line, not a section of its own — so the
-       gap stays small rather than reading as its own empty stretch. */
-    margin-top: 11vh;
+@media (min-width: 900px) {
+  .inter-quote {
+    padding-inline: var(--gutter-desktop);
+    padding-bottom: 28px;
   }
 }
 
-/* Words fill in with ink as the line scrolls through the middle of the
-   viewport — muted brightening to full oxblood — rather than a plain
-   fade-in. --fill is a continuous 0..1 value recomputed every scroll
-   frame (see closeWordFill in home.ts), so the color genuinely sweeps
-   across the sentence instead of each word snapping between two states;
-   the short transition below just smooths between animation frames. */
+.hook-close {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: 'opsz' 16;
+  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.3rem);
+  line-height: 1.5;
+  max-width: 28ch;
+}
+
+/* Each word fills in with a honey (yellow) highlight — identical to the
+   browser's ::selection colour — as it scrolls into view. --fill is a
+   continuous 0..1 value recomputed every scroll frame so the sweep is
+   genuinely tied to the scroll gesture, not a fixed-duration timer. */
 .hook-close-word {
   --fill: 0;
-  color: color-mix(in oklab, var(--oxblood) calc(var(--fill) * 100%), color-mix(in oklab, var(--oxblood) 22%, var(--parchment)));
-  transition: color var(--dur-micro) linear;
+  background: color-mix(in oklab, var(--honey) calc(var(--fill) * 100%), transparent);
+  padding-block: 0.06em;
+  transition: background var(--dur-micro) linear;
 }
 
 /* ---------- how we treat · step 1 ---------- */
