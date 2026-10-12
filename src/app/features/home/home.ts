@@ -376,7 +376,7 @@ export class Home implements AfterViewInit {
    * touching the shape of the crossfade curve itself (still smooth either
    * way — this only stretches it out).
    */
-  protected readonly hookVhPerCard = 115;
+  protected readonly hookVhPerCard = 160;
 
   /**
    * On desktop, the drag through all cards uses only this fraction of the
@@ -483,8 +483,8 @@ export class Home implements AfterViewInit {
    * abruptness — it just means less time where nothing on screen is clearly
    * readable.
    */
-  private static readonly HOOK_CARD_PLATEAU = 0.4;
-  private static readonly HOOK_CARD_FADE = 0.6;
+  private static readonly HOOK_CARD_PLATEAU = 0.5;
+  private static readonly HOOK_CARD_FADE = 0.2;
   /** Subtle drift, not a full-screen throw — this is parallax, not a slide carousel. */
   private static readonly HOOK_CARD_PARALLAX_PX = 90;
   /** Blur is only ever applied to the image (see cardImageFilter) — blurring
