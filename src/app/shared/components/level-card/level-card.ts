@@ -40,6 +40,9 @@ export interface Level {
       }
       <span class="tag">{{ level().tag }}</span>
       <h3>{{ level().name }}</h3>
+      @if (level().description; as description) {
+        <p class="description">{{ description }}</p>
+      }
       @if (level().price; as price) {
       <p class="price">
         @if (level().originalPrice; as original) {
@@ -51,17 +54,17 @@ export interface Level {
         }
       </p>
       }
-      @if (level().description; as description) {
-        <p class="description">{{ description }}</p>
-      } @else if (level().features; as features) {
-        <ul>
-          @for (feature of features; track feature) {
-            <li>
-              <app-evidence-tick />
-              {{ feature }}
-            </li>
-          }
-        </ul>
+      @if (!level().description) {
+        @if (level().features; as features) {
+          <ul>
+            @for (feature of features; track feature) {
+              <li>
+                <app-evidence-tick />
+                {{ feature }}
+              </li>
+            }
+          </ul>
+        }
       }
       @if (level().locked) {
         @if (level().lockedNote; as lockedNote) {
@@ -203,7 +206,9 @@ export interface Level {
       font-size: 0.9rem;
       line-height: 1.5;
       color: var(--text-quiet-light);
-      margin: var(--sp-5) 0 0;
+      /* Tight, not --sp-5 — reads as the heading's own subline rather than
+         a second, separate point sitting below it. */
+      margin: var(--sp-1) 0 0;
     }
     .cta {
       display: block;

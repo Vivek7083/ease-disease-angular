@@ -1211,18 +1211,13 @@ export class Home implements AfterViewInit {
   protected readonly levels: readonly Level[] = [
     {
       tag: 'Start here',
-      name: 'One-time Consultation',
+      name: 'One-time consult. 3-week plan.',
       price: MAIN_PLAN.price,
       originalPrice: MAIN_PLAN.originalPrice,
       priceNote: '30 minutes',
       ctaLabel: MAIN_PLAN.label,
       recommended: true,
-      features: [
-        'We listen to your concerns, history and health goals',
-        'We explain what may be behind your dis-ease, in plain words',
-        'We suggest the tests and supplements that make sense for you',
-        'You leave with a simple anti-inflammatory food plan and starting supplement guidance',
-      ],
+      description: 'Understand your underlying root cause.',
     },
     {
       // Stays locked until first consultation is tracked (needs a backend).
@@ -1232,15 +1227,6 @@ export class Home implements AfterViewInit {
       description: 'Guided support if your main concern starts in digestion: bloating, acidity, irregular bowels, food sensitivities.',
       locked: true,
       lockedNote: 'Complete your first consultation to unlock.',
-    },
-    {
-      // Stays locked until Digest with Ease is tracked (needs a backend).
-      tag: '6 months',
-      name: 'Ease Dis-ease',
-      ctaLabel: 'Unlock Digest with Ease first',
-      description: 'Whole-person support if your symptoms show up in many places: skin, hormones, energy, sleep, mood, weight.',
-      locked: true,
-      lockedNote: 'Complete Digest with Ease to unlock.',
     },
   ];
 
