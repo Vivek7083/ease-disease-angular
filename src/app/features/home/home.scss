@@ -1465,7 +1465,7 @@
      only became necessary because the node row itself was carrying more
      text and bigger images than it needed to (see bodyShort and
      .treat-node-image's smaller size). */
-  gap: clamp(var(--sp-10), 4vw, var(--sp-12));
+  gap: clamp(25.6px, 2.56vw, 30.72px);
   /* Same clearance as .hook-viewport under the fixed chrome wordmark. */
   padding-top: var(--sp-16);
 }
