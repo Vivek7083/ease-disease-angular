@@ -2,6 +2,8 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CanvasStoryService } from './core/services/canvas-story';
 import { BookingCtaService } from './core/services/booking-cta';
+import { AppUpdateService } from './core/services/app-update';
+import { FragmentScrollService } from './core/services/fragment-scroll';
 import { Wordmark } from './shared/components/wordmark/wordmark';
 import { ScrollProgress } from './shared/components/scroll-progress/scroll-progress';
 import { CtaPill } from './shared/components/cta-pill/cta-pill';
@@ -22,5 +24,7 @@ export class App {
 
   constructor() {
     this.canvasStory.start(this.destroyRef);
+    inject(AppUpdateService).start(this.destroyRef);
+    inject(FragmentScrollService).start(this.destroyRef);
   }
 }

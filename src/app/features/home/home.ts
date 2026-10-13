@@ -19,6 +19,7 @@ import { Results } from '../../shared/components/results/results';
 import { Testimonials } from '../../shared/components/testimonials/testimonials';
 import { SectionTransition } from '../../shared/components/section-transition/section-transition';
 import { SiteFooter } from '../../shared/components/site-footer/site-footer';
+import { EventsInvite } from '../../shared/components/events-invite/events-invite';
 
 interface RootCause {
   readonly name: string;
@@ -64,6 +65,7 @@ interface TreatStep {
     Testimonials,
     SectionTransition,
     SiteFooter,
+    EventsInvite,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',

@@ -1756,8 +1756,8 @@ app-expert-carousel {
      browsers/devices. Clipping it here instead of on .programme-banner
      keeps the glow's spill-onto-the-page look (it still extends well past
      the card itself) while guaranteeing it can never escape past this
-     section's own width. */
-  overflow: hidden;
+     section's own width. Horizontal only: a vertical clip cut the glow into a hard rectangle. */
+  overflow-x: clip;
 }
 
 /* Registered so the browser can actually interpolate changes to it (a plain
@@ -1819,7 +1819,7 @@ app-expert-carousel {
 .programme-banner::before {
   content: '';
   position: absolute;
-  inset: -14%;
+  inset: -26% -14%;
   z-index: -1;
   background-image: url('/images/marketing/founders-banner.png');
   background-size: cover;
@@ -1828,6 +1828,8 @@ app-expert-carousel {
   filter: blur(56px) saturate(1.2) brightness(1.03);
   opacity: 0.55;
   pointer-events: none;
+  /* Dissolves into the page instead of ending in a visible edge. */
+  mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {

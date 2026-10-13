@@ -1,4 +1,5 @@
 import { Component, output } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Wordmark } from '../wordmark/wordmark';
 import { CtaPill } from '../cta-pill/cta-pill';
 import { EyebrowLabel } from '../eyebrow-label/eyebrow-label';
@@ -6,6 +7,10 @@ import { EyebrowLabel } from '../eyebrow-label/eyebrow-label';
 interface FooterLink {
   readonly label: string;
   readonly href: string;
+  /** Home-page section id; when set the link is a router link to `/#fragment`. */
+  readonly fragment?: string;
+  /** App route; when set the link is a router link to it. */
+  readonly route?: string;
   /** Opens the booking form instead of navigating. */
   readonly book?: boolean;
 }
@@ -19,7 +24,7 @@ interface FooterLink {
  */
 @Component({
   selector: 'app-site-footer',
-  imports: [Wordmark, CtaPill, EyebrowLabel],
+  imports: [RouterLink, Wordmark, CtaPill, EyebrowLabel],
   template: `
     <footer class="site-footer">
       <div class="footer-top">
@@ -33,7 +38,15 @@ interface FooterLink {
           <app-eyebrow-label text="Explore" tone="dark" />
           <ul>
             @for (link of exploreLinks; track link.label) {
-              <li><a [href]="link.href" (click)="onExploreClick($event, link)">{{ link.label }}</a></li>
+              <li>
+                @if (link.fragment) {
+                  <a routerLink="/" [fragment]="link.fragment">{{ link.label }}</a>
+                } @else if (link.route) {
+                  <a [routerLink]="link.route">{{ link.label }}</a>
+                } @else {
+                  <a [href]="link.href" (click)="onExploreClick($event, link)">{{ link.label }}</a>
+                }
+              </li>
             }
           </ul>
         </nav>
@@ -224,11 +237,12 @@ export class SiteFooter {
   protected readonly year = new Date().getFullYear();
 
   protected readonly exploreLinks: readonly FooterLink[] = [
-    { label: 'Home', href: '#top' },
-    { label: 'Why root-cause care', href: '#hook' },
-    { label: 'Conditions we treat', href: '#root-map' },
-    { label: 'Packages', href: '#programme' },
-    { label: 'Meet the experts', href: '#experts' },
+    { label: 'Home', href: '#top', fragment: 'top' },
+    { label: 'Why root-cause care', href: '#hook', fragment: 'hook' },
+    { label: 'Conditions we treat', href: '#root-map', fragment: 'root-map' },
+    { label: 'Packages', href: '#programme', fragment: 'programme' },
+    { label: 'Meet the experts', href: '#experts', fragment: 'experts' },
+    { label: 'Events & retreats', href: '/events', route: '/events' },
     { label: 'Book now', href: '#', book: true },
   ];
 
