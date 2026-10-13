@@ -25,10 +25,14 @@
         <div class="carol-portrait">
           <img ngSrc="images/team/carol.jpg" fill alt="Carol, functional nutritionist" />
         </div>
-        <div class="illustration-placeholder illustration-hero" aria-hidden="true">
-          <span>Illustration placeholder</span>
-          <span class="illustration-note">AI-generated — Carol, warm &amp; editorial style</span>
-        </div>
+        <img
+          ngSrc="images/illustrations/carol-hero.png"
+          class="illustration-hero"
+          width="800"
+          height="800"
+          alt=""
+          aria-hidden="true"
+        />
       </div>
     </div>
   </header>
@@ -52,10 +56,14 @@
     <div class="carol-inner">
       <app-eyebrow-label text="A recent moment" />
       <article class="featured-card reveal" [appScrollReveal]="0">
-        <div class="illustration-placeholder illustration-certificate" aria-hidden="true">
-          <span>Illustration placeholder</span>
-          <span class="illustration-note">AI-generated — certificate / webinar motif</span>
-        </div>
+        <img
+          ngSrc="images/illustrations/carol-certificate.png"
+          class="featured-illustration"
+          width="800"
+          height="616"
+          alt=""
+          aria-hidden="true"
+        />
         <div class="featured-copy">
           <span class="featured-org">{{ featuredPost.org }}</span>
           <h3>{{ featuredPost.title }}</h3>

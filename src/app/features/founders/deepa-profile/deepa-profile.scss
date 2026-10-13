@@ -28,12 +28,14 @@
   /* app.scss's fixed .chrome-wordmark/.chrome-cta float above everything
      regardless of section padding, so the heading needs enough clearance
      to start below them instead of rendering right underneath. */
-  padding-top: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
+  --hero-pt: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
+  padding-top: var(--hero-pt);
   padding-bottom: clamp(var(--sp-8), 4vw, var(--sp-12));
   background: linear-gradient(180deg, color-mix(in oklab, var(--terracotta) 10%, var(--ivory)), var(--ivory));
 }
 
 .deepa-hero-grid {
+  position: relative;
   display: grid;
   gap: var(--sp-10);
 }
@@ -78,7 +80,7 @@
 @media (min-width: 900px) {
   .founders-tabs {
     position: absolute;
-    top: var(--sp-8);
+    top: calc(var(--sp-8) - var(--hero-pt));
     right: var(--gutter-desktop);
     margin-top: 0;
     padding: 3px;
@@ -118,6 +120,9 @@ a.founders-tab:hover {
 
 .deepa-hero-visual {
   position: relative;
+  width: min(360px, 100%);
+  margin-inline: auto;
+  margin-bottom: var(--sp-10);
 }
 
 .deepa-portrait {
@@ -134,47 +139,23 @@ a.founders-tab:hover {
   object-fit: cover;
 }
 
-/* A clearly-marked placeholder — easy to spot and swap for a real
-   AI-generated illustration or real cover art later. */
-.illustration-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sp-1);
-  text-align: center;
-  border: 1.5px dashed color-mix(in oklab, var(--terracotta) 55%, var(--rule-on-light));
-  border-radius: var(--r-lg);
-  background: color-mix(in oklab, var(--honey) 16%, var(--parchment));
-  color: var(--text-quiet-light);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  padding: var(--sp-4);
-}
-
-.illustration-note {
-  text-transform: none;
-  letter-spacing: normal;
-  font-size: 0.72rem;
-  opacity: 0.8;
-}
-
-.illustration-hero {
+.deepa-hero-visual .illustration-hero {
   position: absolute;
-  inset: auto -8% -10% auto;
-  width: 46%;
-  aspect-ratio: 1;
+  right: -4%;
+  bottom: -12%;
+  width: 54%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
   transform: rotate(4deg);
+  pointer-events: none;
 }
 
-@media (max-width: 640px) {
-  .illustration-hero {
-    position: static;
-    width: 60%;
-    margin: var(--sp-6) auto 0;
-    transform: none;
+@media (min-width: 900px) {
+  .deepa-hero-visual .illustration-hero {
+    right: -22%;
+    bottom: -10%;
+    width: 58%;
   }
 }
 

@@ -931,48 +931,111 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Clears the fixed chrome wordmark, same clearance as .hook-viewport. */
-  padding-top: var(--sp-16);
-  /* The strip of each older step left showing as the stack builds. */
-  --treat-tab: 44px;
+  /* Clears the fixed chrome wordmark/CTA pill — on a device with a notch or
+     dynamic island, env(safe-area-inset-top) pushes that chrome down past
+     its baseline var(--sp-5) top offset (see .chrome-wordmark), so a flat
+     var(--sp-16) here isn't always enough clearance and the deck's card can
+     render up underneath it. .hook-mobile's padding-top already accounts
+     for this; this didn't, and is the fix for that overlap. */
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--sp-16));
 }
 
-@media (max-height: 700px) {
-  .treat-viewport {
-    --treat-tab: 36px;
-  }
+.treat-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  flex: 0 0 auto;
+  margin-bottom: var(--sp-5);
 }
 
+.treat-progress-dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--rule-on-light);
+  background: var(--surface-card-light);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-quiet-light);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease);
+}
+.treat-progress-dot:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+.treat-progress-dot.is-active {
+  background: var(--oxblood);
+  box-shadow: var(--shadow-soft);
+  color: #fff6ef;
+  font-weight: 600;
+}
+.treat-progress-dot.is-done {
+  background: color-mix(in oklab, var(--oxblood) 20%, var(--surface-card-light));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--oxblood) 40%, var(--rule-on-light));
+  color: var(--oxblood);
+}
+
+.treat-progress-line {
+  width: 18px;
+  height: 1px;
+  flex: 0 0 auto;
+  background: var(--rule-on-light);
+  transition: background var(--dur-base) var(--ease);
+}
+.treat-progress-line.is-filled {
+  background: var(--oxblood);
+}
+
+/* A grid, not a flex row/column — every card shares the same cell
+   (grid-area: 1 / 1 below), which is what lets this container's own height
+   track the TALLEST step's actual content instead of being told to fill
+   whatever's left of the pinned viewport (the old flex: 1 + each card
+   position: absolute; inset: 0 approach, which forced every card's opaque
+   background to stretch to that full height even when its own content —
+   a short step with a small illustration — was much shorter, reading as a
+   big empty white card). */
 .treat-deck {
-  position: relative;
+  display: grid;
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  flex: 0 1 auto;
 }
 
-/* A card in the stack: an opaque sheet, so a step sliding up really covers the
-   one beneath it and only its top strip (badge + title) is left showing. It is
-   placed purely by transform (treatStackTransform) — no CSS transition: the
-   value is already recomputed every scroll frame, and a transition retargeted
-   on each of them trails the scroll and stutters on a slow one. */
+/* All four cards stack in the same grid cell and cross-fade between each
+   other (treatCardOpacity/treatCardTransform) instead of sliding up as
+   opaque sheets that cover one another — that stack-of-sheets look read as
+   a swipeable card deck (like the expert carousel above it), which it
+   wasn't: this section only ever advances by scrolling. .treat-progress is
+   the step-count cue now instead of the stack's peeking strips. */
 .treat-deck-card {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: var(--sp-3) var(--sp-4) var(--sp-5);
+  padding: var(--sp-5) var(--sp-4);
   background: var(--surface-card-light);
   border: 1px solid var(--rule-on-light);
-  border-bottom: 0;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  box-shadow: 0 -12px 28px -18px color-mix(in oklab, var(--oxblood) 45%, transparent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+  /* Opacity is binary now (treatCardOpacity), not a crossfade — no
+     transition on it, so the outgoing step disappears immediately instead
+     of lingering through a fade. The slide (transform) is the transition. */
+  transition: transform 260ms var(--ease-out-soft);
   will-change: transform;
 }
 
-/* A step that has been covered — its strip stays readable but quieter. */
-.treat-deck-card:not(.is-active) .treat-step-title {
-  color: color-mix(in oklab, var(--ink) 70%, var(--parchment));
+@media (prefers-reduced-motion: reduce) {
+  .treat-deck-card {
+    transition: none;
+  }
 }
 
 .treat-scroll-hint {
@@ -1467,7 +1530,7 @@
      .treat-node-image's smaller size). */
   gap: clamp(25.6px, 2.56vw, 30.72px);
   /* Same clearance as .hook-viewport under the fixed chrome wordmark. */
-  padding-top: var(--sp-16);
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--sp-16));
 }
 
 /* The heading reuses .treat-heading-row/.treat-heading/.treat-subtext at

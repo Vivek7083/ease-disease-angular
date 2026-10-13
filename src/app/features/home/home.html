@@ -343,14 +343,38 @@
              pin releases into Root Map. -->
         <div class="treat-pin" #treatPin [style.height.vh]="treatSteps.length * treatVhPerStep">
           <div class="treat-viewport">
+            <!-- Replaces the old peeking card-stack as the step-count cue —
+                 that stack visually resembled the swipeable expert carousel
+                 above it, but dragging it did nothing (this section advances
+                 by scrolling, not swiping). Plain numbered dots read as
+                 "step 2 of 4" without implying a gesture this isn't. -->
+            <div class="treat-progress" role="group" aria-label="Jump to a step">
+              @for (step of treatSteps; track step.title; let i = $index; let last = $last) {
+                <button
+                  type="button"
+                  class="treat-progress-dot"
+                  [class.is-active]="i === treatActiveStepIndex()"
+                  [class.is-done]="i < treatActiveStepIndex()"
+                  [attr.aria-label]="'Jump to step ' + (i + 1) + ': ' + step.title"
+                  [attr.aria-pressed]="i === treatActiveStepIndex()"
+                  (click)="scrollToTreatStep(i)"
+                >
+                  {{ i + 1 }}
+                </button>
+                @if (!last) {
+                  <span class="treat-progress-line" [class.is-filled]="i < treatActiveStepIndex()" aria-hidden="true"></span>
+                }
+              }
+            </div>
             <div class="treat-deck">
               @for (step of treatSteps; track step.title; let i = $index) {
                 <div
                   class="treat-deck-card"
                   [class.is-active]="treatStackActive(i)"
-                  [style.z-index]="i + 1"
-                  [style.transform]="treatStackTransform(i)"
+                  [style.opacity]="treatCardOpacity(i)"
+                  [style.transform]="treatCardTransform(i)"
                   [style.pointer-events]="treatStackActive(i) ? 'auto' : 'none'"
+                  [attr.aria-hidden]="!treatStackActive(i)"
                 >
                   <div class="treat-step-main">
                     <div class="treat-step-rail" aria-hidden="true">
@@ -380,7 +404,7 @@
               }
             </div>
             <p class="treat-scroll-hint" aria-hidden="true" [style.opacity]="treatHintOpacity()">
-              Keep scrolling <span class="treat-scroll-hint-arrow">↓</span>
+              {{ treatHintLabel() }} <span class="treat-scroll-hint-arrow">↓</span>
             </p>
           </div>
         </div>

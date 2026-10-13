@@ -203,7 +203,7 @@ export class Home implements AfterViewInit {
       bodyShort: 'Food as medicine first. Supplements added only when your results and history call for them.',
     },
     {
-      title: 'Food that truly nourishes, nutrients that bridge the gap',
+      title: 'Life, mindset & check-ins',
       body: 'Sleep, stress and mindset shape recovery as much as food does. Regular check-ins keep the plan working as your life changes.',
       bodyShort: 'Sleep, stress and mindset matter too. Check-ins keep the change lasting.',
     },
@@ -220,25 +220,34 @@ export class Home implements AfterViewInit {
    * ground: a real, readable hold per step without turning the section
    * into a long haul.
    */
-  protected readonly treatVhPerStep = 178.125; // 95 × 1.25 × 1.5 — mobile hold per step
+  protected readonly treatVhPerStep = 120; // mobile scroll budget per step — shortened so the next step arrives sooner
 
   /**
    * Same trailing-hold trick as HOOK_DRAG_PHASE: the drag through all steps
    * only uses this fraction of the pin's scrollable range, so the last step
    * reaches full view and then actually holds still for a beat before the
    * pin releases, instead of arriving and being yanked away in the same
-   * instant.
+   * instant. Halved from the original 0.18 hold (0.82 phase) — once step 4
+   * is visible and read, there's nothing left to wait for, so continuing to
+   * scroll should reach the next section sooner.
    */
-  private static readonly TREAT_DRAG_PHASE = 0.82;
+  private static readonly TREAT_DRAG_PHASE = 0.91;
   /**
-   * Mobile steps are a stack of cards, not a crossfade: each next step slides
-   * up from the bottom over the current one, leaving a strip of it showing —
-   * so by the last step all four sit stacked like stairs. A step slides in
-   * over the last (1 - TREAT_STACK_HOLD) of its share of the scroll, after
-   * holding still for TREAT_STACK_HOLD of the one before it, so each step
-   * gets a moment to be read before the next one starts to arrive.
+   * Mobile steps crossfade in place, one "current" step at a time — a step
+   * fades/rises in over the last (1 - TREAT_STACK_HOLD) of its share of the
+   * scroll, after holding fully visible for TREAT_STACK_HOLD of the one
+   * before it, so each step gets a moment to be read before the next one
+   * starts to arrive. Kept low (was 0.4) so the next step starts arriving
+   * almost as soon as you resume scrolling past the current one, instead of
+   * needing a long dead scroll first. (Previously these slid up as opaque
+   * stacked sheets leaving a strip of each earlier step showing — that
+   * card-stack look read as a swipeable carousel, which it isn't, and the
+   * opaque sheets had to fill the whole pinned viewport height to stay
+   * covered, which left a lot of dead white space under any step shorter
+   * than the tallest one. See .treat-progress for the step-count indicator
+   * that replaced the strips themselves.)
    */
-  private static readonly TREAT_STACK_HOLD = 0.4;
+  private static readonly TREAT_STACK_HOLD = 0.15;
 
   private readonly treatPin = viewChild<ElementRef<HTMLElement>>('treatPin');
   private readonly treatPinProgress = signal(0);
@@ -246,7 +255,7 @@ export class Home implements AfterViewInit {
   protected readonly treatDragProgress = computed(() => Home.clamp01(this.treatPinProgress() / Home.TREAT_DRAG_PHASE));
   protected readonly treatDragUnits = computed(() => this.treatDragProgress() * (this.treatSteps.length - 1));
 
-  /** 0..1 — how far step i has slid up into place (step 1 is simply there). Eased out so it settles. */
+  /** 0..1 — how "arrived" step i is (step 1 starts there). Eased out so it settles. */
   private treatStackProgress(i: number): number {
     if (i === 0) {
       return 1;
@@ -255,20 +264,67 @@ export class Home implements AfterViewInit {
     return 1 - (1 - raw) ** 3;
   }
 
-  /** Resting place is i strips down (--treat-tab, set in CSS); before that the card waits one full card-height lower. */
-  protected treatStackTransform(i: number): string {
-    const waiting = (1 - this.treatStackProgress(i)) * 100;
-    return `translate3d(0, calc(${i} * var(--treat-tab) + ${waiting.toFixed(2)}%), 0)`;
+  /** Binary, not a crossfade — only the current step is shown at all, no opacity blend with its neighbour. The slide (treatCardTransform) carries the whole transition. */
+  protected treatCardOpacity(i: number): number {
+    return this.treatStackActive(i) ? 1 : 0;
   }
 
-  /** The step now in front — the only one that takes taps (the ones beneath only show their top strip). */
+  /** A small rise-in on arrival — the only transition now (see treatCardOpacity). */
+  protected treatCardTransform(i: number): string {
+    const rise = (1 - this.treatStackProgress(i)) * 16;
+    return `translateY(${rise.toFixed(2)}px)`;
+  }
+
+  /** The step now in front — the only one that takes taps and isn't aria-hidden. */
   protected treatStackActive(i: number): boolean {
     const last = this.treatSteps.length - 1;
     return this.treatStackProgress(i) > 0.5 && (i === last || this.treatStackProgress(i + 1) <= 0.5);
   }
 
+  /** Drives .treat-progress (the step-count dots) and the sr-only live region. */
+  protected readonly treatActiveStepIndex = computed(() => {
+    const index = this.treatSteps.findIndex((_, i) => this.treatStackActive(i));
+    return index === -1 ? 0 : index;
+  });
+
+  /** Tapping a progress dot scrolls the page to the point in the pin's scroll
+   *  range where that step is fully arrived — the mechanic is still driven
+   *  by scroll position (updateTreatScroll), this just moves the scrollbar
+   *  there for you, the same way a video scrubber tap jumps playback. */
+  protected scrollToTreatStep(i: number): void {
+    const pin = this.treatPin()?.nativeElement;
+    if (!pin) return;
+
+    const rect = pin.getBoundingClientRect();
+    const viewportHeight = Home.stickyViewportHeight(pin);
+    const scrollable = rect.height - viewportHeight;
+    if (scrollable <= 0) return;
+
+    const dragProgress = i / (this.treatSteps.length - 1);
+    const pinProgress = Home.clamp01(dragProgress * Home.TREAT_DRAG_PHASE);
+    const pinAbsoluteTop = rect.top + window.scrollY;
+    window.scrollTo({ top: pinAbsoluteTop + pinProgress * scrollable, behavior: 'smooth' });
+  }
+
   /** "Keep scrolling" cue: fully visible at the start, gone once the first step has begun to hand over. */
-  protected readonly treatHintOpacity = computed(() => Home.clamp01(1 - this.treatDragUnits() / 0.3));
+  private readonly treatHintAtStart = computed(() => Home.clamp01(1 - this.treatDragUnits() / 0.3));
+
+  /**
+   * Same "Scroll for more" cue as the Hook section's end-of-pin hint
+   * (hookHintAtEnd) — rises in as step 4 finishes arriving, then fades back
+   * out over the first 60% of the trailing hold, so continuing to scroll
+   * visibly dismisses it instead of it just vanishing in a cut when the
+   * section releases.
+   */
+  private readonly treatHintAtEnd = computed(() => {
+    const rise = Home.clamp01((this.treatDragUnits() - (this.treatSteps.length - 1 - 0.35)) / 0.35);
+    const holdProgress = Home.clamp01((this.treatPinProgress() - Home.TREAT_DRAG_PHASE) / (1 - Home.TREAT_DRAG_PHASE));
+    const fadeOut = Home.clamp01(holdProgress / 0.6);
+    return rise * (1 - fadeOut);
+  });
+
+  protected readonly treatHintOpacity = computed(() => Math.max(this.treatHintAtStart(), this.treatHintAtEnd()));
+  protected readonly treatHintLabel = computed(() => (this.treatHintAtEnd() > this.treatHintAtStart() ? 'Scroll for more' : 'Keep scrolling'));
 
   private updateTreatScroll(): void {
     const pin = this.treatPin()?.nativeElement;
