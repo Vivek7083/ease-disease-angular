@@ -100,6 +100,26 @@ export class Home implements AfterViewInit {
     openBookingForm();
   }
 
+  private static readonly BILLBOARD_CURSOR_TILT_MAX_DEG = 6;
+
+  /**
+   * Direct DOM write, not a signal — this just feeds a CSS custom property
+   * the idle-wiggle keyframes already read (see `--cursor-tilt` in
+   * home.scss), so there's nothing for Angular to re-render on every
+   * mousemove.
+   */
+  protected onBillboardPointerMove(event: PointerEvent): void {
+    const el = event.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    const fraction = Home.clamp01((event.clientX - rect.left) / rect.width);
+    const tilt = (fraction - 0.5) * 2 * Home.BILLBOARD_CURSOR_TILT_MAX_DEG;
+    el.style.setProperty('--cursor-tilt', `${tilt.toFixed(2)}deg`);
+  }
+
+  protected onBillboardPointerLeave(event: PointerEvent): void {
+    (event.currentTarget as HTMLElement).style.setProperty('--cursor-tilt', '0deg');
+  }
+
   protected jumpToRootMap(): void {
     document.getElementById('root-map')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
