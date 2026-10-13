@@ -2,6 +2,14 @@
   display: block;
 }
 
+/* Easter egg: the "ease" in every "dis-ease" carries a whisper of the brand
+   colour — only visible if you're really looking. font-style: normal so it
+   stays upright in italic contexts (e.g. the inter-section quote). */
+.ease-mark {
+  color: color-mix(in oklab, var(--oxblood) 55%, currentColor);
+  font-style: normal;
+}
+
 .canvas-root {
   position: fixed;
   inset: 0;
@@ -127,10 +135,13 @@
      label changes as the reader moves through the story. It also sits
      directly over body copy at this width, so keep it translucent —
      glassy rather than a solid block — so it doesn't look odd overlapping
-     text while scrolling. */
+     text while scrolling. "none" only released the pill's own reveal cap —
+     it still needs a real ceiling here, or a long cycling label (or the
+     price/duration reveal) can grow the pill wider than the viewport and
+     get clipped by the right edge instead of wrapping. */
   .chrome-cta {
     opacity: 0.88 !important;
-    max-width: none !important;
+    max-width: calc(100vw - 2 * var(--sp-4)) !important;
     pointer-events: auto !important;
     backdrop-filter: blur(6px);
     border-radius: var(--r-pill);

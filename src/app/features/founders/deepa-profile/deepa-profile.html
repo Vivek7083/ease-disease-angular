@@ -1,0 +1,138 @@
+<main id="top" class="deepa-page">
+  <!-- ============ HERO ============ -->
+  <header class="deepa-hero">
+    <div class="deepa-inner deepa-hero-grid">
+      <div class="deepa-hero-copy">
+        <!-- The reveal wrapper is transformed (translateY) while animating in, which
+             makes it a positioning containing block for the duration of that animation —
+             keeping the tab nav outside of it means its [position:absolute] top-right
+             placement (deepa-profile.scss) never gets temporarily hijacked by that. -->
+        <div class="reveal" [appScrollReveal]="0">
+          <app-eyebrow-label text="Meet the founders" />
+          <h1 class="t-display">Deepa</h1>
+          <p class="deepa-headline">{{ headline }}</p>
+          <p class="deepa-location">{{ location }}</p>
+          <app-social-links [links]="socials" />
+        </div>
+
+        <nav class="founders-tabs" aria-label="Switch founder">
+          <a routerLink="/founders/carol" class="founders-tab">Carol</a>
+          <span class="founders-tab active" aria-current="page">Deepa</span>
+        </nav>
+      </div>
+
+      <div class="deepa-hero-visual reveal" [appScrollReveal]="120">
+        <div class="deepa-portrait">
+          <img ngSrc="images/team/deepa.jpg" fill alt="Deepa Rajani" style="object-position: 5% center" />
+        </div>
+        <img
+          ngSrc="images/illustrations/deepa-hero.png"
+          class="illustration-hero"
+          width="800"
+          height="800"
+          alt=""
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="deepa-section deepa-about">
+    <div class="deepa-inner">
+      <p class="deepa-about-copy reveal" [appScrollReveal]="0">{{ about }}</p>
+    </div>
+  </section>
+
+  <!-- ============ QUOTE ============ -->
+  <section class="deepa-section deepa-quote">
+    <div class="deepa-inner">
+      <p class="pull-quote reveal" [appScrollReveal]="0">The Magic begins when your <span class="mark">soul</span> awakens.</p>
+    </div>
+  </section>
+
+  <!-- ============ BOOK ============ -->
+  <section class="deepa-section deepa-books">
+    <div class="deepa-inner">
+      <app-eyebrow-label text="An author" />
+      <h2 class="t-display section-heading">One book, one idea: healing starts from within.</h2>
+
+      <article class="book-feature reveal" [appScrollReveal]="0">
+        <div class="book-cover">
+          <img [ngSrc]="book.cover" fill alt="{{ book.title }} — {{ book.subtitle }} book cover" />
+        </div>
+        <div class="book-copy">
+          <span class="book-status">{{ book.status }}</span>
+          <h3>{{ book.title }}</h3>
+          <p class="book-subtitle">{{ book.subtitle }}</p>
+          <p class="book-description">{{ book.description }}</p>
+          <a [href]="book.buyUrl" target="_blank" rel="noopener noreferrer" class="cta-link">
+            <span>Get the book</span>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
+          </a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ PROGRAMMES ============ -->
+  <section class="deepa-section deepa-programmes">
+    <div class="deepa-inner">
+      <app-eyebrow-label text="Programmes" />
+      <h2 class="t-display section-heading">The Magic begins when your soul awakens.</h2>
+
+      <div class="programme-grid">
+        @for (programme of programmes; track programme.name; let i = $index) {
+          <article class="programme-card reveal" [appScrollReveal]="i * 90">
+            <h3>{{ programme.name }}</h3>
+            <p class="programme-tagline">{{ programme.tagline }}</p>
+            <p class="programme-description">{{ programme.description }}</p>
+          </article>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CERTIFICATIONS & COLLABORATIONS ============ -->
+  <section class="deepa-section deepa-collab">
+    <div class="deepa-inner">
+      <app-eyebrow-label text="Certifications & collaborations" />
+
+      <ul class="collab-grid">
+        @for (collaborator of collaborators; track collaborator.name; let i = $index) {
+          <li class="collab-card reveal" [appScrollReveal]="i * 90">
+            <span class="collab-mark" aria-hidden="true">{{ collaborator.name.charAt(0) }}</span>
+            <h3>{{ collaborator.name }}</h3>
+            <p>{{ collaborator.detail }}</p>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section class="deepa-section deepa-testimonials">
+    <div class="deepa-inner">
+      <app-eyebrow-label text="From readers" />
+
+      <ul class="testimonial-grid">
+        @for (testimonial of testimonials; track testimonial.name; let i = $index) {
+          <li class="testimonial-card reveal" [appScrollReveal]="i * 90">
+            <p class="testimonial-quote">“{{ testimonial.quote }}”</p>
+            <p class="testimonial-name">{{ testimonial.name }}</p>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="deepa-section deepa-close">
+    <div class="deepa-inner deepa-close-inner reveal" [appScrollReveal]="0">
+      <h2 class="t-display">Start with the person who looks at the whole picture.</h2>
+      <app-cta-pill label="Book a consultation with Deepa" variant="primary" (pressed)="bookConsultation()" />
+    </div>
+  </section>
+
+  <app-site-footer />
+</main>

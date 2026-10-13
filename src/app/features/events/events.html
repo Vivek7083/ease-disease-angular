@@ -1,0 +1,69 @@
+<main id="top" class="events-page">
+  <!-- ============ HERO ============ -->
+  <header class="events-hero">
+    <div class="events-inner reveal" [appScrollReveal]="0">
+      <app-eyebrow-label text="Gather with us" />
+      <h1 class="t-display">Events &amp; <span class="mark">retreats</span></h1>
+      <p class="events-lede">Talks, workshops and retreats on gut health and whole-person healing.</p>
+    </div>
+  </header>
+
+  <!-- ============ UPCOMING ============ -->
+  <section class="events-section" aria-labelledby="upcoming-heading">
+    <div class="events-inner">
+      <app-eyebrow-label text="Upcoming" />
+      <div class="brewing reveal" [appScrollReveal]="0">
+        <svg class="brewing-cup" viewBox="0 0 120 104" aria-hidden="true" focusable="false">
+          <path class="steam steam-1" d="M44 38c-6-6 6-10 0-18" />
+          <path class="steam steam-2" d="M60 38c-6-6 6-10 0-18" />
+          <path class="steam steam-3" d="M76 38c-6-6 6-10 0-18" />
+          <ellipse class="saucer" cx="60" cy="92" rx="44" ry="8" />
+          <path class="cup" d="M26 46h68v14c0 17-13 28-34 28S26 77 26 60z" />
+          <path class="cup-handle" d="M94 52h6c8 0 8 16 0 16h-8" />
+          <ellipse class="cup-rim" cx="60" cy="46" rx="34" ry="5" />
+        </svg>
+        <h2 id="upcoming-heading" class="t-display">We're brewing more for you.</h2>
+        <p class="brewing-note">New events and retreats are on their way. Check back soon.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAST EVENTS ============ -->
+  <section class="events-section events-past" aria-labelledby="past-heading">
+    <div class="events-inner">
+      <app-eyebrow-label text="Past events" />
+      <h2 id="past-heading" class="t-display section-heading">Where we've gathered.</h2>
+
+      <ul class="event-grid">
+        @for (event of pastEvents; track event.title; let i = $index) {
+          <li class="event-card reveal" [appScrollReveal]="i * 90">
+            <div class="event-media" [class.is-photo]="event.fit === 'cover'" [style.--backdrop]="'url(/' + event.image + ')'">
+              <img [ngSrc]="event.image" fill [alt]="event.imageAlt" />
+            </div>
+            <div class="event-ticket">
+              <time class="event-stub" [attr.datetime]="event.iso">
+                <span class="stub-day" [class.stub-day-range]="event.day.length > 2">{{ event.day }}</span>
+                <span class="stub-month">{{ event.month }}</span>
+                <span class="stub-year">{{ event.year }}</span>
+              </time>
+              <div class="event-details">
+                <span class="event-status">Past event</span>
+                <h3>{{ event.title }}</h3>
+                <p class="event-meta">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.5" /><path d="M10 5.5V10l3 2" /></svg>
+                  <span>{{ event.time }}</span>
+                </p>
+                <p class="event-meta">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 18s6-5.2 6-10a6 6 0 0 0-12 0c0 4.8 6 10 6 10z" /><circle cx="10" cy="8" r="2.2" /></svg>
+                  <span>{{ event.venue }}</span>
+                </p>
+              </div>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+
+  <app-site-footer />
+</main>

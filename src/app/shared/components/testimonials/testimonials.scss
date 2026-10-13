@@ -1,0 +1,581 @@
+/* WhatsApp's own palette, not the brand's — this section deliberately
+   impersonates the WhatsApp UI so the message reads as an authentic
+   screenshot rather than a styled quote. Scoped to this component only;
+   nowhere else in the app uses these. */
+:host {
+  --wa-canvas: #0b141a;
+  --wa-pattern: rgba(255, 255, 255, 0.035);
+  --wa-in-bg: #202c33;
+  --wa-out-bg: #005c4b;
+  --wa-text: #e9edef;
+  --wa-time: #8696a0;
+  --wa-tick: #53bdeb;
+  --wa-chip-bg: #2a3942;
+  --wa-header-bg: #1f2c34;
+  --wa-titlebar-bg: #11181d;
+  --wa-side-bg: #111b21;
+  --wa-active: #2a3942;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.wa-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.wa-intro .t-display {
+  margin: 0;
+  font-weight: 400;
+  font-size: var(--fs-display-m);
+  color: var(--ink);
+}
+
+.lede {
+  margin: 0;
+  color: var(--text-quiet-light);
+}
+
+.wa-stage {
+  display: flex;
+  justify-content: center;
+}
+
+/* ---------- shared chat chrome ---------- */
+
+.wa-chat-header {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 10px 14px;
+  background: var(--wa-header-bg);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex: none;
+}
+
+.wa-back {
+  width: 20px;
+  height: 20px;
+  color: var(--wa-text);
+  flex: none;
+}
+
+.wa-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--avatar, var(--oxblood));
+  color: var(--ivory);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  flex: none;
+}
+
+.wa-chat-id {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.wa-chat-name {
+  color: var(--wa-text);
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.wa-chat-status {
+  color: var(--wa-time);
+  font-size: 0.74rem;
+}
+
+.wa-body {
+  flex: 1;
+  padding: 16px 14px 20px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background-color: var(--wa-canvas);
+  background-image: radial-gradient(var(--wa-pattern) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.wa-date {
+  align-self: center;
+  margin: 0 0 var(--sp-3);
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--wa-chip-bg);
+  color: var(--wa-text);
+  font-size: 0.7rem;
+}
+
+.wa-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: var(--sp-3);
+}
+
+.wa-row-out {
+  justify-content: flex-end;
+}
+
+.wa-bubble {
+  position: relative;
+  max-width: 82%;
+  padding: 8px 10px 20px;
+  background: var(--wa-in-bg);
+  color: var(--wa-text);
+  border-radius: 10px 10px 10px 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.wa-bubble-out {
+  background: var(--wa-out-bg);
+  border-radius: 10px 10px 2px 10px;
+}
+
+.wa-text {
+  margin: 0;
+  white-space: pre-line;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.wa-meta {
+  position: absolute;
+  bottom: 6px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.wa-time {
+  font-size: 0.66rem;
+  color: var(--wa-time);
+}
+
+.wa-ticks {
+  width: 15px;
+  height: 9px;
+}
+
+.wa-ticks path {
+  fill: none;
+  stroke: var(--wa-tick);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.wa-reaction {
+  position: absolute;
+  bottom: -10px;
+  left: 10px;
+  padding: 1px 6px;
+  border-radius: var(--r-pill);
+  background: var(--wa-chip-bg);
+  font-size: 0.72rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.wa-reaction-out {
+  left: auto;
+  right: 10px;
+}
+
+/* ---------- mobile: phone frame + dynamic island (default) ---------- */
+
+.wa-window {
+  display: none;
+}
+
+.wa-phone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, 100%);
+  margin-inline: auto;
+  padding-top: 34px;
+  border: 8px solid var(--ink);
+  border-radius: 44px;
+  background: var(--wa-canvas);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+}
+
+.wa-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 24px;
+  border-radius: var(--r-pill);
+  background: #000;
+}
+
+.wa-phone .wa-body {
+  height: 340px;
+}
+
+.wa-phone::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 104px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.55);
+  transform: translateX(-50%);
+}
+
+.wa-phone {
+  touch-action: pan-y;
+}
+
+.wa-mobile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  width: 100%;
+}
+
+/* ---------- mobile pager: arrows, caption and dots ---------- */
+
+.wa-pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+}
+
+.wa-pager-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap-min);
+  height: var(--tap-min);
+  flex: none;
+  border: 1px solid var(--rule-on-light);
+  border-radius: 50%;
+  background: var(--surface-card-light);
+  color: var(--oxblood);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: background var(--dur-micro) var(--ease);
+}
+
+.wa-pager-btn:hover {
+  background: var(--parchment);
+}
+
+.wa-pager-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wa-pager-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  min-width: 150px;
+}
+
+.wa-pager-label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+.wa-dots {
+  display: flex;
+}
+
+.wa-dot-btn {
+  position: relative;
+  width: 28px;
+  height: var(--tap-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.wa-dot-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--rule-on-light);
+  transform: translate(-50%, -50%);
+  transition:
+    width var(--dur-micro) var(--ease),
+    background var(--dur-micro) var(--ease);
+}
+
+.wa-dot-btn.is-active::after {
+  width: 22px;
+  background: var(--oxblood);
+}
+
+.wa-input-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 8px 10px 16px;
+  background: var(--wa-header-bg);
+  flex: none;
+}
+
+.wa-input-plus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  color: var(--wa-time);
+}
+
+.wa-input-plus svg {
+  width: 20px;
+  height: 20px;
+}
+
+.wa-input-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  height: 34px;
+  padding: 0 6px 0 14px;
+  border-radius: var(--r-pill);
+  background: var(--wa-in-bg);
+}
+
+.wa-input-placeholder {
+  font-size: 0.86rem;
+  color: var(--wa-time);
+}
+
+.wa-input-camera {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  color: var(--wa-time);
+}
+
+.wa-mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+}
+
+.wa-mic svg {
+  width: 20px;
+  height: 20px;
+  color: var(--wa-time);
+}
+
+/* ---------- desktop: WhatsApp-for-Mac chat pane ---------- */
+
+@media (min-width: 900px) {
+  :host {
+    gap: var(--sp-10);
+  }
+
+  .wa-intro {
+    align-items: center;
+    text-align: center;
+  }
+
+  .wa-mobile {
+    display: none;
+  }
+
+  .wa-window {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 880px;
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-lift);
+    background: var(--wa-canvas);
+  }
+
+  .wa-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    height: 30px;
+    padding: 0 12px;
+    background: var(--wa-titlebar-bg);
+    flex: none;
+  }
+
+  .wa-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+
+  .wa-dot-red {
+    background: #ff5f57;
+  }
+
+  .wa-dot-yellow {
+    background: #febc2e;
+  }
+
+  .wa-dot-green {
+    background: #28c840;
+  }
+
+  .wa-window-main {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+  }
+
+  .wa-sidebar {
+    display: flex;
+    flex-direction: column;
+    background: var(--wa-side-bg);
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    min-width: 0;
+  }
+
+  .wa-sidebar-title {
+    margin: 0;
+    padding: 14px 16px 10px;
+    color: var(--wa-text);
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .wa-chat-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .wa-chat-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-3);
+    width: 100%;
+    padding: 12px 16px;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    background: transparent;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+    transition: background var(--dur-micro) var(--ease);
+  }
+
+  .wa-chat-item:hover,
+  .wa-chat-item.is-active {
+    background: var(--wa-active);
+  }
+
+  .wa-chat-item:focus-visible {
+    outline: 2px solid var(--honey);
+    outline-offset: -2px;
+    border-radius: 0;
+  }
+
+  .wa-chat-item-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .wa-chat-item-top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-2);
+  }
+
+  .wa-chat-item-time {
+    color: var(--wa-time);
+    font-size: 0.7rem;
+    flex: none;
+  }
+
+  .wa-chat-item-label {
+    color: var(--honey);
+    font-size: 0.76rem;
+  }
+
+  .wa-chat-item-preview {
+    color: var(--wa-time);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .wa-pane {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .wa-pane .wa-body {
+    height: 460px;
+  }
+}
+
+/* ---------- reveal ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .wa-thread {
+    animation: wa-thread-in 320ms var(--ease-out-soft, ease-out);
+  }
+
+  .wa-stage.reveal {
+    transform: translateY(28px) scale(0.98);
+  }
+
+  .wa-stage.reveal.is-visible {
+    transform: none;
+  }
+}
+
+@keyframes wa-thread-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}

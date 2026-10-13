@@ -21,7 +21,7 @@
               (pressed)="bookConsultation()"
             />
             <a class="source-link" href="#root-map">
-              <span>Find your root cause</span>
+              <span>Find your source</span>
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
             </a>
           </div>
@@ -32,6 +32,16 @@
       </div>
     </div>
   </section>
+
+  <!-- ============ INTER-QUOTE — sits in the 20px gap between hero and hook,
+       fills in word by word as it scrolls into view. ============ -->
+  <div class="inter-quote">
+    <p class="hook-close" #closeQuote>
+      @for (word of hookCloseWords; track $index; let i = $index) {
+        <span class="hook-close-word" [style.--fill]="closeWordFill(i)">{{ word }}{{ $last ? '' : ' ' }}</span>
+      }
+    </p>
+  </div>
 
   <!-- Shared card copy (desktop deck + mobile stack): title and body typed in
        word by word, with an optional "Read more" for long bodies. -->
@@ -94,7 +104,24 @@
               [style.clip-path]="'inset(0 ' + (100 - headingRevealProgress() * 100) + '% 0 0)'"
             >
               <app-eyebrow-label text="Root-cause, not symptoms" />
-              <h2 id="hook-heading" class="hook-heading">Why functional medicine?</h2>
+              <h2 id="hook-heading" class="hook-heading">Our philosophy</h2>
+            </div>
+
+            <div class="hook-rail" [style.opacity]="cardsOpacity()">
+              @for (point of hookPoints; track point.title; let i = $index) {
+                <span class="hook-rail-step" [style.--fill]="cardVisibility(i)">
+                  <button
+                    type="button"
+                    class="hook-rail-num"
+                    [attr.aria-current]="cardVisibility(i) > 0.5 ? 'step' : null"
+                    [attr.aria-label]="'Go to: ' + point.title"
+                    (click)="jumpToHookCard(i)"
+                  >
+                    {{ '0' + (i + 1) }}
+                  </button>
+                  <span class="hook-rail-line" aria-hidden="true"></span>
+                </span>
+              }
             </div>
 
             <div class="hook-deck" [style.opacity]="cardsOpacity()">
@@ -122,6 +149,11 @@
               }
             </div>
           </div>
+
+          <p class="hook-scroll-hint" [style.opacity]="hookScrollHintOpacity()" aria-hidden="true">
+            <span>{{ hookScrollHintLabel() }}</span>
+            <svg class="hook-scroll-hint-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" /></svg>
+          </p>
         </div>
       </div>
     } @else {
@@ -136,7 +168,7 @@
           [style.transform]="'translateY(' + (1 - mobileHeadingRevealProgress()) * 24 + 'px)'"
         >
           <app-eyebrow-label text="Root-cause, not symptoms" />
-          <h2 id="hook-heading" class="hook-heading">Why functional medicine?</h2>
+          <h2 id="hook-heading" class="hook-heading">Our philosophy</h2>
         </div>
 
         <div class="hook-carousel reveal" [appScrollReveal]="150">
@@ -200,14 +232,6 @@
       </div>
     }
 
-    <div class="scene-inner">
-      <p class="hook-close" #closeQuote>
-        @for (word of hookCloseWords; track $index; let i = $index) {
-          <span class="hook-close-word" [style.--fill]="closeWordFill(i)">{{ word }}</span
-          >{{ ' ' }}
-        }
-      </p>
-    </div>
   </section>
 
   <app-section-transition variant="dots" />
@@ -230,11 +254,11 @@
       <ng-template #treatHeading>
         <div class="treat-heading-row reveal" [appScrollReveal]="0">
           <app-eyebrow-label text="Built with you, not for you" />
-          <h2 id="treat-heading" class="treat-heading">Here's how we get to your root cause</h2>
+          <h2 id="treat-heading" class="treat-heading">Transform with E.A.S.E</h2>
           @if (treatHorizontal()) {
-            <p class="treat-subtext">Four honest conversations — no guesswork, no generic checklist.</p>
+            <p class="treat-subtext">Four steps. Every one grounded in what your body is actually telling us.</p>
           } @else {
-            <p class="treat-subtext">Four honest conversations. No guesswork, no generic checklist — just what your body is actually telling us.</p>
+            <p class="treat-subtext">Four steps — grounded in what your body is actually telling us, not a generic protocol.</p>
           }
         </div>
       </ng-template>
@@ -319,14 +343,38 @@
              pin releases into Root Map. -->
         <div class="treat-pin" #treatPin [style.height.vh]="treatSteps.length * treatVhPerStep">
           <div class="treat-viewport">
+            <!-- Replaces the old peeking card-stack as the step-count cue —
+                 that stack visually resembled the swipeable expert carousel
+                 above it, but dragging it did nothing (this section advances
+                 by scrolling, not swiping). Plain numbered dots read as
+                 "step 2 of 4" without implying a gesture this isn't. -->
+            <div class="treat-progress" role="group" aria-label="Jump to a step">
+              @for (step of treatSteps; track step.title; let i = $index; let last = $last) {
+                <button
+                  type="button"
+                  class="treat-progress-dot"
+                  [class.is-active]="i === treatActiveStepIndex()"
+                  [class.is-done]="i < treatActiveStepIndex()"
+                  [attr.aria-label]="'Jump to step ' + (i + 1) + ': ' + step.title"
+                  [attr.aria-pressed]="i === treatActiveStepIndex()"
+                  (click)="scrollToTreatStep(i)"
+                >
+                  {{ i + 1 }}
+                </button>
+                @if (!last) {
+                  <span class="treat-progress-line" [class.is-filled]="i < treatActiveStepIndex()" aria-hidden="true"></span>
+                }
+              }
+            </div>
             <div class="treat-deck">
               @for (step of treatSteps; track step.title; let i = $index) {
                 <div
                   class="treat-deck-card"
                   [class.is-active]="treatStackActive(i)"
-                  [style.z-index]="i + 1"
-                  [style.transform]="treatStackTransform(i)"
+                  [style.opacity]="treatCardOpacity(i)"
+                  [style.transform]="treatCardTransform(i)"
                   [style.pointer-events]="treatStackActive(i) ? 'auto' : 'none'"
+                  [attr.aria-hidden]="!treatStackActive(i)"
                 >
                   <div class="treat-step-main">
                     <div class="treat-step-rail" aria-hidden="true">
@@ -356,7 +404,7 @@
               }
             </div>
             <p class="treat-scroll-hint" aria-hidden="true" [style.opacity]="treatHintOpacity()">
-              Keep scrolling <span class="treat-scroll-hint-arrow">↓</span>
+              {{ treatHintLabel() }} <span class="treat-scroll-hint-arrow">↓</span>
             </p>
           </div>
         </div>
@@ -439,6 +487,17 @@
     </div>
   </section>
 
+  <!-- ============ TESTIMONIALS — a real client message shown as it was
+       received, a WhatsApp thread, rather than a styled pull-quote. Same
+       canvas stop as the end of Results (flat, not chained) so inserting
+       this section doesn't disturb the canvas handoff into the root map
+       below it. ============ -->
+  <section class="scene testimonials" id="testimonials" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="testimonials-heading">
+    <div class="scene-inner">
+      <app-testimonials />
+    </div>
+  </section>
+
   <app-section-transition variant="vine" />
 
   <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
@@ -457,9 +516,9 @@
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="How it starts" />
-      <h2 id="programme-heading" class="t-display">Your plan begins with seven days.</h2>
+      <h2 id="programme-heading" class="t-display">Start where you are. Go as deep as you need.</h2>
       <p class="t-body lede">
-        Level 1 is a 7-day plan — start there. Level 2 unlocks once Level 1 is done: drag to see what each level covers.
+        One consultation. Three months. Choose where to begin — drag or tap to explore what each level covers.
       </p>
       <app-level-selector [levels]="levels" (booked)="bookConsultation()" />
       <p class="levels-fallback">
@@ -469,6 +528,49 @@
           <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
         </a>
       </p>
+
+      <div class="programme-highway reveal" [appScrollReveal]="160">
+        <div
+          class="programme-billboard"
+          (pointermove)="onBillboardPointerMove($event)"
+          (pointerleave)="onBillboardPointerLeave($event)"
+        >
+          <figure class="programme-banner">
+            <img
+              ngSrc="images/marketing/founders-banner.png"
+              width="1584"
+              height="672"
+              class="programme-banner-img"
+              alt="Illustrated portraits of Carol and Deepa, Ease Dis-ease's founders, standing among houseplants in a warm consultation room, with the brand's wordmark and tagline: Right Knowledge plus Right Action equals Optimum Health."
+            />
+          </figure>
+          <div class="programme-billboard-post" aria-hidden="true">
+            <span class="programme-billboard-leg programme-billboard-leg-left"></span>
+            <span class="programme-billboard-leg programme-billboard-leg-right"></span>
+          </div>
+          <span class="programme-billboard-ground" aria-hidden="true"></span>
+        </div>
+
+        <!-- The highway car-pass was commented out — it played before the
+             billboard was even in frame on most scroll speeds, so it added
+             motion without actually being seen. The road/car markup is kept
+             (see home.scss) in case it's worth revisiting with a different
+             trigger.
+        <div class="programme-road" aria-hidden="true">
+          <svg class="programme-car" viewBox="0 0 128 56" focusable="false">
+            <ellipse class="programme-car-shadow" cx="64" cy="50" rx="46" ry="5" />
+            <path
+              class="programme-car-body"
+              d="M10 38c0-4 3-7 8-8l10-2 8-10c2-3 6-5 10-5h20c4 0 8 2 10 5l8 10 10 2c5 1 8 4 8 8v6c0 3-2 5-5 5h-4a10 10 0 0 1-20 0H39a10 10 0 0 1-20 0h-4c-3 0-5-2-5-5z"
+            />
+            <path class="programme-car-cabin" d="M40 28l6-9c1-2 3-3 5-3h14c2 0 4 1 5 3l5 9z" />
+            <circle class="programme-car-wheel" cx="34" cy="44" r="8" />
+            <circle class="programme-car-wheel" cx="84" cy="44" r="8" />
+            <circle class="programme-car-light" cx="13" cy="34" r="2.6" />
+          </svg>
+        </div>
+        -->
+      </div>
     </div>
   </section>
 
@@ -479,7 +581,18 @@
     <div class="scene-inner">
       <app-eyebrow-label text="Meet the experts" />
       <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
-      <app-expert-carousel [members]="team" (connectRequested)="bookConsultation()" />
+      <p class="t-body lede">
+        Whether you are newly diagnosed, struggling with chronic symptoms, or seeking deeper transformation, there
+        is a path for you here.
+      </p>
+      <app-expert-carousel [members]="team" (connectRequested)="onExpertConnect($event)" />
+    </div>
+  </section>
+
+  <!-- ============ EVENTS & RETREATS — invite to the events page ============ -->
+  <section class="scene events-invite" id="events" appCanvasStop from="var(--canvas-team-to)" to="var(--canvas-team-to)" aria-labelledby="events-invite-heading">
+    <div class="scene-inner">
+      <app-events-invite />
     </div>
   </section>
 

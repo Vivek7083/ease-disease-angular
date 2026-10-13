@@ -96,7 +96,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
 
       .carousel-stage {
         position: relative;
-        height: 480px;
+        height: clamp(500px, 68vh, 560px);
         /* Bleeds past the section's own gutter to the true viewport edges —
            the rotated side cards need that extra width to peek convincingly.
            Only the stage bleeds; the arrows row below stays within the gutter. */
@@ -196,6 +196,7 @@ export class ExpertCarousel {
 
   private readonly destroyRef = inject(DestroyRef);
   private autoTimer: ReturnType<typeof setInterval> | undefined;
+  private spotlightFallbackTimer: ReturnType<typeof setTimeout> | undefined;
   private dragStartX: number | null = null;
   private lastSpotlightSource = 0;
   private readonly reduceMotion: boolean;
@@ -226,7 +227,14 @@ export class ExpertCarousel {
       }
 
       this.spotlightFading.set(true); // fade the current content out in place; onSpotlightContentHidden takes it from here
+      // (contentHidden) is the normal path — this is just a backstop so a swap
+      // can never get stuck mid-fade (content invisible forever) if that event
+      // doesn't fire for some reason. Comfortably longer than TeamCard's own
+      // 260ms fade-out, so it only ever fires after the real handshake already has.
+      clearTimeout(this.spotlightFallbackTimer);
+      this.spotlightFallbackTimer = setTimeout(() => this.onSpotlightContentHidden(), 500);
     });
+    this.destroyRef.onDestroy(() => clearTimeout(this.spotlightFallbackTimer));
   }
 
   private startAutoTimer(): void {

@@ -1,16 +1,17 @@
 import { NgOptimizedImage } from '@angular/common';
 import { Component, DestroyRef, inject, input, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 const MINIMIZE_THRESHOLD = 64;
 
 @Component({
   selector: 'app-wordmark',
-  imports: [NgOptimizedImage],
+  imports: [NgOptimizedImage, RouterLink],
   template: `
-    <a class="wordmark" href="#top" aria-label="Ease Disease — back to top" [class.on-dark]="onDark()" [class.minimized]="collapse() && minimized()">
+    <a class="wordmark" routerLink="/" fragment="top" aria-label="Ease Dis-ease — back to top" [class.on-dark]="onDark()" [class.minimized]="collapse() && minimized()">
       <img class="wordmark-logo" [ngSrc]="onDark() ? 'images/logo/logo-white.png' : 'images/logo/logo-transparent.png'" width="36" height="36" priority alt="" />
       <span class="wordmark-text-group">
-        <span class="wordmark-text">Ease Disease</span>
+        <span class="wordmark-text">Ease Dis-<span class="ease-mark">ease</span></span>
         @if (tagline(); as t) {
           <span class="wordmark-tagline">{{ t }}</span>
         }

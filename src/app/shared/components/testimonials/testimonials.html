@@ -1,0 +1,164 @@
+<div class="wa-intro reveal" [appScrollReveal]="0">
+  <app-eyebrow-label text="In their own words" />
+  <h2 id="testimonials-heading" class="t-display">A message, not a quote.</h2>
+  <p class="t-body lede">Notes from our clients to our experts, on WhatsApp — shared with permission, names withheld.</p>
+</div>
+
+@for (line of transcript; track $index) {
+  <p class="sr-only">{{ line }}</p>
+}
+
+<div class="wa-stage reveal" [appScrollReveal]="120">
+  <!-- Desktop: WhatsApp-for-Mac window — chat list on the left, open chat on the right. -->
+  <div class="wa-window">
+    <div class="wa-titlebar" aria-hidden="true">
+      <span class="wa-dot wa-dot-red"></span>
+      <span class="wa-dot wa-dot-yellow"></span>
+      <span class="wa-dot wa-dot-green"></span>
+    </div>
+    <div class="wa-window-main">
+      <nav class="wa-sidebar" aria-label="Client messages">
+        <p class="wa-sidebar-title" aria-hidden="true">Chats</p>
+        <ul class="wa-chat-list">
+          @for (thread of threads; track thread.id; let i = $index) {
+            <li>
+              <button
+                type="button"
+                class="wa-chat-item"
+                [class.is-active]="i === active()"
+                [attr.aria-current]="i === active() ? 'true' : null"
+                [attr.aria-label]="'Message ' + (i + 1) + ' of ' + threads.length + ': ' + thread.label"
+                (click)="select(i)"
+              >
+                <span class="wa-avatar" [style.--avatar]="thread.tone" aria-hidden="true">{{ thread.initial }}</span>
+                <span class="wa-chat-item-text" aria-hidden="true">
+                  <span class="wa-chat-item-top">
+                    <span class="wa-chat-name">Our client</span>
+                    <span class="wa-chat-item-time">{{ thread.listTime }}</span>
+                  </span>
+                  <span class="wa-chat-item-label">{{ thread.label }}</span>
+                  <span class="wa-chat-item-preview">{{ thread.preview }}</span>
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      </nav>
+
+      <div class="wa-pane">
+        <div class="wa-chat-header" aria-hidden="true">
+          <span class="wa-avatar" [style.--avatar]="current().tone">{{ current().initial }}</span>
+          <span class="wa-chat-id">
+            <span class="wa-chat-name">Our client</span>
+            <span class="wa-chat-status">{{ current().status }}</span>
+          </span>
+        </div>
+        @for (thread of threads; track thread.id) {
+          @if (thread.id === current().id) {
+            <div class="wa-body wa-thread" aria-hidden="true">
+              <ng-container [ngTemplateOutlet]="bubbles" [ngTemplateOutletContext]="{ $implicit: thread }" />
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile: phone frame with a dynamic island; swipe or use the controls below. -->
+  <div class="wa-mobile">
+    <div class="wa-phone" (pointerdown)="onPointerDown($event)" (pointerup)="onPointerUp($event)">
+      <span class="wa-island" aria-hidden="true"></span>
+      <div class="wa-chat-header" aria-hidden="true">
+        <svg class="wa-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
+        <span class="wa-avatar" [style.--avatar]="current().tone">{{ current().initial }}</span>
+        <span class="wa-chat-id">
+          <span class="wa-chat-name">Our client</span>
+          <span class="wa-chat-status">{{ current().status }}</span>
+        </span>
+      </div>
+      @for (thread of threads; track thread.id) {
+        @if (thread.id === current().id) {
+          <div class="wa-body wa-thread" aria-hidden="true">
+            <ng-container [ngTemplateOutlet]="bubbles" [ngTemplateOutletContext]="{ $implicit: thread }" />
+          </div>
+        }
+      }
+      <div class="wa-input-bar" aria-hidden="true">
+        <span class="wa-input-plus">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 8v8M8 12h8" />
+          </svg>
+        </span>
+        <span class="wa-input-field">
+          <span class="wa-input-placeholder">Message</span>
+          <svg class="wa-input-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 8h2.5l1.3-2h8.4l1.3 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+            <circle cx="12" cy="13.5" r="3.4" />
+          </svg>
+        </span>
+        <span class="wa-mic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z" />
+            <path d="M19 11a7 7 0 0 1-14 0M12 18v3" />
+          </svg>
+        </span>
+      </div>
+    </div>
+
+    <div class="wa-pager">
+      <button type="button" class="wa-pager-btn" aria-label="Previous message" (click)="step(-1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M15 5l-7 7 7 7" />
+        </svg>
+      </button>
+      <div class="wa-pager-center">
+        <p class="wa-pager-label" aria-live="polite">{{ current().label }}</p>
+        <div class="wa-dots">
+          @for (thread of threads; track thread.id; let i = $index) {
+            <button
+              type="button"
+              class="wa-dot-btn"
+              [class.is-active]="i === active()"
+              [attr.aria-current]="i === active() ? 'true' : null"
+              [attr.aria-label]="'Message ' + (i + 1) + ' of ' + threads.length + ': ' + thread.label"
+              (click)="select(i)"
+            ></button>
+          }
+        </div>
+      </div>
+      <button type="button" class="wa-pager-btn" aria-label="Next message" (click)="step(1)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #bubbles let-thread>
+  @if (thread.date) {
+    <p class="wa-date">{{ thread.date }}</p>
+  }
+  @for (message of thread.messages; track $index) {
+    <div class="wa-row" [class.wa-row-out]="message.sender === 'coach'">
+      <div class="wa-bubble" [class.wa-bubble-out]="message.sender === 'coach'">
+        <p class="wa-text">{{ message.text }}</p>
+        <span class="wa-meta">
+          <span class="wa-time">{{ message.time }}</span>
+          @if (message.sender === 'coach') {
+            <svg class="wa-ticks" viewBox="0 0 18 10">
+              <path d="M1 5l3 3 7-7" />
+              <path d="M7 5l3 3 7-7" />
+            </svg>
+          }
+        </span>
+        @if (message.reaction) {
+          <span class="wa-reaction" [class.wa-reaction-out]="message.sender === 'coach'">{{ message.reaction }}</span>
+        }
+      </div>
+    </div>
+  }
+</ng-template>

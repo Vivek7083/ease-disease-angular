@@ -1,0 +1,444 @@
+:host {
+  display: block;
+}
+
+.carol-page {
+  background: var(--ivory);
+}
+
+.carol-inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-mobile);
+}
+
+@media (min-width: 900px) {
+  .carol-inner {
+    padding-inline: var(--gutter-desktop);
+  }
+}
+
+.carol-section {
+  padding-block: clamp(var(--sp-10), 5vw, var(--sp-16));
+}
+
+/* ---------- hero ---------- */
+.carol-hero {
+  position: relative;
+  /* app.scss's fixed .chrome-wordmark/.chrome-cta float above everything
+     regardless of section padding, so the heading needs enough clearance
+     to start below them instead of rendering right underneath. */
+  --hero-pt: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
+  padding-top: var(--hero-pt);
+  padding-bottom: clamp(var(--sp-8), 4vw, var(--sp-12));
+  background: linear-gradient(180deg, color-mix(in oklab, var(--honey) 10%, var(--ivory)), var(--ivory));
+}
+
+.carol-hero-grid {
+  position: relative;
+  display: grid;
+  gap: var(--sp-10);
+}
+
+@media (min-width: 900px) {
+  .carol-hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+  }
+}
+
+.carol-headline {
+  margin-top: var(--sp-5);
+  font-size: 1.1rem;
+  line-height: var(--lh-body);
+  color: var(--text-quiet-light);
+  max-width: 46ch;
+}
+
+.carol-location {
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+.founders-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-8);
+  padding: var(--sp-1);
+  border-radius: var(--r-pill);
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+}
+
+/* On wide screens this reads better as a persistent switcher pinned to the
+   hero's corner than as another line of copy in the text column. */
+@media (min-width: 900px) {
+  .founders-tabs {
+    position: absolute;
+    top: calc(var(--sp-8) - var(--hero-pt));
+    right: var(--gutter-desktop);
+    margin-top: 0;
+    padding: 3px;
+    box-shadow: var(--shadow-soft);
+  }
+  .founders-tab {
+    padding: 6px var(--sp-4);
+    font-size: 0.68rem;
+  }
+}
+
+.founders-tab {
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-pill);
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-quiet-light);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+
+a.founders-tab:hover {
+  color: var(--oxblood);
+}
+
+.founders-tab.active {
+  background: var(--gradient-ember);
+  color: #fff6ef;
+}
+
+.carol-hero-visual {
+  position: relative;
+  width: min(360px, 100%);
+  margin-inline: auto;
+  margin-bottom: var(--sp-10);
+}
+
+.carol-portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: min(360px, 100%);
+  margin-inline: auto;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lift);
+}
+
+.carol-portrait img {
+  object-fit: cover;
+  /* Shifts the crop window down a touch so more of the lower half of the
+     photo shows instead of cutting straight across it. */
+  object-position: center 70%;
+}
+
+.carol-hero-visual .illustration-hero {
+  position: absolute;
+  right: -4%;
+  bottom: -12%;
+  width: 54%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  transform: rotate(-4deg);
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  .carol-hero-visual .illustration-hero {
+    right: -22%;
+    bottom: -10%;
+    width: 58%;
+  }
+}
+
+/* ---------- about ---------- */
+.carol-about-copy {
+  max-width: 68ch;
+  font-size: 1.15rem;
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+/* ---------- yellow highlighter mark + editorial pull-quote (same treatment
+   as the home hero's "It's time to listen" and close-quote sections) ---------- */
+.mark {
+  font-style: normal;
+  font-weight: 600;
+  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  padding: 0 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.pull-quote {
+  margin: 0 auto;
+  max-width: 32ch;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: 'opsz' 16;
+  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.1rem);
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.carol-quote {
+  padding-block: clamp(var(--sp-6), 3vw, var(--sp-10));
+}
+
+/* ---------- featured post ---------- */
+.carol-featured {
+  padding-block: clamp(calc(var(--sp-10) * 0.1), 0.5vw, calc(var(--sp-16) * 0.1));
+}
+
+.featured-card {
+  margin-top: var(--sp-6);
+  display: grid;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+@media (min-width: 700px) {
+  .featured-card {
+    grid-template-columns: 220px 1fr;
+    gap: var(--sp-6);
+    align-items: center;
+    padding: var(--sp-4);
+  }
+}
+
+.featured-illustration {
+  width: min(100%, 220px);
+  height: auto;
+  margin-inline: auto;
+  display: block;
+}
+
+.featured-org {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.featured-copy h3 {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-display-s);
+}
+
+.featured-subtitle {
+  margin-top: var(--sp-1);
+  font-style: italic;
+  color: var(--text-quiet-light);
+}
+
+.featured-description {
+  margin-top: var(--sp-4);
+  color: var(--text-quiet-light);
+  line-height: var(--lh-body);
+  max-width: 56ch;
+}
+
+/* ---------- experience timeline ---------- */
+.section-heading {
+  margin-top: var(--sp-3);
+  max-width: 28ch;
+}
+
+.timeline {
+  position: relative;
+  margin-top: var(--sp-10);
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-8);
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1.5px;
+  background: linear-gradient(180deg, var(--terracotta), transparent);
+  opacity: 0.4;
+}
+
+.timeline-entry {
+  position: relative;
+  padding-left: var(--sp-8);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--gradient-ember);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ivory) 70%, transparent);
+}
+
+.timeline-card h3 {
+  font-size: var(--fs-display-xs, 1.15rem);
+}
+
+.timeline-org {
+  margin-top: var(--sp-1);
+  font-weight: 500;
+  color: var(--oxblood);
+}
+
+.timeline-meta {
+  margin-top: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--text-quiet-light);
+}
+
+.timeline-detail {
+  margin-top: var(--sp-3);
+  color: var(--text-quiet-light);
+  line-height: var(--lh-body);
+  max-width: 56ch;
+}
+
+.skill-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  padding: 0;
+  margin-top: var(--sp-3);
+}
+
+.skill-chips li {
+  padding: 4px var(--sp-3);
+  border-radius: var(--r-pill);
+  background: color-mix(in oklab, var(--olive) 12%, var(--parchment));
+  color: var(--olive);
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+}
+
+/* ---------- certifications ---------- */
+.cert-grid {
+  margin-top: var(--sp-10);
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 700px) {
+  .cert-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.cert-card {
+  padding: var(--sp-6);
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.cert-icon {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: var(--oxblood);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cert-card h3 {
+  margin-top: var(--sp-3);
+  font-size: 1.05rem;
+}
+
+.cert-issuer {
+  margin-top: var(--sp-1);
+  color: var(--text-quiet-light);
+}
+
+.cert-issued {
+  margin-top: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--olive);
+}
+
+.cert-card-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--text-quiet-light);
+  font-style: italic;
+  background: color-mix(in oklab, var(--honey) 10%, var(--parchment));
+  border-style: dashed;
+}
+
+/* ---------- skills ---------- */
+.skill-group {
+  margin-top: var(--sp-8);
+}
+
+.skill-group h3 {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-quiet-light);
+}
+
+.skill-chips-large li {
+  font-size: 0.86rem;
+  padding: 6px var(--sp-4);
+}
+
+/* ---------- close ---------- */
+.carol-close {
+  text-align: center;
+  background: color-mix(in oklab, var(--honey) 8%, var(--ivory));
+}
+
+.carol-close-inner h2 {
+  max-width: 24ch;
+  margin-inline: auto;
+}
+
+.carol-close-inner app-cta-pill {
+  display: inline-block;
+  margin-top: var(--sp-8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline::before {
+    opacity: 0.4;
+  }
+}

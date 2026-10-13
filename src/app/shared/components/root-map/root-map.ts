@@ -4,7 +4,6 @@ import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
 import { ConditionNoteCard } from '../conditions-board/condition-note';
 import { ConditionsBoard } from '../conditions-board/conditions-board';
 import { NOTES } from '../conditions-board/conditions-data';
-import { CtaPill } from '../cta-pill/cta-pill';
 import { EyebrowLabel } from '../eyebrow-label/eyebrow-label';
 
 interface MapNode {
@@ -99,7 +98,7 @@ const NOTES_STEP = 0.14;
  */
 @Component({
   selector: 'app-root-map',
-  imports: [NgTemplateOutlet, ScrollRevealDirective, ConditionNoteCard, ConditionsBoard, CtaPill, EyebrowLabel],
+  imports: [NgTemplateOutlet, ScrollRevealDirective, ConditionNoteCard, ConditionsBoard, EyebrowLabel],
   template: `
     <!-- The map itself, declared once and placed by whichever layout is
          showing — pinned in the centre stage on large screens, in plain
@@ -255,23 +254,6 @@ const NOTES_STEP = 0.14;
       <ng-container [ngTemplateOutlet]="mapTpl" />
       <app-conditions-board class="root-map-board" />
     }
-
-    <!-- The fact block: everything above resolves to this one root, so the
-         closing beat just states it, then offers the way in. -->
-    <section class="rm-fact" aria-labelledby="rm-fact-heading">
-      <div class="reveal" [appScrollReveal]="0" [revealRepeat]="true"><app-eyebrow-label text="The common thread" /></div>
-      <h3 id="rm-fact-heading" class="rm-fact-heading reveal" [appScrollReveal]="120" [revealRepeat]="true">Every path leads to the same root.</h3>
-      <p class="rm-fact-root reveal" [appScrollReveal]="360" [revealRepeat]="true"><span class="mark">Minerals</span> &amp; <span class="mark">Vitamin deficiencies</span></p>
-      <p class="rm-fact-copy reveal" [appScrollReveal]="560" [revealRepeat]="true">
-        When the body runs short of what it needs, it can show up differently in everyone. The 7-day plan finds out which ones are yours.
-      </p>
-      <div class="rm-fact-cta reveal" [appScrollReveal]="720" [revealRepeat]="true">
-        <app-cta-pill label="Start the 7-day plan" variant="primary" (pressed)="bookRequested.emit()" />
-      </div>
-      <p class="root-map-fine reveal" [appScrollReveal]="860" [revealRepeat]="true">
-        This map shows common patterns, not a diagnosis. Please speak to our qualified practitioner for your diagnosis.
-      </p>
-    </section>
   `,
   styles: `
     :host {
@@ -816,68 +798,6 @@ const NOTES_STEP = 0.14;
 
     .rm-more-note:nth-child(3n + 2) {
       margin-top: var(--sp-6);
-    }
-
-    /* ---------- the fact block ---------- */
-
-    .rm-fact {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: var(--sp-5);
-      padding-block: var(--sp-16) var(--sp-24);
-    }
-
-    .rm-fact-heading {
-      margin: 0;
-      font-family: var(--font-display);
-      font-weight: 400;
-      font-size: clamp(1.8rem, 1.3rem + 2.4vw, 3rem);
-      line-height: 1.1;
-      color: var(--ink);
-      max-width: 20ch;
-    }
-
-    /* The single fact the whole section builds to — set as display type
-       with the hero's own treatment: same face, weight, size and ink colour,
-       the same blue highlighter underline on the key words, and none under
-       the ampersand. */
-    .rm-fact-root {
-      margin: 0;
-      font-family: var(--font-display);
-      font-weight: 300;
-      /* Same size as the hero's highlighted sub-line (headline size less 3px). */
-      font-size: calc(clamp(2.3rem, 1.6rem + 3vw, 3.5rem) - 3px);
-      line-height: 1.1;
-      letter-spacing: var(--ls-display);
-      color: var(--ink);
-      max-width: 22ch;
-    }
-
-    .rm-fact-root .mark {
-      background: linear-gradient(transparent 62%, color-mix(in oklab, var(--evidence-blue) 55%, transparent) 62%);
-      padding: 0 2px;
-      -webkit-box-decoration-break: clone;
-      box-decoration-break: clone;
-    }
-
-    .rm-fact-copy {
-      margin: 0;
-      max-width: 46ch;
-      line-height: var(--lh-body);
-      color: var(--text-quiet-light);
-    }
-
-    .rm-fact-cta {
-      margin-top: var(--sp-3);
-    }
-
-    .root-map-fine {
-      margin: var(--sp-6) 0 0;
-      font-size: 0.82rem;
-      color: var(--text-quiet-light);
-      max-width: 46ch;
     }
 
     @media (prefers-reduced-motion: reduce) {

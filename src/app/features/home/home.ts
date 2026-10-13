@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { Router } from '@angular/router';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
 import { MAIN_PLAN, openBookingForm } from '../../core/config/booking';
@@ -15,8 +16,10 @@ import { type TeamMember } from '../../shared/components/team-card/team-card';
 import { ExpertCarousel } from '../../shared/components/expert-carousel/expert-carousel';
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
+import { Testimonials } from '../../shared/components/testimonials/testimonials';
 import { SectionTransition } from '../../shared/components/section-transition/section-transition';
 import { SiteFooter } from '../../shared/components/site-footer/site-footer';
+import { EventsInvite } from '../../shared/components/events-invite/events-invite';
 
 interface RootCause {
   readonly name: string;
@@ -59,8 +62,10 @@ interface TreatStep {
     ExpertCarousel,
     RootMap,
     Results,
+    Testimonials,
     SectionTransition,
     SiteFooter,
+    EventsInvite,
   ],
   templateUrl: './home.html',
   styleUrl: './home.scss',
@@ -68,6 +73,7 @@ interface TreatStep {
 export class Home implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly bookingCta = inject(BookingCtaService);
+  private readonly router = inject(Router);
 
   /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
   protected readonly showRemainingSections = false;
@@ -96,6 +102,26 @@ export class Home implements AfterViewInit {
   /** Phase 1: every booking CTA opens the Google Form. */
   protected bookConsultation(): void {
     openBookingForm();
+  }
+
+  private static readonly BILLBOARD_CURSOR_TILT_MAX_DEG = 6;
+
+  /**
+   * Direct DOM write, not a signal — this just feeds a CSS custom property
+   * the idle-wiggle keyframes already read (see `--cursor-tilt` in
+   * home.scss), so there's nothing for Angular to re-render on every
+   * mousemove.
+   */
+  protected onBillboardPointerMove(event: PointerEvent): void {
+    const el = event.currentTarget as HTMLElement;
+    const rect = el.getBoundingClientRect();
+    const fraction = Home.clamp01((event.clientX - rect.left) / rect.width);
+    const tilt = (fraction - 0.5) * 2 * Home.BILLBOARD_CURSOR_TILT_MAX_DEG;
+    el.style.setProperty('--cursor-tilt', `${tilt.toFixed(2)}deg`);
+  }
+
+  protected onBillboardPointerLeave(event: PointerEvent): void {
+    (event.currentTarget as HTMLElement).style.setProperty('--cursor-tilt', '0deg');
   }
 
   protected jumpToRootMap(): void {
@@ -164,25 +190,24 @@ export class Home implements AfterViewInit {
    */
   protected readonly treatSteps: readonly TreatStep[] = [
     {
-      title: 'We start by listening',
-      body: "Before anything else, we want your side of the story — your symptoms, your days, what's already been tried. We'll go through all of it together in your first 30-minute call, nothing rushed, nothing assumed.",
-      bodyShort:
-        "Your symptoms, your days, what's already been tried — we go through it together in your first 30-minute call, nothing rushed.",
+      title: 'You speak, we listen',
+      body: 'A full conversation about your symptoms, your current diet, sleep, stress, past reports and lifestyle — and your goals. Nothing is rushed, nothing assumed.',
+      bodyShort: 'Your symptoms, diet, sleep, stress and past reports — we go through all of it together.',
     },
     {
-      title: 'Then we look for proof',
-      body: "Blood tests chosen for you get to why it's happening, not just what's showing up. We start you on a simple anti-inflammatory, elimination diet right away too, so healing begins before results even come back.",
-      bodyShort: "Blood tests chosen for you get to why it's happening, not just what's showing up.",
+      title: 'Getting to the Root Cause',
+      body: "Tests chosen for you to find what's driving your dis-ease, with a full root-cause analysis. We also start you on a simple anti-inflammatory, elimination diet right away, so healing begins before results even come back.",
+      bodyShort: "Tests chosen for you to find what's driving your dis-ease, not just what's showing up.",
     },
     {
-      title: 'Food first, then supplements',
-      body: 'We use food as medicine first. Supplements only join in where your results and history actually point to them — never by default.',
-      bodyShort: 'Food first, supplements only when results call for it.',
+      title: 'Digest with Ease',
+      body: "We use food as medicine, and nutrient supplements where your results show a need, to support your body through dis-ease. When your body gets the nutrition it's been missing, it can begin to recover. Food comes first — supplements only when your tests and history point to them.",
+      bodyShort: 'Food as medicine first. Supplements added only when your results and history call for them.',
     },
     {
-      title: 'What makes it last',
+      title: 'Life, mindset & check-ins',
       body: 'Sleep, stress and mindset shape recovery as much as food does. Regular check-ins keep the plan working as your life changes.',
-      bodyShort: 'Sleep and stress matter too.',
+      bodyShort: 'Sleep, stress and mindset matter too. Check-ins keep the change lasting.',
     },
   ];
 
@@ -197,25 +222,34 @@ export class Home implements AfterViewInit {
    * ground: a real, readable hold per step without turning the section
    * into a long haul.
    */
-  protected readonly treatVhPerStep = 178.125; // 95 × 1.25 × 1.5 — mobile hold per step
+  protected readonly treatVhPerStep = 120; // mobile scroll budget per step — shortened so the next step arrives sooner
 
   /**
    * Same trailing-hold trick as HOOK_DRAG_PHASE: the drag through all steps
    * only uses this fraction of the pin's scrollable range, so the last step
    * reaches full view and then actually holds still for a beat before the
    * pin releases, instead of arriving and being yanked away in the same
-   * instant.
+   * instant. Halved from the original 0.18 hold (0.82 phase) — once step 4
+   * is visible and read, there's nothing left to wait for, so continuing to
+   * scroll should reach the next section sooner.
    */
-  private static readonly TREAT_DRAG_PHASE = 0.82;
+  private static readonly TREAT_DRAG_PHASE = 0.91;
   /**
-   * Mobile steps are a stack of cards, not a crossfade: each next step slides
-   * up from the bottom over the current one, leaving a strip of it showing —
-   * so by the last step all four sit stacked like stairs. A step slides in
-   * over the last (1 - TREAT_STACK_HOLD) of its share of the scroll, after
-   * holding still for TREAT_STACK_HOLD of the one before it, so each step
-   * gets a moment to be read before the next one starts to arrive.
+   * Mobile steps crossfade in place, one "current" step at a time — a step
+   * fades/rises in over the last (1 - TREAT_STACK_HOLD) of its share of the
+   * scroll, after holding fully visible for TREAT_STACK_HOLD of the one
+   * before it, so each step gets a moment to be read before the next one
+   * starts to arrive. Kept low (was 0.4) so the next step starts arriving
+   * almost as soon as you resume scrolling past the current one, instead of
+   * needing a long dead scroll first. (Previously these slid up as opaque
+   * stacked sheets leaving a strip of each earlier step showing — that
+   * card-stack look read as a swipeable carousel, which it isn't, and the
+   * opaque sheets had to fill the whole pinned viewport height to stay
+   * covered, which left a lot of dead white space under any step shorter
+   * than the tallest one. See .treat-progress for the step-count indicator
+   * that replaced the strips themselves.)
    */
-  private static readonly TREAT_STACK_HOLD = 0.4;
+  private static readonly TREAT_STACK_HOLD = 0.15;
 
   private readonly treatPin = viewChild<ElementRef<HTMLElement>>('treatPin');
   private readonly treatPinProgress = signal(0);
@@ -223,7 +257,7 @@ export class Home implements AfterViewInit {
   protected readonly treatDragProgress = computed(() => Home.clamp01(this.treatPinProgress() / Home.TREAT_DRAG_PHASE));
   protected readonly treatDragUnits = computed(() => this.treatDragProgress() * (this.treatSteps.length - 1));
 
-  /** 0..1 — how far step i has slid up into place (step 1 is simply there). Eased out so it settles. */
+  /** 0..1 — how "arrived" step i is (step 1 starts there). Eased out so it settles. */
   private treatStackProgress(i: number): number {
     if (i === 0) {
       return 1;
@@ -232,20 +266,67 @@ export class Home implements AfterViewInit {
     return 1 - (1 - raw) ** 3;
   }
 
-  /** Resting place is i strips down (--treat-tab, set in CSS); before that the card waits one full card-height lower. */
-  protected treatStackTransform(i: number): string {
-    const waiting = (1 - this.treatStackProgress(i)) * 100;
-    return `translate3d(0, calc(${i} * var(--treat-tab) + ${waiting.toFixed(2)}%), 0)`;
+  /** Binary, not a crossfade — only the current step is shown at all, no opacity blend with its neighbour. The slide (treatCardTransform) carries the whole transition. */
+  protected treatCardOpacity(i: number): number {
+    return this.treatStackActive(i) ? 1 : 0;
   }
 
-  /** The step now in front — the only one that takes taps (the ones beneath only show their top strip). */
+  /** A small rise-in on arrival — the only transition now (see treatCardOpacity). */
+  protected treatCardTransform(i: number): string {
+    const rise = (1 - this.treatStackProgress(i)) * 16;
+    return `translateY(${rise.toFixed(2)}px)`;
+  }
+
+  /** The step now in front — the only one that takes taps and isn't aria-hidden. */
   protected treatStackActive(i: number): boolean {
     const last = this.treatSteps.length - 1;
     return this.treatStackProgress(i) > 0.5 && (i === last || this.treatStackProgress(i + 1) <= 0.5);
   }
 
+  /** Drives .treat-progress (the step-count dots) and the sr-only live region. */
+  protected readonly treatActiveStepIndex = computed(() => {
+    const index = this.treatSteps.findIndex((_, i) => this.treatStackActive(i));
+    return index === -1 ? 0 : index;
+  });
+
+  /** Tapping a progress dot scrolls the page to the point in the pin's scroll
+   *  range where that step is fully arrived — the mechanic is still driven
+   *  by scroll position (updateTreatScroll), this just moves the scrollbar
+   *  there for you, the same way a video scrubber tap jumps playback. */
+  protected scrollToTreatStep(i: number): void {
+    const pin = this.treatPin()?.nativeElement;
+    if (!pin) return;
+
+    const rect = pin.getBoundingClientRect();
+    const viewportHeight = Home.stickyViewportHeight(pin);
+    const scrollable = rect.height - viewportHeight;
+    if (scrollable <= 0) return;
+
+    const dragProgress = i / (this.treatSteps.length - 1);
+    const pinProgress = Home.clamp01(dragProgress * Home.TREAT_DRAG_PHASE);
+    const pinAbsoluteTop = rect.top + window.scrollY;
+    window.scrollTo({ top: pinAbsoluteTop + pinProgress * scrollable, behavior: 'smooth' });
+  }
+
   /** "Keep scrolling" cue: fully visible at the start, gone once the first step has begun to hand over. */
-  protected readonly treatHintOpacity = computed(() => Home.clamp01(1 - this.treatDragUnits() / 0.3));
+  private readonly treatHintAtStart = computed(() => Home.clamp01(1 - this.treatDragUnits() / 0.3));
+
+  /**
+   * Same "Scroll for more" cue as the Hook section's end-of-pin hint
+   * (hookHintAtEnd) — rises in as step 4 finishes arriving, then fades back
+   * out over the first 60% of the trailing hold, so continuing to scroll
+   * visibly dismisses it instead of it just vanishing in a cut when the
+   * section releases.
+   */
+  private readonly treatHintAtEnd = computed(() => {
+    const rise = Home.clamp01((this.treatDragUnits() - (this.treatSteps.length - 1 - 0.35)) / 0.35);
+    const holdProgress = Home.clamp01((this.treatPinProgress() - Home.TREAT_DRAG_PHASE) / (1 - Home.TREAT_DRAG_PHASE));
+    const fadeOut = Home.clamp01(holdProgress / 0.6);
+    return rise * (1 - fadeOut);
+  });
+
+  protected readonly treatHintOpacity = computed(() => Math.max(this.treatHintAtStart(), this.treatHintAtEnd()));
+  protected readonly treatHintLabel = computed(() => (this.treatHintAtEnd() > this.treatHintAtStart() ? 'Scroll for more' : 'Keep scrolling'));
 
   private updateTreatScroll(): void {
     const pin = this.treatPin()?.nativeElement;
@@ -377,7 +458,7 @@ export class Home implements AfterViewInit {
    * touching the shape of the crossfade curve itself (still smooth either
    * way — this only stretches it out).
    */
-  protected readonly hookVhPerCard = 115;
+  protected readonly hookVhPerCard = 125;
 
   /**
    * On desktop, the drag through all cards uses only this fraction of the
@@ -438,7 +519,9 @@ export class Home implements AfterViewInit {
    * stretch of scroll producing barely-visible progress, which read as a
    * plain blank section for a beat before anything seemed to happen.
    */
-  protected readonly headingRevealProgress = computed(() => Home.easeOutQuad(this.hookEntryProgress()));
+  protected readonly headingRevealProgress = computed(() =>
+    this.closeFillProgress() < 1 ? 0 : Home.easeOutQuad(this.hookEntryProgress()),
+  );
   /**
    * The card track's own fade-in used to key off hookProgress, which only
    * starts moving once the pin is fully stuck — but the pin's sticky child
@@ -450,7 +533,7 @@ export class Home implements AfterViewInit {
    * fully opaque by the moment the pin locks — the first card is "already
    * loaded" the instant its viewport is reached, exactly like the heading.
    */
-  protected readonly cardsOpacity = computed(() => this.headingRevealProgress());
+  protected readonly cardsOpacity = computed(() => (this.headingRevealProgress() < 0.95 ? 0 : 1));
   protected readonly hookDragProgress = computed(() => {
     if (!this.hookHorizontal()) {
       return Math.min(1, this.cardsPhaseProgress() / Home.HOOK_DRAG_PHASE);
@@ -475,30 +558,21 @@ export class Home implements AfterViewInit {
    * cross-dissolve through each other rather than handing off with a cut.
    */
   /**
-   * A bigger plateau (and correspondingly narrower fade) than a literal
-   * 50/50 split — each card spends most of its turn fully legible, with only
-   * a brief, smooth window where it's actually crossfading into its
-   * neighbor. This is purely a reshaping of the opacity curve, not the
-   * motion: position/scale keep moving continuously throughout regardless,
-   * so narrowing the fade doesn't bring back the old sprint-then-freeze
-   * abruptness — it just means less time where nothing on screen is clearly
-   * readable.
+   * Adjacent cards sit 1 unit apart, so plateau + fade must not exceed 0.5 —
+   * otherwise both neighbors are still within each other's plateau/fade
+   * range at the midpoint and briefly sit at (or near) full opacity at the
+   * same time, reading as two cards' text stacked on top of each other
+   * instead of one handing off to the next. Keeping the sum at exactly 0.5
+   * means a card reaches zero right as its neighbor starts rising from zero
+   * — a clean, quick swap with no double-exposure — while still giving each
+   * card the bulk of its turn (the plateau) fully legible and still.
    */
-  private static readonly HOOK_CARD_PLATEAU = 0.4;
-  private static readonly HOOK_CARD_FADE = 0.6;
-  /** Subtle drift, not a full-screen throw — this is parallax, not a slide carousel. */
-  private static readonly HOOK_CARD_PARALLAX_PX = 90;
+  private static readonly HOOK_CARD_PLATEAU = 0.35;
+  private static readonly HOOK_CARD_FADE = 0.15;
   /** Blur is only ever applied to the image (see cardImageFilter) — blurring
    *  the copy made two overlapping paragraphs of blurred text during a
    *  crossfade, which read as noise, not depth. */
   private static readonly HOOK_CARD_MAX_BLUR_PX = 5;
-  /** Image and copy drift at slightly different rates for a layered, dimensional feel within each card. */
-  private static readonly HOOK_IMAGE_PARALLAX_FACTOR = 0.5;
-  private static readonly HOOK_COPY_PARALLAX_FACTOR = 1.15;
-
-  private cardDelta(i: number): number {
-    return Home.clampSigned(this.hookDragUnits() - i, -1, 1);
-  }
 
   protected cardVisibility(i: number): number {
     const distance = Math.abs(this.hookDragUnits() - i);
@@ -511,14 +585,14 @@ export class Home implements AfterViewInit {
     return 1 - (distance - Home.HOOK_CARD_PLATEAU) / Home.HOOK_CARD_FADE;
   }
 
-  protected cardDeckTransform(i: number): string {
-    const translate = this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX;
-    const scale = 0.96 + 0.04 * this.cardVisibility(i);
-    return `translateX(${translate}px) scale(${scale})`;
+  protected cardDeckTransform(_i: number): string {
+    return 'none';
   }
 
+  /** Incoming/outgoing card's image settles in with a gentle scale (0.96 → 1) rather than a flat dissolve — physical weight instead of a slideshow cut. */
   protected cardImageTransform(i: number): string {
-    return `translateX(${this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX * Home.HOOK_IMAGE_PARALLAX_FACTOR}px)`;
+    const scale = 0.96 + 0.04 * this.cardVisibility(i);
+    return `scale3d(${scale}, ${scale}, 1)`;
   }
 
   protected cardImageFilter(i: number): string {
@@ -526,13 +600,71 @@ export class Home implements AfterViewInit {
     return blur > 0.05 ? `blur(${blur}px)` : 'none';
   }
 
+  /** The copy rises a short distance into place as its card becomes active, instead of appearing flat in its final spot. */
   protected cardCopyTransform(i: number): string {
-    return `translateX(${this.cardDelta(i) * Home.HOOK_CARD_PARALLAX_PX * Home.HOOK_COPY_PARALLAX_FACTOR}px)`;
+    const rise = (1 - this.cardVisibility(i)) * 10;
+    return `translate3d(0, ${rise}px, 0)`;
   }
 
   protected cardPointerEvents(i: number): 'auto' | 'none' {
     return this.cardVisibility(i) > 0.5 ? 'auto' : 'none';
   }
+
+  /**
+   * Clicking a rail number scrolls the page to the exact scroll position
+   * where that card sits at the centre of its plateau (cardVisibility = 1) —
+   * worked out by inverting the same chain updateHookScroll uses to go the
+   * other way (scroll position -> hookDragUnits). The pin itself never
+   * moves; what moves is the page scroll position underneath it.
+   */
+  protected jumpToHookCard(i: number): void {
+    const pin = this.hookPin()?.nativeElement;
+    if (!pin) {
+      return;
+    }
+    const rect = pin.getBoundingClientRect();
+    const viewportHeight = Home.stickyViewportHeight(pin);
+    const scrollable = rect.height - viewportHeight;
+    if (scrollable <= 0) {
+      return;
+    }
+    const pinDocTop = window.scrollY + rect.top;
+    const targetDragProgress = i / (this.hookPoints.length - 1);
+    const targetHookProgress = targetDragProgress * Home.HOOK_DRAG_PHASE;
+    const targetY = pinDocTop + targetHookProgress * scrollable;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+  }
+
+  /**
+   * "Scroll to explore" cue for the desktop deck — visible once the heading
+   * and first card have faded in, then fades away itself as soon as the
+   * reader starts actually progressing through the cards. Mirrors the
+   * mobile carousel's own swipe hint, just for the scroll-driven track.
+   * It reappears (reworded) once the last card has arrived, since the pin's
+   * own trailing hold (HOOK_DRAG_PHASE) means there's still real scroll
+   * distance left before the next section begins — without this, that hold
+   * reads as "the page is stuck" rather than "keep scrolling".
+   */
+  private readonly hookHintAtStart = computed(() => 1 - Home.clamp01(this.hookDragUnits() / 0.35));
+  /**
+   * Rises to full as the last card settles into place (right as the pin's
+   * trailing hold begins), then fades back out over the first ~60% of that
+   * hold itself — so continuing to scroll through the hold visibly
+   * dismisses the hint, instead of it sitting at full opacity, static, for
+   * the entire hold and only disappearing in a cut when the section ends.
+   */
+  private readonly hookHintAtEnd = computed(() => {
+    const rise = Home.clamp01((this.hookDragUnits() - (this.hookPoints.length - 1 - 0.35)) / 0.35);
+    const holdProgress = Home.clamp01((this.cardsPhaseProgress() - Home.HOOK_DRAG_PHASE) / (1 - Home.HOOK_DRAG_PHASE));
+    const fadeOut = Home.clamp01(holdProgress / 0.6);
+    return rise * (1 - fadeOut);
+  });
+  protected readonly hookScrollHintOpacity = computed(
+    () => this.cardsOpacity() * Math.max(this.hookHintAtStart(), this.hookHintAtEnd()),
+  );
+  protected readonly hookScrollHintLabel = computed(() =>
+    this.hookHintAtEnd() > this.hookHintAtStart() ? 'Scroll for more' : 'Scroll to explore',
+  );
 
   /**
    * ---------------- Mobile · swipeable card carousel ----------------
@@ -949,10 +1081,6 @@ export class Home implements AfterViewInit {
     return sticky?.offsetHeight || document.documentElement.clientHeight;
   }
 
-  private static clampSigned(value: number, min: number, max: number): number {
-    return Math.max(min, Math.min(max, value));
-  }
-
   private static easeOutQuad(t: number): number {
     return 1 - (1 - t) * (1 - t);
   }
@@ -971,7 +1099,7 @@ export class Home implements AfterViewInit {
    */
   private static readonly WORD_FILL_SPAN = 1.6;
 
-  protected readonly hookCloseWords = 'Underneath, fewer things are actually going on than it feels like.'.split(' ');
+  protected readonly hookCloseWords = 'You are what you think, what you eat, and how well you digest it.'.split(' ');
 
   private readonly closeQuote = viewChild<ElementRef<HTMLElement>>('closeQuote');
   private readonly closeFillProgress = signal(0);
@@ -1009,6 +1137,10 @@ export class Home implements AfterViewInit {
   protected readonly mobileHeadingRevealProgress = signal(0);
 
   private updateMobileHeadingReveal(): void {
+    if (this.closeFillProgress() < 1) {
+      this.mobileHeadingRevealProgress.set(0);
+      return;
+    }
     const el = this.mobileHookHeading()?.nativeElement;
     if (!el) {
       this.mobileHeadingRevealProgress.set(0);
@@ -1104,33 +1236,32 @@ export class Home implements AfterViewInit {
 
   protected readonly hookPoints: readonly HookPoint[] = [
     {
-      title: 'What is functional medicine?',
-      body: 'The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission.',
-      more: "The functional nutrition approach is based on using food as medicine and nutrient supplements as a line of treatment for dysfunctions and diseases. Adding required nutrition helps the body to recover, reverse, and put certain diseases into remission. If a plant or tree isn't flourishing, we nourish the roots, not the leaves. In the same way, to heal the disease, we at FM look for what is causing the Dis-ease.",
+      title: 'Why root-cause healing?',
+      body: 'Every dis-ease has a cause. Have you ever asked — why do I have this dis-ease?',
       icon: 'root',
       image: 'images/hook/root-cause.webp',
       imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',
     },
     {
-      title: 'What you will not get from an AI chat',
-      body: "AI gives generic answers. It can't read your history, labs and symptoms like a clinician actually looking at you can.",
-      icon: 'ai',
-      image: 'images/hook/ai-chat.webp',
-      imageAlt: 'A clinician studying a patient chart closely, with a generic chat-bubble icon faded in the background.',
-    },
-    {
-      title: 'Why root-cause healing?',
-      body: 'Conventional care asks "what stops this now?" Root-cause care asks "why did this start?" That\'s why it doesn\'t come back.',
+      title: 'Why functional medicine is the answer?',
+      body: 'Functional medicine is a science-based approach of healing from the root cause of the dis-ease.',
       icon: 'balance',
       image: 'images/hook/root-cause-balance.webp',
       imageAlt: 'A balanced scale weighing a pill against a sprouting plant.',
     },
     {
-      title: 'Why not just another consultation?',
-      body: "A 10–15 minute appointment treats the symptom, with no time to ask why it showed up. That's the gap root-cause care closes.",
+      title: 'Your personal health guide',
+      body: 'The Ease guide is available around the clock — ask it anything about your symptoms, your food, or your results. It connects the dots between what you are experiencing and what your body may be telling you.',
+      icon: 'ai',
+      image: 'images/hook/ai-chat.webp',
+      imageAlt: 'A chat interface showing a guided health conversation.',
+    },
+    {
+      title: 'A doctor can only guide you',
+      body: 'Only you can heal yourself. When you gain the right knowledge and take the right actions you can once again start living in optimum health.',
       icon: 'doctor',
       image: 'images/hook/short-consultation.webp',
-      imageAlt: 'An hourglass running low next to an empty chair at a desk, suggesting a rushed, too-short appointment.',
+      imageAlt: 'A practitioner in a consultation, sharing knowledge with a patient.',
     },
   ];
 
@@ -1159,50 +1290,53 @@ export class Home implements AfterViewInit {
 
   protected readonly levels: readonly Level[] = [
     {
-      tag: 'Level 1',
-      name: '7-day plan',
+      tag: 'Start here',
+      name: 'One-time consult. 3-week plan.',
       price: MAIN_PLAN.price,
       originalPrice: MAIN_PLAN.originalPrice,
-      priceNote: '7 days',
+      priceNote: '30 minutes',
       ctaLabel: MAIN_PLAN.label,
       recommended: true,
-      features: [
-        'We listen to your concerns, history and health goals',
-        'We explain what may be behind your dis-ease, in plain words',
-        'We suggest the tests and supplements that make sense for you',
-        'You leave with a simple anti-inflammatory food plan and starting supplement guidance',
-      ],
+      description: 'Understand your underlying root cause.',
     },
     {
-      // Static for now — stays locked until Level 1 completion can be tracked (needs a backend).
-      tag: 'Level 2',
+      // Stays locked until first consultation is tracked (needs a backend).
+      tag: '3 months',
       name: 'Digest with Ease',
-      ctaLabel: 'Unlock Level 1 first',
+      ctaLabel: 'Unlock with consultation first',
       description: 'Guided support if your main concern starts in digestion: bloating, acidity, irregular bowels, food sensitivities.',
       locked: true,
-      lockedNote: 'Complete Level 1 to unlock Level 2.',
+      lockedNote: 'Complete your first consultation to unlock.',
     },
   ];
 
   protected readonly team: readonly TeamMember[] = [
     {
+      slug: 'carol',
       name: 'Carol',
       role: 'Functional Nutritionist',
       credential: 'iCFN certified · Hospital operations background',
       initials: 'C',
-      bio: "Helps people find the root cause of chronic conditions — with a focus on women's health, pregnancy and sports nutrition.",
-      ctaLabel: 'Connect with Carol',
+      bio: 'Helps people find the root cause of chronic conditions with a focus on type 2 diabetes, autoimmunity, thyroid health and menopause.',
+      ctaLabel: 'Know more about Carol',
+      ctaStyle: 'link',
       photo: 'images/team/carol.jpg',
     },
     {
+      slug: 'deepa',
       name: 'Deepa Rajani',
-      role: 'Gut Health Coach',
-      credential: 'IFM (USA) certified · Author',
+      role: 'Founder, Awaken Your Soul',
+      credential: 'IFM (USA) certified · Gut health & mindset coach',
       initials: 'D',
-      bio: 'Wellness mindset and gut health coach, event curator, and author of The Magic In You and Healing Begins in the Gut.',
-      ctaLabel: 'Connect with Deepa',
+      bio: 'Helps people with gut issues and misaligned inner states — not just healing symptoms, but reprogramming how they think, feel, digest and heal, through her 90-day transformation journey, Becoming Creators of a F.A.B. L.I.F.E.',
+      ctaLabel: 'Know more about Deepa',
+      ctaStyle: 'link',
       photo: 'images/team/deepa.jpg',
+      photoPosition: '5% center',
     },
   ];
 
+  protected onExpertConnect(member: TeamMember): void {
+    this.router.navigate(['/founders', member.slug ?? 'carol']);
+  }
 }

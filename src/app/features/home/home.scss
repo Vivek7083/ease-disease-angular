@@ -256,7 +256,7 @@
 
 .hook-heading {
   margin-top: var(--sp-3);
-  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  font-size: clamp(1.76rem, 1.43rem + 1.32vw, 2.42rem);
   font-weight: 400;
   line-height: 1.15;
   /* Plain --ink read as just another line of body copy once it's sitting
@@ -298,14 +298,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-6);
-  padding-bottom: var(--sp-5);
-  /* This is desktop-only content (mobile never renders .hook-viewport), so
-     the fixed chrome wordmark/CTA (~56-60px tall incl. its own top offset)
-     is always above it — centering the heading+deck block with only
-     --sp-10 (40px) of top padding let the heading's top edge land right
-     under/behind the logo on shorter laptop screens. */
-  padding-top: var(--sp-16);
+  gap: 20px;
+  padding-block: 77px;
 }
 
 /* Dissolves on desktop (default) so .hook-heading-row and .hook-deck stay
@@ -447,7 +441,7 @@
 /* Mobile type — larger than the shared base sizes, which are tuned for the
    desktop deck. */
 .hook-mobile .hook-heading {
-  font-size: clamp(2rem, 1.55rem + 2.2vw, 2.7rem);
+  font-size: clamp(2.2rem, 1.705rem + 2.42vw, 2.97rem);
   line-height: 1.12;
 }
 
@@ -567,7 +561,7 @@
   width: 100%;
   flex: 1;
   min-height: 0;
-  transition: opacity 60ms linear;
+  transition: opacity 360ms var(--ease-out-soft);
 }
 
 .hook-deck-card {
@@ -585,6 +579,7 @@
 
 .hook-pin.is-horizontal .hook-deck-card {
   padding-inline: var(--gutter-desktop);
+  align-items: center;
 }
 
 /* Blur lives on the image only — blurring the copy meant two overlapping
@@ -628,6 +623,129 @@
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
   color: var(--terracotta);
+}
+
+/* The desktop deck has its own step rail (below, next to the heading) that
+   already carries the 01/02/03/04 — showing it again per-card would just be
+   noise. Mobile has no rail, so it keeps this inline index. */
+.hook-pin.is-horizontal .hook-index {
+  display: none;
+}
+
+/* ---------- the hook · step rail (desktop) ----------
+   A persistent "01 — 02 — 03 — 04" progress stepper between the heading and
+   the deck, each number filling in (scale + weight + color) as its card
+   becomes active via the same cardVisibility() driving the card crossfade —
+   this is what actually reads as scrollytelling rather than a slideshow:
+   always a sense of where you are and how much is left. */
+.hook-rail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  flex: 0 0 auto;
+}
+
+.hook-rail-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.hook-rail-num {
+  /* Reset button chrome — this is a small text control, not a UI button. */
+  appearance: none;
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 2px 2px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: var(--ls-eyebrow);
+  color: color-mix(in oklab, var(--oxblood) calc(var(--fill, 0) * 100%), var(--text-quiet-light));
+  opacity: calc(0.45 + var(--fill, 0) * 0.55);
+  transform: scale(calc(1 + var(--fill, 0) * 0.25));
+  transition:
+    color 60ms linear,
+    opacity 60ms linear,
+    transform 60ms linear;
+}
+
+.hook-rail-num:hover {
+  color: var(--oxblood);
+  opacity: 1;
+}
+
+.hook-rail-num:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 3px;
+  border-radius: var(--r-sm, 4px);
+}
+
+.hook-rail-line {
+  width: 28px;
+  height: 1px;
+  background: color-mix(in oklab, var(--ink) 16%, transparent);
+}
+
+.hook-rail-step:last-child .hook-rail-line {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-rail-num {
+    transition: none;
+  }
+}
+
+/* "Scroll to explore" cue — pinned to the bottom of the viewport so it
+   doesn't participate in the heading/rail/deck's own vertical centering; it
+   fades out (hookScrollHintOpacity, home.ts) the moment the reader starts
+   actually progressing through the cards. */
+.hook-scroll-hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 28px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+  color: var(--text-quiet-light);
+  pointer-events: none;
+  transition: opacity 300ms var(--ease-out-soft);
+}
+
+.hook-scroll-hint-arrow {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--oxblood);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: hook-scroll-hint-nudge 1.6s var(--ease-out-soft) infinite;
+}
+
+@keyframes hook-scroll-hint-nudge {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hook-scroll-hint-arrow {
+    animation: none;
+  }
 }
 
 .hook-image {
@@ -697,12 +815,12 @@
     text-align: left;
     gap: clamp(var(--sp-8), 5vw, var(--sp-12));
     width: 100%;
-    max-width: 1040px;
+    max-width: calc(var(--container-max) - 2 * var(--gutter-desktop));
   }
 
-  .hook-pin.is-horizontal .hook-deck-card:nth-child(even) .hook-card {
-    flex-direction: row-reverse;
-  }
+  /* Every card keeps image-left/copy-right, deliberately not alternating —
+     the composition stays fixed as you scroll so the section reads as one
+     continuous scene advancing, not a slideshow flipping sides each slide. */
 
   .hook-pin.is-horizontal .hook-image {
     flex: 0 1 420px;
@@ -714,50 +832,59 @@
   .hook-pin.is-horizontal .hook-copy {
     flex: 1;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
   }
 
   .hook-pin.is-horizontal .hook-copy h3 {
-    font-size: clamp(1.6rem, 1.1rem + 1.6vw, 2.4rem);
-    max-width: 16ch;
+    margin-top: 0;
+    font-size: clamp(1.2rem, 0.825rem + 1.2vw, 1.8rem);
   }
 
   .hook-pin.is-horizontal .hook-copy p {
     margin-top: var(--sp-5);
-    font-size: clamp(1rem, 0.9rem + 0.4vw, 1.15rem);
+    font-size: clamp(0.88rem, 0.8rem + 0.3vw, 1rem);
     max-width: 42ch;
   }
 }
 
-.hook-close {
-  margin-top: 16px;
-  margin-bottom: clamp(var(--sp-10), 6vw, var(--sp-16));
-  text-align: center;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.3rem);
-  line-height: 1.35;
+/* Inter-section quote: sits in the 20px gap between hero and hook. */
+.inter-quote {
+  padding-block: 20px;
+  display: flex;
+  justify-content: center;
+  padding-inline: var(--gutter-mobile);
 }
 
-@media (max-width: 899px) {
-  .hook-close {
-    /* Reads as a short transitional beat between the hook and root-map
-       sections — a "post-credit" line, not a section of its own — so the
-       gap stays small rather than reading as its own empty stretch. */
-    margin-top: 11vh;
+@media (min-width: 900px) {
+  .inter-quote {
+    padding-inline: var(--gutter-desktop);
+    padding-bottom: 28px;
   }
 }
 
-/* Words fill in with ink as the line scrolls through the middle of the
-   viewport — muted brightening to full oxblood — rather than a plain
-   fade-in. --fill is a continuous 0..1 value recomputed every scroll
-   frame (see closeWordFill in home.ts), so the color genuinely sweeps
-   across the sentence instead of each word snapping between two states;
-   the short transition below just smooths between animation frames. */
+.hook-close {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: 'opsz' 16;
+  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.3rem);
+  line-height: 1.5;
+  max-width: 28ch;
+}
+
+/* Each word fills in with a honey (yellow) highlight — identical to the
+   browser's ::selection colour — as it scrolls into view. --fill is a
+   continuous 0..1 value recomputed every scroll frame so the sweep is
+   genuinely tied to the scroll gesture, not a fixed-duration timer. */
 .hook-close-word {
   --fill: 0;
-  color: color-mix(in oklab, var(--oxblood) calc(var(--fill) * 100%), color-mix(in oklab, var(--oxblood) 22%, var(--parchment)));
-  transition: color var(--dur-micro) linear;
+  background: color-mix(in oklab, var(--honey) calc(var(--fill) * 100%), transparent);
+  padding-block: 0.06em;
+  transition: background var(--dur-micro) linear;
 }
 
 /* ---------- how we treat · step 1 ---------- */
@@ -773,7 +900,7 @@
 
 .treat-heading {
   margin-top: var(--sp-3);
-  font-size: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  font-size: clamp(1.76rem, 1.43rem + 1.32vw, 2.42rem);
   font-weight: 400;
   line-height: 1.15;
   color: var(--ink);
@@ -804,48 +931,111 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Clears the fixed chrome wordmark, same clearance as .hook-viewport. */
-  padding-top: var(--sp-16);
-  /* The strip of each older step left showing as the stack builds. */
-  --treat-tab: 44px;
+  /* Clears the fixed chrome wordmark/CTA pill — on a device with a notch or
+     dynamic island, env(safe-area-inset-top) pushes that chrome down past
+     its baseline var(--sp-5) top offset (see .chrome-wordmark), so a flat
+     var(--sp-16) here isn't always enough clearance and the deck's card can
+     render up underneath it. .hook-mobile's padding-top already accounts
+     for this; this didn't, and is the fix for that overlap. */
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--sp-16));
 }
 
-@media (max-height: 700px) {
-  .treat-viewport {
-    --treat-tab: 36px;
-  }
+.treat-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  flex: 0 0 auto;
+  margin-bottom: var(--sp-5);
 }
 
+.treat-progress-dot {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--rule-on-light);
+  background: var(--surface-card-light);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-quiet-light);
+  cursor: pointer;
+  transition:
+    background var(--dur-base) var(--ease),
+    color var(--dur-base) var(--ease);
+}
+.treat-progress-dot:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 2px;
+}
+.treat-progress-dot.is-active {
+  background: var(--oxblood);
+  box-shadow: var(--shadow-soft);
+  color: #fff6ef;
+  font-weight: 600;
+}
+.treat-progress-dot.is-done {
+  background: color-mix(in oklab, var(--oxblood) 20%, var(--surface-card-light));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--oxblood) 40%, var(--rule-on-light));
+  color: var(--oxblood);
+}
+
+.treat-progress-line {
+  width: 18px;
+  height: 1px;
+  flex: 0 0 auto;
+  background: var(--rule-on-light);
+  transition: background var(--dur-base) var(--ease);
+}
+.treat-progress-line.is-filled {
+  background: var(--oxblood);
+}
+
+/* A grid, not a flex row/column — every card shares the same cell
+   (grid-area: 1 / 1 below), which is what lets this container's own height
+   track the TALLEST step's actual content instead of being told to fill
+   whatever's left of the pinned viewport (the old flex: 1 + each card
+   position: absolute; inset: 0 approach, which forced every card's opaque
+   background to stretch to that full height even when its own content —
+   a short step with a small illustration — was much shorter, reading as a
+   big empty white card). */
 .treat-deck {
-  position: relative;
+  display: grid;
   width: 100%;
-  flex: 1;
-  min-height: 0;
+  flex: 0 1 auto;
 }
 
-/* A card in the stack: an opaque sheet, so a step sliding up really covers the
-   one beneath it and only its top strip (badge + title) is left showing. It is
-   placed purely by transform (treatStackTransform) — no CSS transition: the
-   value is already recomputed every scroll frame, and a transition retargeted
-   on each of them trails the scroll and stutters on a slow one. */
+/* All four cards stack in the same grid cell and cross-fade between each
+   other (treatCardOpacity/treatCardTransform) instead of sliding up as
+   opaque sheets that cover one another — that stack-of-sheets look read as
+   a swipeable card deck (like the expert carousel above it), which it
+   wasn't: this section only ever advances by scrolling. .treat-progress is
+   the step-count cue now instead of the stack's peeking strips. */
 .treat-deck-card {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: var(--sp-3) var(--sp-4) var(--sp-5);
+  padding: var(--sp-5) var(--sp-4);
   background: var(--surface-card-light);
   border: 1px solid var(--rule-on-light);
-  border-bottom: 0;
-  border-radius: var(--r-lg) var(--r-lg) 0 0;
-  box-shadow: 0 -12px 28px -18px color-mix(in oklab, var(--oxblood) 45%, transparent);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+  /* Opacity is binary now (treatCardOpacity), not a crossfade — no
+     transition on it, so the outgoing step disappears immediately instead
+     of lingering through a fade. The slide (transform) is the transition. */
+  transition: transform 260ms var(--ease-out-soft);
   will-change: transform;
 }
 
-/* A step that has been covered — its strip stays readable but quieter. */
-.treat-deck-card:not(.is-active) .treat-step-title {
-  color: color-mix(in oklab, var(--ink) 70%, var(--parchment));
+@media (prefers-reduced-motion: reduce) {
+  .treat-deck-card {
+    transition: none;
+  }
 }
 
 .treat-scroll-hint {
@@ -1338,9 +1528,9 @@
      only became necessary because the node row itself was carrying more
      text and bigger images than it needed to (see bodyShort and
      .treat-node-image's smaller size). */
-  gap: clamp(var(--sp-10), 4vw, var(--sp-12));
+  gap: clamp(25.6px, 2.56vw, 30.72px);
   /* Same clearance as .hook-viewport under the fixed chrome wordmark. */
-  padding-top: var(--sp-16);
+  padding-top: calc(env(safe-area-inset-top, 0px) + var(--sp-16));
 }
 
 /* The heading reuses .treat-heading-row/.treat-heading/.treat-subtext at
@@ -1546,6 +1736,299 @@ app-expert-carousel {
   color: var(--text-quiet-light);
 }
 
+/* ---------- programme · founders billboard ----------
+   The billboard stands upright and gently wiggles left-right on its own
+   (an idle ambient animation), and also tilts live toward wherever the
+   cursor/touch is over it — both read off the same `--cursor-tilt` custom
+   property (set from pointer position in home.ts, defaulting to 0 and
+   recentering on pointer-leave), so the idle wiggle and the pointer tilt
+   compose into one motion instead of fighting each other. */
+.programme-highway {
+  position: relative;
+  width: 100%;
+  margin-top: var(--sp-16);
+  /* .programme-banner::before (the Ambilight glow) bleeds ~14% past the
+     banner's own edges on purpose, to look like light spilling onto the
+     page around the card — but isolation: isolate only creates a stacking
+     context, it does NOT clip, so that bleed was reaching all the way out
+     to (and past) the real viewport edge on narrow screens, inflating the
+     page's scrollWidth and risking paint artifacts near the edge on some
+     browsers/devices. Clipping it here instead of on .programme-banner
+     keeps the glow's spill-onto-the-page look (it still extends well past
+     the card itself) while guaranteeing it can never escape past this
+     section's own width. Horizontal only: a vertical clip cut the glow into a hard rectangle. */
+  overflow-x: clip;
+}
+
+/* Registered so the browser can actually interpolate changes to it (a plain
+   custom property jumps instantly otherwise) — this is what makes the
+   pointer-follow tilt glide instead of stepping on every mousemove tick,
+   and what smooths the snap back to 0 on pointer-leave. */
+@property --cursor-tilt {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.programme-billboard {
+  --cursor-tilt: 0deg;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  transform: rotate(var(--cursor-tilt));
+  transform-origin: 50% 100%;
+  transition: --cursor-tilt 220ms var(--ease-out-soft);
+  /* Tracking the pointer across this for the tilt effect would otherwise
+     trigger a text/image selection drag on every move. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.programme-banner {
+  --banner-pad: var(--sp-2);
+  position: relative;
+  /* Contains the blurred glow pseudo-element below to its own stacking
+     context, so it can never paint over the road/car sitting after it in
+     the DOM, however far its blur/inset extends. */
+  isolation: isolate;
+  width: 100%;
+  /* .programme-billboard is a flex column with align-items: center, so this
+     (a flex item) doesn't stretch to fill it by default — it sizes to fit
+     its content instead, and a flex item's content-based min size ignores
+     `width: 100%` on its own replaced descendant (the banner <img>, which
+     carries width/height attributes for its intrinsic aspect ratio),
+     falling back to the image's native 1584px width and blowing out past
+     the viewport on mobile. min-width: 0 overrides that default so the
+     explicit width: 100% above actually governs. */
+  min-width: 0;
+  padding: var(--banner-pad);
+  background: var(--surface-card-light);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lift);
+}
+
+/* "Ambilight" treatment (as in modern TVs that bias-light the wall behind
+   the screen to match what's on it): the same photo, scaled up and heavily
+   blurred, sitting behind the card and bleeding its own actual colours out
+   past every edge — rather than an arbitrary gradient or a glow animated
+   independently of the image. */
+.programme-banner::before {
+  content: '';
+  position: absolute;
+  inset: -26% -14%;
+  z-index: -1;
+  background-image: url('/images/marketing/founders-banner.png');
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--r-xl);
+  filter: blur(56px) saturate(1.2) brightness(1.03);
+  opacity: 0.55;
+  pointer-events: none;
+  /* Dissolves into the page instead of ending in a visible edge. */
+  mask-image: radial-gradient(ellipse closest-side, #000 45%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .programme-banner::before {
+    animation: programme-banner-ambilight-breathe 6s ease-in-out infinite;
+  }
+}
+
+@keyframes programme-banner-ambilight-breathe {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.62;
+    transform: scale(1.02);
+  }
+}
+
+.programme-banner-img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--r-lg);
+  /* The pointer tracking for the tilt effect means readers are dragging
+     their cursor/finger across this image constantly — without this it
+     gets selected (and highlighted honey/yellow, per the global
+     ::selection style) on every drag instead of just tilting the sign. */
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+.programme-billboard-post {
+  position: relative;
+  width: 62%;
+  height: clamp(48px, 9vw, 108px);
+  margin-top: -2px;
+}
+
+.programme-billboard-leg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: clamp(7px, 1vw, 13px);
+  border-radius: 3px;
+  background: linear-gradient(180deg, var(--ink), color-mix(in oklab, var(--ink) 55%, var(--parchment)));
+}
+
+.programme-billboard-leg-left {
+  left: 8%;
+  transform: skewX(-4deg);
+  transform-origin: top;
+}
+
+.programme-billboard-leg-right {
+  right: 8%;
+  transform: skewX(4deg);
+  transform-origin: top;
+}
+
+.programme-billboard-ground {
+  width: min(66%, 400px);
+  height: clamp(9px, 1.4vw, 15px);
+  margin-top: -2px;
+  border-radius: var(--r-pill);
+  background: radial-gradient(closest-side, color-mix(in oklab, var(--ink) 24%, transparent), transparent 75%);
+  filter: blur(2px);
+}
+
+/* The highway car-pass (road + car + the lean-in/snap reveal synced to it)
+   is commented out — see the matching comment in home.html. Left in place
+   in case it's worth revisiting with a different trigger.
+.programme-road {
+  position: relative;
+  width: 100%;
+  height: clamp(8px, 1.3vw, 14px);
+  margin-top: var(--sp-6);
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  overflow: visible;
+}
+
+.programme-road::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 2px;
+  transform: translateY(-50%);
+  background-image: repeating-linear-gradient(90deg, var(--parchment) 0 18px, transparent 18px 36px);
+  opacity: 0.7;
+}
+
+.programme-car {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: clamp(64px, 9vw, 104px);
+  height: auto;
+  transform: translate(0, -62%);
+  opacity: 0;
+}
+
+.programme-car-body {
+  fill: var(--oxblood);
+}
+
+.programme-car-cabin {
+  fill: color-mix(in oklab, var(--oxblood) 70%, var(--ivory));
+}
+
+.programme-car-wheel {
+  fill: var(--ink);
+}
+
+.programme-car-light {
+  fill: var(--honey);
+}
+
+.programme-car-shadow {
+  fill: var(--ink);
+  opacity: 0.16;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .programme-highway.is-visible .programme-car {
+    animation: programme-car-drive 1.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .programme-highway.is-visible .programme-road {
+    animation: programme-road-vanish 0.7s var(--ease-out-soft) 2.6s forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .programme-road {
+    display: none;
+  }
+}
+
+@keyframes programme-car-drive {
+  0% {
+    left: 100%;
+    opacity: 1;
+  }
+  96% {
+    opacity: 1;
+  }
+  100% {
+    left: -14%;
+    opacity: 1;
+  }
+}
+
+@keyframes programme-road-vanish {
+  to {
+    opacity: 0;
+  }
+}
+*/
+
+/* The billboard's own idle wiggle, independent of the (commented-out) car:
+   starts as soon as the section is in view, oscillating around whatever
+   `--cursor-tilt` currently is (0 by default, or wherever the pointer last
+   set it) rather than a fixed 0deg — so the ambient wiggle and the
+   pointer-follow tilt are one continuous motion, not two competing ones. */
+@media (prefers-reduced-motion: no-preference) {
+  .programme-highway.is-visible .programme-billboard {
+    animation: programme-billboard-idle-wiggle 4s ease-in-out infinite;
+  }
+}
+
+@keyframes programme-billboard-idle-wiggle {
+  0%,
+  100% {
+    transform: rotate(var(--cursor-tilt));
+  }
+  25% {
+    transform: rotate(calc(var(--cursor-tilt) + 1.6deg));
+  }
+  75% {
+    transform: rotate(calc(var(--cursor-tilt) - 1.6deg));
+  }
+}
+
+@media (min-width: 900px) {
+  .programme-highway {
+    margin-top: var(--sp-20);
+  }
+
+  .programme-banner {
+    --banner-pad: var(--sp-3);
+    padding: var(--banner-pad);
+  }
+}
 
 
 /* ---------- hook cards · typewriter fill + "Read more" ---------- */
