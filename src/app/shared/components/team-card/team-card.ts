@@ -3,14 +3,25 @@ import { Component, DestroyRef, effect, inject, input, output, signal, untracked
 import { CtaPill } from '../cta-pill/cta-pill';
 
 export interface TeamMember {
+  /** Stable id for this member — used to route to/anchor their section on the founders page. */
+  readonly slug?: string;
   readonly name: string;
   readonly role: string;
   readonly credential: string;
   readonly bio: string;
   readonly initials: string;
   readonly ctaLabel: string;
+  /** 'pill' (default) is the full button; 'link' renders as a plain
+   *  text-plus-arrow hyperlink instead — used where the card's job is just
+   *  to tease ("know more about X") rather than to be the primary action. */
+  readonly ctaStyle?: 'pill' | 'link';
   /** Left unset until a real photo is supplied — the portrait falls back to the initials badge. */
   readonly photo?: string;
+  /** object-position for the portrait crop — most photos are centered on the
+   *  face already, but a source shot framed off-center (e.g. a wide 16:9
+   *  photo with the subject on one side) needs this to land the circular
+   *  crop on the face instead of empty background. */
+  readonly photoPosition?: string;
 }
 
 @Component({
@@ -33,9 +44,17 @@ export interface TeamMember {
       <span class="card-energy" aria-hidden="true"></span>
       <div class="content" [style.opacity]="contentOpacity()">
         <div class="portrait">
-          @if (member().photo; as photo) {
-            <img [ngSrc]="photo" fill alt="" />
-          } @else {
+          <!-- The desktop spotlight keeps ONE persistent app-team-card and just
+               changes its [member] input (see expert-carousel.ts) — so unlike
+               the mobile carousel's per-member instances, this <img> node can
+               stay mounted across a photo change. NgOptimizedImage doesn't
+               support mutating ngSrc on an already-initialized image (it
+               throws NG0953), so @for/track on the photo URL forces Angular
+               to tear down and recreate the node on each change instead of
+               reusing it — ngSrc is then only ever set once per node. -->
+          @for (photo of member().photo ? [member().photo] : []; track photo) {
+            <img [ngSrc]="photo!" fill alt="" [style.object-position]="member().photoPosition ?? 'center'" />
+          } @empty {
             <span class="portrait-fallback" aria-hidden="true">{{ member().initials }}</span>
           }
         </div>
@@ -44,7 +63,14 @@ export interface TeamMember {
           <p class="role">{{ member().role }}</p>
           <p class="credential">{{ member().credential }}</p>
           <p class="bio">{{ member().bio }}</p>
-          <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
+          @if (member().ctaStyle === 'link') {
+            <button type="button" class="cta-link" (click)="connectRequested.emit()">
+              <span>{{ member().ctaLabel }}</span>
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
+            </button>
+          } @else {
+            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
+          }
         </div>
       </div>
     </article>
@@ -205,21 +231,92 @@ export interface TeamMember {
       max-width: 32ch;
     }
 
+    /* Non-split only (the compact carousel/stacked card): bio copy varies a
+       lot in length between experts, so it's clamped there to keep the
+       card's height — and therefore the CTA's position — predictable,
+       instead of pushing the button off the bottom of a fixed-height
+       carousel stage on mobile. The split layout (e.g. the founders page)
+       has room to breathe and shows the bio in full. */
+    .team-card:not(.is-split) .bio {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 5;
+      overflow: hidden;
+    }
+
     .cta {
       margin-top: var(--sp-6);
     }
 
-    /* Split layout: photo and info sit side by side instead of stacked —
-       used for the large-screen spotlight, where there's width to spare and
-       centering everything would waste it. */
-    .team-card.is-split {
-      padding: var(--sp-10);
-    }
-    .team-card.is-split .content {
-      flex-direction: row;
+    /* Matches .source-link in home.scss ("Find your root cause →") exactly —
+       the same hairline-underline link treatment used wherever the page
+       teases toward more detail instead of taking the primary action. */
+    .cta-link {
+      display: inline-flex;
       align-items: center;
-      text-align: left;
-      gap: var(--sp-10);
+      gap: var(--sp-2);
+      margin-top: var(--sp-6);
+      padding: 0 0 2px;
+      border: none;
+      border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
+      background: none;
+      width: fit-content;
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 0.94rem;
+      color: var(--oxblood);
+      cursor: pointer;
+      transition:
+        gap var(--dur-micro) var(--ease),
+        border-color var(--dur-base) var(--ease);
+    }
+    .cta-link svg {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform var(--dur-micro) var(--ease);
+    }
+    .cta-link:hover,
+    .cta-link:focus-visible {
+      gap: var(--sp-3);
+      border-color: var(--oxblood);
+    }
+    .cta-link:hover svg,
+    .cta-link:focus-visible svg {
+      transform: translateX(2px);
+    }
+    .cta-link:focus-visible {
+      outline: 2px solid var(--oxblood);
+      outline-offset: 3px;
+    }
+
+    /* Split layout: photo and info sit side by side instead of stacked — the
+       large-screen expert-carousel spotlight only ever renders this at
+       ≥900px anyway (its wrapper is display:none below that), but the
+       founders page reuses split at every width, so the row layout itself
+       is gated behind the same breakpoint — below it, is-split just falls
+       back to the normal stacked layout instead of squeezing a 220px
+       portrait and text into a narrow row. */
+    .team-card.is-split {
+      padding: var(--sp-8) var(--sp-6) var(--sp-6);
+    }
+    @media (min-width: 900px) {
+      .team-card.is-split {
+        padding: var(--sp-10);
+      }
+    }
+    @media (min-width: 900px) {
+      .team-card.is-split .content {
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        gap: var(--sp-10);
+      }
     }
     .team-card.is-split .portrait {
       flex: none;
@@ -229,13 +326,15 @@ export interface TeamMember {
     .team-card.is-split .portrait-fallback {
       font-size: 3.2rem;
     }
-    .team-card.is-split .info {
-      align-items: flex-start;
-      flex: 1;
-    }
-    .team-card.is-split h3 {
-      margin-top: 0;
-      font-size: var(--fs-display-m);
+    @media (min-width: 900px) {
+      .team-card.is-split .info {
+        align-items: flex-start;
+        flex: 1;
+      }
+      .team-card.is-split h3 {
+        margin-top: 0;
+        font-size: var(--fs-display-m);
+      }
     }
     .team-card.is-split .bio {
       max-width: 48ch;

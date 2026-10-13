@@ -1,0 +1,151 @@
+<main id="top" class="carol-page">
+  <!-- ============ HERO ============ -->
+  <header class="carol-hero">
+    <div class="carol-inner carol-hero-grid">
+      <div class="carol-hero-copy">
+        <!-- The reveal wrapper is transformed (translateY) while animating in, which
+             makes it a positioning containing block for the duration of that animation —
+             keeping the tab nav outside of it means its [position:absolute] top-right
+             placement (carol-profile.scss) never gets temporarily hijacked by that. -->
+        <div class="reveal" [appScrollReveal]="0">
+          <app-eyebrow-label text="Meet the founders" />
+          <h1 class="t-display">Carol</h1>
+          <p class="carol-headline">{{ headline }}</p>
+          <p class="carol-location">{{ location }}</p>
+          <app-social-links [links]="socials" />
+        </div>
+
+        <nav class="founders-tabs" aria-label="Switch founder">
+          <span class="founders-tab active" aria-current="page">Carol</span>
+          <a routerLink="/founders/deepa" class="founders-tab">Deepa</a>
+        </nav>
+      </div>
+
+      <div class="carol-hero-visual reveal" [appScrollReveal]="120">
+        <div class="carol-portrait">
+          <img ngSrc="images/team/carol.jpg" fill alt="Carol, functional nutritionist" />
+        </div>
+        <div class="illustration-placeholder illustration-hero" aria-hidden="true">
+          <span>Illustration placeholder</span>
+          <span class="illustration-note">AI-generated — Carol, warm &amp; editorial style</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ ABOUT ============ -->
+  <section class="carol-section carol-about">
+    <div class="carol-inner">
+      <p class="carol-about-copy reveal" [appScrollReveal]="0">{{ about }}</p>
+    </div>
+  </section>
+
+  <!-- ============ QUOTE ============ -->
+  <section class="carol-section carol-quote">
+    <div class="carol-inner">
+      <p class="pull-quote reveal" [appScrollReveal]="0">Health isn't random — there's always a <span class="mark">root cause</span> waiting to be found.</p>
+    </div>
+  </section>
+
+  <!-- ============ FEATURED POST / CERTIFICATE ============ -->
+  <section class="carol-section carol-featured">
+    <div class="carol-inner">
+      <app-eyebrow-label text="A recent moment" />
+      <article class="featured-card reveal" [appScrollReveal]="0">
+        <div class="illustration-placeholder illustration-certificate" aria-hidden="true">
+          <span>Illustration placeholder</span>
+          <span class="illustration-note">AI-generated — certificate / webinar motif</span>
+        </div>
+        <div class="featured-copy">
+          <span class="featured-org">{{ featuredPost.org }}</span>
+          <h3>{{ featuredPost.title }}</h3>
+          <p class="featured-subtitle">{{ featuredPost.subtitle }}</p>
+          <p class="featured-description">{{ featuredPost.description }}</p>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ EXPERIENCE ============ -->
+  <section class="carol-section carol-experience">
+    <div class="carol-inner">
+      <app-eyebrow-label text="Experience" />
+      <h2 class="t-display section-heading">A clinical eye, brought to nutrition.</h2>
+
+      <ol class="timeline">
+        @for (entry of experience; track entry.title + entry.period; let i = $index) {
+          <li class="timeline-entry reveal" [appScrollReveal]="i * 90">
+            <span class="timeline-dot" aria-hidden="true"></span>
+            <div class="timeline-card">
+              <h3>{{ entry.title }}</h3>
+              <p class="timeline-org">{{ entry.org }}</p>
+              <p class="timeline-meta">{{ entry.period }} · {{ entry.location }}</p>
+              @if (entry.detail) {
+                <p class="timeline-detail">{{ entry.detail }}</p>
+              }
+              @if (entry.skills; as skills) {
+                <ul class="skill-chips">
+                  @for (skill of skills; track skill) {
+                    <li>{{ skill }}</li>
+                  }
+                </ul>
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ CERTIFICATIONS ============ -->
+  <section class="carol-section carol-certifications">
+    <div class="carol-inner">
+      <app-eyebrow-label text="Certifications" />
+      <h2 class="t-display section-heading">Credentials behind the practice.</h2>
+
+      <ul class="cert-grid">
+        @for (cert of certifications; track cert.name; let i = $index) {
+          <li class="cert-card reveal" [appScrollReveal]="i * 90">
+            <svg class="cert-icon" viewBox="0 0 20 20" aria-hidden="true">
+              <rect x="3" y="3" width="14" height="14" rx="2" />
+              <path d="M7 10l2 2 4-4" />
+            </svg>
+            <h3>{{ cert.name }}</h3>
+            <p class="cert-issuer">{{ cert.issuer }}</p>
+            <p class="cert-issued">{{ cert.issued }}</p>
+          </li>
+        }
+        <li class="cert-card cert-card-more reveal" [appScrollReveal]="certifications.length * 90">
+          <p>+ 3 more credentials, from hospital operations to entrepreneurship.</p>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SKILLS ============ -->
+  <section class="carol-section carol-skills">
+    <div class="carol-inner">
+      <app-eyebrow-label text="Skills" />
+      @for (group of skillGroups; track group.label; let i = $index) {
+        <div class="skill-group reveal" [appScrollReveal]="i * 90">
+          <h3>{{ group.label }}</h3>
+          <ul class="skill-chips skill-chips-large">
+            @for (skill of group.skills; track skill) {
+              <li>{{ skill }}</li>
+            }
+          </ul>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ============ CLOSE ============ -->
+  <section class="carol-section carol-close">
+    <div class="carol-inner carol-close-inner reveal" [appScrollReveal]="0">
+      <h2 class="t-display">Start with the person who looks for the root cause.</h2>
+      <app-cta-pill label="Book a consultation with Carol" variant="primary" (pressed)="bookConsultation()" />
+    </div>
+  </section>
+
+  <app-site-footer />
+</main>

@@ -1,0 +1,502 @@
+:host {
+  display: block;
+}
+
+.deepa-page {
+  background: var(--ivory);
+}
+
+.deepa-inner {
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter-mobile);
+}
+
+@media (min-width: 900px) {
+  .deepa-inner {
+    padding-inline: var(--gutter-desktop);
+  }
+}
+
+.deepa-section {
+  padding-block: clamp(var(--sp-10), 5vw, var(--sp-16));
+}
+
+/* ---------- hero ---------- */
+.deepa-hero {
+  position: relative;
+  /* app.scss's fixed .chrome-wordmark/.chrome-cta float above everything
+     regardless of section padding, so the heading needs enough clearance
+     to start below them instead of rendering right underneath. */
+  padding-top: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
+  padding-bottom: clamp(var(--sp-8), 4vw, var(--sp-12));
+  background: linear-gradient(180deg, color-mix(in oklab, var(--terracotta) 10%, var(--ivory)), var(--ivory));
+}
+
+.deepa-hero-grid {
+  display: grid;
+  gap: var(--sp-10);
+}
+
+@media (min-width: 900px) {
+  .deepa-hero-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: center;
+  }
+}
+
+.deepa-headline {
+  margin-top: var(--sp-5);
+  font-size: 1.1rem;
+  line-height: var(--lh-body);
+  color: var(--text-quiet-light);
+  max-width: 46ch;
+}
+
+.deepa-location {
+  margin-top: var(--sp-2);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+.founders-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-top: var(--sp-8);
+  padding: var(--sp-1);
+  border-radius: var(--r-pill);
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+}
+
+/* On wide screens this reads better as a persistent switcher pinned to the
+   hero's corner than as another line of copy in the text column. */
+@media (min-width: 900px) {
+  .founders-tabs {
+    position: absolute;
+    top: var(--sp-8);
+    right: var(--gutter-desktop);
+    margin-top: 0;
+    padding: 3px;
+    box-shadow: var(--shadow-soft);
+  }
+  .founders-tab {
+    padding: 6px var(--sp-4);
+    font-size: 0.68rem;
+  }
+}
+
+.founders-tab {
+  padding: var(--sp-3) var(--sp-5);
+  border-radius: var(--r-pill);
+  border: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-quiet-light);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--dur-micro) var(--ease),
+    color var(--dur-micro) var(--ease);
+}
+
+a.founders-tab:hover {
+  color: var(--oxblood);
+}
+
+.founders-tab.active {
+  background: var(--gradient-ember);
+  color: #fff6ef;
+}
+
+.deepa-hero-visual {
+  position: relative;
+}
+
+.deepa-portrait {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: min(360px, 100%);
+  margin-inline: auto;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lift);
+}
+
+.deepa-portrait img {
+  object-fit: cover;
+}
+
+/* A clearly-marked placeholder — easy to spot and swap for a real
+   AI-generated illustration or real cover art later. */
+.illustration-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-1);
+  text-align: center;
+  border: 1.5px dashed color-mix(in oklab, var(--terracotta) 55%, var(--rule-on-light));
+  border-radius: var(--r-lg);
+  background: color-mix(in oklab, var(--honey) 16%, var(--parchment));
+  color: var(--text-quiet-light);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  padding: var(--sp-4);
+}
+
+.illustration-note {
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0.72rem;
+  opacity: 0.8;
+}
+
+.illustration-hero {
+  position: absolute;
+  inset: auto -8% -10% auto;
+  width: 46%;
+  aspect-ratio: 1;
+  transform: rotate(4deg);
+}
+
+@media (max-width: 640px) {
+  .illustration-hero {
+    position: static;
+    width: 60%;
+    margin: var(--sp-6) auto 0;
+    transform: none;
+  }
+}
+
+/* ---------- about ---------- */
+.deepa-about-copy {
+  max-width: 68ch;
+  font-size: 1.15rem;
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+/* ---------- shared section heading ---------- */
+.section-heading {
+  margin-top: var(--sp-3);
+  max-width: 32ch;
+}
+
+/* ---------- yellow highlighter mark + editorial pull-quote (same treatment
+   as the home hero's "It's time to listen" and close-quote sections) ---------- */
+.mark {
+  font-style: normal;
+  font-weight: 600;
+  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  padding: 0 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.pull-quote {
+  margin: 0 auto;
+  max-width: 32ch;
+  text-align: center;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: 'opsz' 16;
+  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.1rem);
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.deepa-quote {
+  padding-block: clamp(var(--sp-6), 3vw, var(--sp-10));
+}
+
+/* ---------- book ---------- */
+/* A gradient "frame" (padding-box content on top of a border-box gradient)
+   ties the card to the E.A.S.E. Dis-ease tile's ember colour without
+   washing the whole card in it — the long description still needs to read
+   as plain dark-on-light text. */
+.book-feature {
+  margin-top: var(--sp-10);
+  display: grid;
+  gap: var(--sp-8);
+  padding: var(--sp-6);
+  background:
+    linear-gradient(var(--surface-card-light), var(--surface-card-light)) padding-box,
+    var(--gradient-ember) border-box;
+  border: 2px solid transparent;
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lift);
+}
+
+@media (min-width: 700px) {
+  .book-feature {
+    grid-template-columns: 156px 1fr;
+    align-items: center;
+    padding: var(--sp-10);
+  }
+}
+
+.book-cover {
+  position: relative;
+  /* Matches the cover artwork's own ratio (243 × 371) — combined with
+     object-fit: contain below, the whole cover is always visible, at any
+     screen size, instead of object-fit: cover cropping a mismatched box. */
+  aspect-ratio: 243 / 371;
+  /* 40% smaller than the original 260px. */
+  width: min(156px, 100%);
+  margin-inline: auto;
+  border-radius: var(--r-md);
+  /* A 1px gradient frame — padding-box left transparent so the card's own
+     background shows through rather than adding a fill colour of its own. */
+  background: linear-gradient(160deg, var(--terracotta), color-mix(in oklab, var(--terracotta) 40%, var(--honey))) border-box;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow-lift);
+}
+
+@media (min-width: 700px) {
+  .book-cover {
+    width: 100%;
+  }
+}
+
+.book-cover img {
+  object-fit: contain;
+}
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-6);
+  padding: 0 0 2px;
+  border: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
+  background: none;
+  width: fit-content;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 0.94rem;
+  color: var(--oxblood);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    gap var(--dur-micro) var(--ease),
+    border-color var(--dur-base) var(--ease);
+}
+.cta-link svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform var(--dur-micro) var(--ease);
+}
+.cta-link:hover,
+.cta-link:focus-visible {
+  gap: var(--sp-3);
+  border-color: var(--oxblood);
+}
+.cta-link:hover svg,
+.cta-link:focus-visible svg {
+  transform: translateX(2px);
+}
+.cta-link:focus-visible {
+  outline: 2px solid var(--oxblood);
+  outline-offset: 3px;
+}
+
+.book-status {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--oxblood);
+}
+
+.book-copy h3 {
+  margin-top: var(--sp-2);
+  font-size: var(--fs-display-s);
+}
+
+.book-subtitle {
+  margin-top: var(--sp-1);
+  font-style: italic;
+  color: var(--text-quiet-light);
+}
+
+.book-description {
+  margin-top: var(--sp-4);
+  color: var(--text-quiet-light);
+  line-height: var(--lh-body);
+}
+
+/* ---------- programmes ---------- */
+/* A cool backdrop (sage, not honey) so the warm ember-gradient cards stand
+   apart from the section instead of blending into a same-hue wash. */
+.deepa-programmes {
+  background: color-mix(in oklab, var(--sage-soft) 24%, var(--ivory));
+}
+
+.programme-grid {
+  margin-top: var(--sp-10);
+  display: grid;
+  gap: var(--sp-6);
+}
+
+@media (min-width: 700px) {
+  .programme-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Same off-white champagne-to-parchment treatment as the team-card shell in
+   the home page's experts section — both programme cards share this exact
+   colour (no per-card variant); they're told apart by their copy, not a
+   colour-coded system. */
+.programme-card {
+  padding: var(--sp-8);
+  border-radius: var(--r-lg);
+  background: linear-gradient(
+    158deg,
+    color-mix(in oklab, var(--honey) 18%, var(--ivory)) 0%,
+    color-mix(in oklab, var(--honey) 8%, var(--parchment)) 100%
+  );
+  color: var(--ink);
+  border: 1px solid color-mix(in oklab, var(--honey) 60%, var(--parchment));
+  box-shadow: var(--shadow-soft);
+}
+
+.programme-card h3 {
+  font-size: var(--fs-display-s);
+  color: var(--oxblood);
+}
+
+.programme-tagline {
+  margin-top: var(--sp-1);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--olive);
+  opacity: 0.85;
+}
+
+.programme-description {
+  margin-top: var(--sp-4);
+  line-height: var(--lh-body);
+  opacity: 0.95;
+}
+
+/* ---------- certifications & collaborations ---------- */
+.collab-grid {
+  margin-top: var(--sp-10);
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 700px) {
+  .collab-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.collab-card {
+  padding: var(--sp-6);
+  text-align: center;
+  background: var(--surface-card-light);
+  border: 1px solid var(--rule-on-light);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.collab-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-inline: auto;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--olive) 14%, var(--parchment));
+  color: var(--olive);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.collab-card h3 {
+  margin-top: var(--sp-4);
+  font-size: 1rem;
+}
+
+.collab-card p {
+  margin-top: var(--sp-1);
+  color: var(--text-quiet-light);
+  font-size: 0.9rem;
+}
+
+/* ---------- testimonials ---------- */
+.testimonial-grid {
+  margin-top: var(--sp-10);
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: var(--sp-5);
+}
+
+@media (min-width: 700px) {
+  .testimonial-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.testimonial-card {
+  padding: var(--sp-6);
+  background: color-mix(in oklab, var(--sage-soft) 16%, var(--parchment));
+  border-radius: var(--r-lg);
+}
+
+.testimonial-quote {
+  font-style: italic;
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.testimonial-name {
+  margin-top: var(--sp-4);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  color: var(--olive);
+}
+
+/* ---------- close ---------- */
+.deepa-close {
+  text-align: center;
+  background: color-mix(in oklab, var(--terracotta) 8%, var(--ivory));
+}
+
+.deepa-close-inner h2 {
+  max-width: 24ch;
+  margin-inline: auto;
+}
+
+.deepa-close-inner app-cta-pill {
+  display: inline-block;
+  margin-top: var(--sp-8);
+}

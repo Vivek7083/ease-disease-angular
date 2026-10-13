@@ -1684,6 +1684,17 @@ app-expert-carousel {
   position: relative;
   width: 100%;
   margin-top: var(--sp-16);
+  /* .programme-banner::before (the Ambilight glow) bleeds ~14% past the
+     banner's own edges on purpose, to look like light spilling onto the
+     page around the card — but isolation: isolate only creates a stacking
+     context, it does NOT clip, so that bleed was reaching all the way out
+     to (and past) the real viewport edge on narrow screens, inflating the
+     page's scrollWidth and risking paint artifacts near the edge on some
+     browsers/devices. Clipping it here instead of on .programme-banner
+     keeps the glow's spill-onto-the-page look (it still extends well past
+     the card itself) while guaranteeing it can never escape past this
+     section's own width. */
+  overflow: hidden;
 }
 
 /* Registered so the browser can actually interpolate changes to it (a plain
@@ -1722,6 +1733,15 @@ app-expert-carousel {
      the DOM, however far its blur/inset extends. */
   isolation: isolate;
   width: 100%;
+  /* .programme-billboard is a flex column with align-items: center, so this
+     (a flex item) doesn't stretch to fill it by default — it sizes to fit
+     its content instead, and a flex item's content-based min size ignores
+     `width: 100%` on its own replaced descendant (the banner <img>, which
+     carries width/height attributes for its intrinsic aspect ratio),
+     falling back to the image's native 1584px width and blowing out past
+     the viewport on mobile. min-width: 0 overrides that default so the
+     explicit width: 100% above actually governs. */
+  min-width: 0;
   padding: var(--banner-pad);
   background: var(--surface-card-light);
   border-radius: var(--r-xl);
@@ -1768,6 +1788,7 @@ app-expert-carousel {
 .programme-banner-img {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: auto;
   border-radius: var(--r-lg);
   /* The pointer tracking for the tilt effect means readers are dragging

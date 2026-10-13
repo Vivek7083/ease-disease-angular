@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { Router } from '@angular/router';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
 import { MAIN_PLAN, openBookingForm } from '../../core/config/booking';
@@ -70,6 +71,7 @@ interface TreatStep {
 export class Home implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly bookingCta = inject(BookingCtaService);
+  private readonly router = inject(Router);
 
   /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
   protected readonly showRemainingSections = false;
@@ -1252,23 +1254,31 @@ export class Home implements AfterViewInit {
 
   protected readonly team: readonly TeamMember[] = [
     {
+      slug: 'carol',
       name: 'Carol',
       role: 'Functional Nutritionist',
       credential: 'iCFN certified · Hospital operations background',
       initials: 'C',
-      bio: "Helps people find the root cause of chronic conditions — with a focus on women's health, pregnancy and sports nutrition.",
-      ctaLabel: 'Connect with Carol',
+      bio: 'Helps people find the root cause of chronic conditions with a focus on type 2 diabetes, autoimmunity, thyroid health and menopause.',
+      ctaLabel: 'Know more about Carol',
+      ctaStyle: 'link',
       photo: 'images/team/carol.jpg',
     },
     {
+      slug: 'deepa',
       name: 'Deepa Rajani',
-      role: 'Gut Health Coach',
-      credential: 'IFM (USA) certified · Author',
+      role: 'Founder, Awaken Your Soul',
+      credential: 'IFM (USA) certified · Gut health & mindset coach',
       initials: 'D',
-      bio: 'Wellness mindset and gut health coach, event curator, and author of The Magic In You and Healing Begins in the Gut.',
-      ctaLabel: 'Connect with Deepa',
+      bio: 'Helps people with gut issues and misaligned inner states — not just healing symptoms, but reprogramming how they think, feel, digest and heal, through her 90-day transformation journey, Becoming Creators of a F.A.B. L.I.F.E.',
+      ctaLabel: 'Know more about Deepa',
+      ctaStyle: 'link',
       photo: 'images/team/deepa.jpg',
+      photoPosition: '5% center',
     },
   ];
 
+  protected onExpertConnect(member: TeamMember): void {
+    this.router.navigate(['/founders', member.slug ?? 'carol']);
+  }
 }

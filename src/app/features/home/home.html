@@ -557,7 +557,11 @@
     <div class="scene-inner">
       <app-eyebrow-label text="Meet the experts" />
       <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
-      <app-expert-carousel [members]="team" (connectRequested)="bookConsultation()" />
+      <p class="t-body lede">
+        Whether you are newly diagnosed, struggling with chronic symptoms, or seeking deeper transformation, there
+        is a path for you here.
+      </p>
+      <app-expert-carousel [members]="team" (connectRequested)="onExpertConnect($event)" />
     </div>
   </section>
 
