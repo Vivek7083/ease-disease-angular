@@ -463,6 +463,17 @@
     </div>
   </section>
 
+  <!-- ============ TESTIMONIALS — a real client message shown as it was
+       received, a WhatsApp thread, rather than a styled pull-quote. Same
+       canvas stop as the end of Results (flat, not chained) so inserting
+       this section doesn't disturb the canvas handoff into the root map
+       below it. ============ -->
+  <section class="scene testimonials" id="testimonials" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="testimonials-heading">
+    <div class="scene-inner">
+      <app-testimonials />
+    </div>
+  </section>
+
   <app-section-transition variant="vine" />
 
   <!-- ============ THE ROOT MAP — diseases & categories, as an interactive

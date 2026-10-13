@@ -1,0 +1,89 @@
+<div class="wa-intro reveal" [appScrollReveal]="0">
+  <app-eyebrow-label text="In their own words" />
+  <h2 id="testimonials-heading" class="t-display">A message, not a quote.</h2>
+  <p class="t-body lede">A note from our client to our expert, on WhatsApp — shared with permission, name withheld.</p>
+</div>
+
+<p class="sr-only">{{ transcript }}</p>
+
+<div class="wa-stage reveal" [appScrollReveal]="120" aria-hidden="true">
+  <!-- Desktop: WhatsApp-for-Mac chat pane. -->
+  <div class="wa-window">
+    <div class="wa-titlebar">
+      <span class="wa-dot wa-dot-red"></span>
+      <span class="wa-dot wa-dot-yellow"></span>
+      <span class="wa-dot wa-dot-green"></span>
+    </div>
+    <div class="wa-chat-header">
+      <span class="wa-avatar">C</span>
+      <span class="wa-chat-id">
+        <span class="wa-chat-name">Our client</span>
+        <span class="wa-chat-status">{{ profileLabel }}</span>
+      </span>
+    </div>
+    <div class="wa-body">
+      <ng-container [ngTemplateOutlet]="bubbles" />
+    </div>
+  </div>
+
+  <!-- Mobile: phone frame with a dynamic island. -->
+  <div class="wa-phone">
+    <span class="wa-island"></span>
+    <div class="wa-chat-header">
+      <svg class="wa-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 5l-7 7 7 7" />
+      </svg>
+      <span class="wa-avatar">C</span>
+      <span class="wa-chat-id">
+        <span class="wa-chat-name">Our client</span>
+        <span class="wa-chat-status">{{ profileLabel }}</span>
+      </span>
+    </div>
+    <div class="wa-body">
+      <ng-container [ngTemplateOutlet]="bubbles" />
+    </div>
+    <div class="wa-input-bar">
+      <span class="wa-input-plus">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 8v8M8 12h8" />
+        </svg>
+      </span>
+      <span class="wa-input-field">
+        <span class="wa-input-placeholder">Message</span>
+        <svg class="wa-input-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 8h2.5l1.3-2h8.4l1.3 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" />
+          <circle cx="12" cy="13.5" r="3.4" />
+        </svg>
+      </span>
+      <span class="wa-mic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z" />
+          <path d="M19 11a7 7 0 0 1-14 0M12 18v3" />
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>
+
+<ng-template #bubbles>
+  @for (message of messages; track $index) {
+    <div class="wa-row" [class.wa-row-out]="message.sender === 'coach'">
+      <div class="wa-bubble" [class.wa-bubble-out]="message.sender === 'coach'">
+        <p class="wa-text">{{ message.text }}</p>
+        <span class="wa-meta">
+          <span class="wa-time">{{ message.time }}</span>
+          @if (message.sender === 'coach') {
+            <svg class="wa-ticks" viewBox="0 0 18 10">
+              <path d="M1 5l3 3 7-7" />
+              <path d="M7 5l3 3 7-7" />
+            </svg>
+          }
+        </span>
+        @if (message.reaction) {
+          <span class="wa-reaction" [class.wa-reaction-out]="message.sender === 'coach'">{{ message.reaction }}</span>
+        }
+      </div>
+    </div>
+  }
+</ng-template>

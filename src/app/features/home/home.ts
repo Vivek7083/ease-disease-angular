@@ -15,6 +15,7 @@ import { type TeamMember } from '../../shared/components/team-card/team-card';
 import { ExpertCarousel } from '../../shared/components/expert-carousel/expert-carousel';
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
+import { Testimonials } from '../../shared/components/testimonials/testimonials';
 import { SectionTransition } from '../../shared/components/section-transition/section-transition';
 import { SiteFooter } from '../../shared/components/site-footer/site-footer';
 
@@ -59,6 +60,7 @@ interface TreatStep {
     ExpertCarousel,
     RootMap,
     Results,
+    Testimonials,
     SectionTransition,
     SiteFooter,
   ],

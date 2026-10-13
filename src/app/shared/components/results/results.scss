@@ -1,5 +1,4 @@
 :host {
-  --quote-rule: var(--rule-on-dark);
   /* Stem + twig geometry, shared by the mobile (vertical) and desktop
      (horizontal) layouts. Pure CSS, no SVG or images. */
   --stem-w: 3px;
@@ -104,68 +103,6 @@
   margin: 0;
   font-size: 0.94rem;
   line-height: 1.5;
-  color: var(--text-quiet-dark);
-}
-
-/* The quote is a deep oxblood SURFACE on the ivory canvas — the page
-   background never goes dark. Oxblood (not olive) so the leaves above are
-   the only olive in the section. */
-.results-quote {
-  position: relative;
-  margin: 0;
-  padding: var(--sp-8) var(--sp-5) var(--sp-5);
-  background: var(--surface-deep);
-  color: var(--text-on-dark);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-soft);
-  overflow: hidden;
-}
-
-.results-quote-mark {
-  position: absolute;
-  top: 0;
-  left: var(--sp-4);
-  font-family: var(--font-display);
-  font-size: 5rem;
-  line-height: 1;
-  color: var(--honey);
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.results-quote blockquote {
-  position: relative;
-  margin: 0;
-}
-
-.results-quote blockquote p {
-  margin: 0;
-  font-family: var(--font-display);
-  font-style: italic;
-  font-weight: 300;
-  font-size: clamp(1.3rem, 1.05rem + 1.2vw, 1.8rem);
-  line-height: 1.3;
-  text-wrap: balance;
-}
-
-.results-quote figcaption {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  margin-top: var(--sp-4);
-  padding-top: var(--sp-3);
-  border-top: 1px solid var(--quote-rule);
-}
-
-.results-quote-name {
-  font-weight: 500;
-}
-
-.results-quote-context {
-  font-family: var(--font-mono);
-  font-size: var(--fs-eyebrow);
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
   color: var(--text-quiet-dark);
 }
 
@@ -280,54 +217,6 @@
   .results-body {
     font-size: 0.9rem;
   }
-
-  /* Large screens: a compact two-column card — attribution on the left,
-     a modestly sized quote on the right — instead of one huge block of
-     display type. The quote stays readable at ~1.4–1.6rem without
-     dominating the section. */
-  .results-quote {
-    display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 8fr);
-    column-gap: var(--sp-10);
-    align-items: center;
-    padding: var(--sp-8) var(--sp-10);
-    border-radius: var(--r-lg);
-  }
-
-  .results-quote-mark {
-    position: static;
-    /* Hangs in the gap right before the quote's first line (right edge of
-       the attribution column), not out at the card's left edge. */
-    grid-column: 1;
-    grid-row: 1;
-    justify-self: end;
-    align-self: start;
-    margin-right: calc(-1 * var(--sp-8));
-    font-size: 4rem;
-    line-height: 1;
-    height: 2.4rem;
-    opacity: 0.9;
-  }
-
-  .results-quote blockquote {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-  }
-
-  .results-quote blockquote p {
-    max-width: 52ch;
-    font-size: clamp(1.15rem, 0.9rem + 0.7vw, 1.5rem);
-    line-height: 1.4;
-    text-wrap: pretty;
-  }
-
-  .results-quote figcaption {
-    grid-column: 1;
-    grid-row: 2;
-    align-self: end;
-    margin-top: 0;
-    padding-top: var(--sp-3);
-  }
 }
 
 /* ---------- leaf transitions ---------- */
@@ -358,20 +247,6 @@
     opacity: 1;
     transform: none;
   }
-
-  .results-quote.reveal .results-quote-mark {
-    opacity: 0;
-    transform: scale(0.4) rotate(-14deg);
-    transform-origin: 0 100%;
-    transition:
-      opacity 500ms ease-out 250ms,
-      transform 800ms cubic-bezier(0.34, 1.56, 0.64, 1) 250ms;
-  }
-
-  .results-quote.reveal.is-visible .results-quote-mark {
-    opacity: 0.8;
-    transform: none;
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
@@ -381,9 +256,5 @@
 
   .results-item.reveal.is-visible {
     --leaf-sweep: 52px;
-  }
-
-  .results-quote.reveal.is-visible .results-quote-mark {
-    opacity: 0.9;
   }
 }
