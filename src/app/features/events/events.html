@@ -38,7 +38,7 @@
         @for (event of pastEvents; track event.title; let i = $index) {
           <li class="event-card reveal" [appScrollReveal]="i * 90">
             <div class="event-media" [class.is-photo]="event.fit === 'cover'" [style.--backdrop]="'url(/' + event.image + ')'">
-              <img [ngSrc]="event.image" fill [alt]="event.imageAlt" sizes="(min-width: 900px) 540px, 100vw" />
+              <img [ngSrc]="event.image" fill [alt]="event.imageAlt" />
             </div>
             <div class="event-ticket">
               <time class="event-stub" [attr.datetime]="event.iso">
