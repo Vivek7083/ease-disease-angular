@@ -22,4 +22,8 @@ export const routes: Routes = [
     path: 'founders/deepa',
     loadComponent: () => import('./features/founders/deepa-profile/deepa-profile').then((m) => m.DeepaProfile),
   },
+  {
+    path: '**',
+    redirectTo: '',
+  },
 ];
