@@ -321,12 +321,12 @@ const NOTES_STEP = 0.14;
        burgundy, echoing the same terracotta/olive/oxblood layering the
        nodes themselves use below. */
     .root-map-links path.lit {
-      stroke: var(--olive);
+      stroke: var(--highlight-blue);
       stroke-width: 2.2;
     }
 
     .root-map-links path.lit.kind-rt {
-      stroke: var(--oxblood);
+      stroke: var(--highlight-blue);
     }
 
     .root-map.focus .root-map-links path.visible:not(.lit) {
@@ -547,30 +547,15 @@ const NOTES_STEP = 0.14;
        with directly. */
     /* Terracotta deepened a touch toward oxblood: plain terracotta under
        ivory text is only ~3.7:1, below the 4.5:1 AA minimum. */
-    .root-map-node.lit {
-      --lit-family: color-mix(in oklab, var(--terracotta) 72%, var(--oxblood));
-      background: var(--lit-family);
-      border-color: var(--lit-family);
-      color: var(--ivory);
-    }
-
-    /* Conditions and roots each light up in their own layer color instead
-       of all three converging on the same terracotta — olive for the
-       processes underneath, burgundy for the roots underneath that. */
-    .root-map-node--static.lit {
-      background: var(--olive);
-      border-color: var(--olive);
-    }
-
-    .root-map-node--root.lit {
-      background: var(--oxblood);
-      border-color: var(--oxblood);
-    }
-
+    /* Palette step: every highlighted chip (and the links between them) is the
+       vivid blue, with black text for contrast (about 8.6:1). */
+    .root-map-node.lit,
+    .root-map-node--static.lit,
+    .root-map-node--root.lit,
     .root-map-node.selected {
-      background: var(--oxblood);
-      border-color: var(--oxblood);
-      color: var(--ivory);
+      background: var(--highlight-blue);
+      border-color: var(--highlight-blue);
+      color: #000;
     }
 
     /* Mobile: compact pills and tighter layer gaps so the three layers

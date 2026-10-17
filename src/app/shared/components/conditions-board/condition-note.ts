@@ -98,7 +98,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       margin-left: -7px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, var(--terracotta), var(--oxblood) 70%);
-      box-shadow: 0 2px 3px rgba(43, 10, 15, 0.35);
+      box-shadow: 0 2px 3px rgba(18, 41, 59, 0.35);
     }
 
     .note-family {

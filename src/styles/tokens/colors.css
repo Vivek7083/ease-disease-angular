@@ -6,17 +6,17 @@
    earthy terracotta/olive/burgundy descent rather than one accent color
    repeated at every depth. Chosen dark enough to carry ivory text at the
    same AA-compliant contrast oxblood already does. */
---oxblood-deep:#2B0A0F;--oxblood:#5A1220;--ember-a:#B33A1E;--ember-b:#E8853A;--terracotta:#C06B4A;--olive:#4A5726;--parchment:#F0E2CE;--ivory:#FAF7EF;--ink:#000;--sage-soft:#CBD6C4;--honey:#F2C14E;--evidence-blue:#0E86C4;
+--oxblood-deep:#12293B;--oxblood:#1B3B53;--ember-a:#BF3820;--ember-b:#E06F27;--terracotta:#BF3820;--olive:#1B3B53;--parchment:#F0E2CE;--ivory:#FAF7EF;--ink:#000;--sage-soft:#CBD6C4;--honey:#00AEEF;--evidence-blue:#0E86C4;
 /* Semantic ink */
---text-on-dark:var(--ivory);--text-on-light:var(--ink);--text-quiet-dark:#E4D6CC;--text-quiet-light:#000;
+--text-on-dark:var(--ivory);--text-on-light:var(--ink);--text-quiet-dark:#D6E2EC;--text-quiet-light:#000;
 /* Sanctioned gradient — primary CTA only */
 --gradient-ember:linear-gradient(135deg,var(--terracotta) 0%,var(--ember-a) 50%,var(--ember-b) 100%);
 /* Roles */
---highlight-honey:var(--honey);--highlight-blue:#00AEEF;--evidence:var(--evidence-blue);--rule-on-dark:#7A3A3F;--rule-on-light:#DCCBB5;
+--highlight-honey:var(--honey);--highlight-blue:#00AEEF;--evidence:var(--evidence-blue);--rule-on-dark:#3A5F7D;--rule-on-light:#DCCBB5;
 /* Deep surfaces — the ONLY place oxblood appears. Darkness is a surface, never the canvas.
    Use for: the root-cause scene panel, the menu overlay, the footer close block,
    the chat header, and dark cards. Ivory text on them runs 12.8–17:1. */
 --surface-deep:var(--oxblood-deep);
 --surface-deep-soft:color-mix(in oklab,var(--oxblood-deep) 50%,var(--oxblood));
 --surface-deep-raised:var(--oxblood);
---surface-card-light:var(--ivory);--surface-card-dark:var(--surface-deep-raised);--surface-glass-dark:rgba(251,247,240,.08);--surface-glass-light:rgba(30,23,20,.06)}
+--surface-card-light:#FFFFFF;--surface-card-dark:var(--surface-deep-raised);--surface-glass-dark:rgba(251,247,240,.08);--surface-glass-light:rgba(30,23,20,.06)}
