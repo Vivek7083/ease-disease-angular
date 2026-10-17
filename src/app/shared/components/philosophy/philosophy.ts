@@ -113,7 +113,7 @@ export interface PhilosophyPoint {
       aspect-ratio: 16 / 10;
       border-radius: 16px;
       overflow: hidden;
-      border: 1px solid rgba(27, 59, 83, 0.12);
+      border: 1px solid rgba(33, 56, 72, 0.12);
     }
     .phil-media img {
       object-fit: cover;
