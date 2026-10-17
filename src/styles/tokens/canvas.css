@@ -62,4 +62,22 @@
    turn=warmth rising, levels=lift back to light, team=rest, close=exit */
 --canvas-default:var(--ivory)}
 
+/* Solid ivory everywhere: no section fades */
+:root{
+--canvas-hero-to:var(--ivory);
+--canvas-hook-from:var(--ivory);
+--canvas-hook-to:var(--ivory);
+--canvas-treat-to:var(--ivory);
+--canvas-results-to:var(--ivory);
+--canvas-descent-to:var(--ivory);
+--canvas-turn-from:var(--ivory);
+--canvas-turn-mid:var(--ivory);
+--canvas-turn-to:var(--ivory);
+--canvas-levels-from:var(--ivory);
+--canvas-levels-to:var(--ivory);
+--canvas-team-from:var(--ivory);
+--canvas-team-to:var(--ivory);
+--canvas-close-from:var(--ivory);
+--canvas-close-to:var(--ivory)}
+
 .canvas-root{position:fixed;inset:0;z-index:-1;background:var(--canvas-default);transition:background-color var(--dur-scene) var(--ease)}

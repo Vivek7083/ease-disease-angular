@@ -27,7 +27,7 @@
   /* Clears the fixed wordmark/CTA chrome, same as the founders pages. */
   padding-top: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
   padding-bottom: clamp(var(--sp-6), 3vw, var(--sp-10));
-  background: linear-gradient(180deg, color-mix(in oklab, var(--honey) 10%, var(--ivory)), var(--ivory));
+  background: var(--ivory);
 }
 
 .events-hero h1 {

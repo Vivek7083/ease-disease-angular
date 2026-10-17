@@ -146,6 +146,7 @@ const LABEL_GAP = 22;
       aspect-ratio: 1 / 0.9;
     }
     .stage-glow {
+      display: none;
       position: absolute;
       inset: -12%;
       border-radius: 50%;

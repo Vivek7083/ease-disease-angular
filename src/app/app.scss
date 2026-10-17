@@ -21,6 +21,7 @@
    drifting brand-color field runs from the hero straight through to the
    close, so no single section reads as visually separate from the rest. */
 .ambient-field {
+  display: none; /* solid #FAF7EF page: no colour glow */
   position: fixed;
   inset: -15%;
   z-index: -1;
@@ -60,6 +61,11 @@
 .chrome-wordmark {
   top: max(env(safe-area-inset-top, 0px), var(--sp-5));
   left: var(--sp-6);
+}
+
+/* Desktop Mac: top offset at 110% to match the 110% wordmark. */
+:host-context(html.is-mac) .chrome-wordmark {
+  top: calc(var(--sp-5) * 1.1);
 }
 
 /* The booking CTA and the scroll rail now live in different corners
