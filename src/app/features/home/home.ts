@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, DestroyRef, ElementRef, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
-import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common';
+import { NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
@@ -9,6 +9,7 @@ import { Wordmark } from '../../shared/components/wordmark/wordmark';
 import { CtaPill } from '../../shared/components/cta-pill/cta-pill';
 import { EyebrowLabel } from '../../shared/components/eyebrow-label/eyebrow-label';
 import { Philosophy } from '../../shared/components/philosophy/philosophy';
+import { TransformTimeline, TimelineStep } from '../../shared/components/transform-timeline/transform-timeline';
 import { EvidenceTick } from '../../shared/components/evidence-tick/evidence-tick';
 import { GutHub } from '../../shared/components/gut-hub/gut-hub';
 import { type Level } from '../../shared/components/level-card/level-card';
@@ -51,13 +52,13 @@ interface TreatStep {
   selector: 'app-home',
   imports: [
     NgOptimizedImage,
-    NgTemplateOutlet,
     CanvasStopDirective,
     ScrollRevealDirective,
     Wordmark,
     CtaPill,
     EyebrowLabel,
     Philosophy,
+    TransformTimeline,
     EvidenceTick,
     GutHub,
     LevelSelector,
@@ -212,6 +213,14 @@ export class Home implements AfterViewInit {
       bodyShort: 'Sleep, stress and mindset matter too. Check-ins keep the change lasting.',
     },
   ];
+
+  /** The four steps for the "Transform with E.A.S.E" timeline: short copy plus the landscape illustrations. */
+  protected readonly treatTimelineSteps: readonly TimelineStep[] = this.treatSteps.map((step, i) => ({
+    title: step.title,
+    body: step.bodyShort,
+    image: this.treatDesktopImages[i].src,
+    imageAlt: this.treatDesktopImages[i].alt,
+  }));
 
   /**
    * Scroll budget per step, in vh — the pin's total height is this × step
