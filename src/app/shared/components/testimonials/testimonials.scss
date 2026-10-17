@@ -275,7 +275,7 @@
   border: 1px solid var(--rule-on-light);
   border-radius: 50%;
   background: var(--surface-card-light);
-  color: var(--oxblood);
+  color: #000;
   box-shadow: var(--shadow-soft);
   cursor: pointer;
   transition: background var(--dur-micro) var(--ease);
@@ -304,7 +304,7 @@
   font-size: 0.74rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--olive);
+  color: #000;
 }
 
 .wa-dots {

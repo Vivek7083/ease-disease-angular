@@ -61,7 +61,7 @@
   font-size: 0.78rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--olive);
+  color: #000;
 }
 
 .founders-tabs {
@@ -110,7 +110,7 @@
 }
 
 a.founders-tab:hover {
-  color: var(--oxblood);
+  color: #000;
 }
 
 .founders-tab.active {
@@ -267,7 +267,7 @@ a.founders-tab:hover {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 0.94rem;
-  color: var(--oxblood);
+  color: #000;
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -304,7 +304,7 @@ a.founders-tab:hover {
   font-size: 0.7rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--oxblood);
+  color: #000;
 }
 
 .book-copy h3 {
@@ -362,7 +362,7 @@ a.founders-tab:hover {
 
 .programme-card h3 {
   font-size: var(--fs-display-s);
-  color: var(--oxblood);
+  color: #000;
 }
 
 .programme-tagline {
@@ -371,7 +371,7 @@ a.founders-tab:hover {
   font-size: 0.78rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--olive);
+  color: #000;
   opacity: 0.85;
 }
 
@@ -413,7 +413,7 @@ a.founders-tab:hover {
   margin-inline: auto;
   border-radius: 50%;
   background: color-mix(in oklab, var(--olive) 14%, var(--parchment));
-  color: var(--olive);
+  color: #000;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.1rem;
@@ -463,7 +463,7 @@ a.founders-tab:hover {
   font-size: 0.78rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--olive);
+  color: #000;
 }
 
 /* ---------- close ---------- */

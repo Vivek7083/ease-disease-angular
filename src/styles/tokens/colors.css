@@ -6,9 +6,9 @@
    earthy terracotta/olive/burgundy descent rather than one accent color
    repeated at every depth. Chosen dark enough to carry ivory text at the
    same AA-compliant contrast oxblood already does. */
---oxblood-deep:#2B0A0F;--oxblood:#5A1220;--ember-a:#B33A1E;--ember-b:#E8853A;--terracotta:#C06B4A;--olive:#4A5726;--parchment:#F0E2CE;--ivory:#FAF7EF;--ink:#1E1714;--sage-soft:#CBD6C4;--honey:#F2C14E;--evidence-blue:#0E86C4;
+--oxblood-deep:#2B0A0F;--oxblood:#5A1220;--ember-a:#B33A1E;--ember-b:#E8853A;--terracotta:#C06B4A;--olive:#4A5726;--parchment:#F0E2CE;--ivory:#FAF7EF;--ink:#000;--sage-soft:#CBD6C4;--honey:#F2C14E;--evidence-blue:#0E86C4;
 /* Semantic ink */
---text-on-dark:var(--ivory);--text-on-light:var(--ink);--text-quiet-dark:#E4D6CC;--text-quiet-light:#5C4A42;
+--text-on-dark:var(--ivory);--text-on-light:var(--ink);--text-quiet-dark:#E4D6CC;--text-quiet-light:#000;
 /* Sanctioned gradient — primary CTA only */
 --gradient-ember:linear-gradient(135deg,var(--terracotta) 0%,var(--ember-a) 50%,var(--ember-b) 100%);
 /* Roles */

@@ -214,7 +214,7 @@ export interface TeamMember {
       font-size: 0.72rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: var(--olive);
+      color: #000;
     }
 
     .credential {
@@ -264,7 +264,7 @@ export interface TeamMember {
       font-family: var(--font-body);
       font-weight: 500;
       font-size: 0.94rem;
-      color: var(--oxblood);
+      color: #000;
       cursor: pointer;
       transition:
         gap var(--dur-micro) var(--ease),

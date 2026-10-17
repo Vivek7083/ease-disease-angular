@@ -104,7 +104,7 @@ const LABELS: Record<SocialPlatform, string> = {
       border-radius: 50%;
       border: 1.5px solid var(--rule-on-light);
       background: var(--surface-card-light);
-      color: var(--oxblood);
+      color: #000;
       transition:
         background var(--dur-micro) var(--ease),
         border-color var(--dur-micro) var(--ease);

@@ -247,7 +247,7 @@
   font-family: var(--font-display);
   font-size: 2.4rem;
   line-height: 1;
-  color: var(--oxblood);
+  color: #000;
 }
 
 .stub-day-range {
@@ -268,7 +268,7 @@
 }
 
 .stub-year {
-  color: var(--olive);
+  color: #000;
 }
 
 .event-details {
@@ -285,7 +285,7 @@
   padding: 2px var(--sp-3);
   border-radius: var(--r-pill);
   background: color-mix(in oklab, var(--olive) 12%, var(--parchment));
-  color: var(--olive);
+  color: #000;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: var(--ls-eyebrow);

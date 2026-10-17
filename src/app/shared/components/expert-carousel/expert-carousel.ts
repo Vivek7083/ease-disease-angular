@@ -154,7 +154,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
       border-radius: 50%;
       border: 1.5px solid var(--rule-on-light);
       background: var(--surface-card-light);
-      color: var(--oxblood);
+      color: #000;
       cursor: pointer;
       transition:
         background var(--dur-micro) var(--ease),

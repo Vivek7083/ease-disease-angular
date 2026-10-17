@@ -287,7 +287,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       box-shadow: inset 0 0 0 1px rgba(251, 247, 240, 0.38);
     }
     .ghostDark {
-      color: var(--oxblood-deep);
+      color: #000;
       background: color-mix(in oklab, var(--terracotta) 8%, transparent);
       box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--terracotta) 55%, var(--oxblood));
     }

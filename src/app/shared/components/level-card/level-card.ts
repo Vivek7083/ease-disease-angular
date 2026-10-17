@@ -118,7 +118,7 @@ export interface Level {
       font-size: 0.66rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: var(--oxblood);
+      color: #000;
     }
     .lock-badge svg {
       width: 14px;
@@ -132,7 +132,7 @@ export interface Level {
     .locked-note {
       margin: var(--sp-4) 0 0;
       font-size: 0.9rem;
-      color: var(--oxblood);
+      color: #000;
     }
     .was {
       margin-right: var(--sp-2);

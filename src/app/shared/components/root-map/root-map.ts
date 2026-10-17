@@ -364,11 +364,11 @@ const NOTES_STEP = 0.14;
        (olive/burgundy), matching the nodes and links beneath it — just
        enough to read as a hint of that layer's identity, not a loud label. */
     .root-map-layer-label--conditions {
-      color: color-mix(in oklab, var(--olive) 55%, var(--text-quiet-light));
+      color: #000;
     }
 
     .root-map-layer-label--roots {
-      color: color-mix(in oklab, var(--oxblood) 55%, var(--text-quiet-light));
+      color: #000;
     }
 
     .root-map-nodes {
@@ -387,7 +387,7 @@ const NOTES_STEP = 0.14;
       border-radius: var(--r-pill);
       border: 1px solid color-mix(in oklab, var(--oxblood) 30%, transparent);
       background: color-mix(in oklab, var(--oxblood) 6%, var(--ivory));
-      color: var(--oxblood-deep);
+      color: #000;
       font-family: var(--font-body);
       font-size: 0.92rem;
       cursor: default;
@@ -502,7 +502,7 @@ const NOTES_STEP = 0.14;
       overflow: hidden;
       font-family: var(--font-body);
       font-size: 0.88rem;
-      color: var(--oxblood);
+      color: #000;
       transition:
         opacity var(--dur-base) var(--ease),
         max-height var(--dur-scene) var(--ease-out-soft),
@@ -775,7 +775,7 @@ const NOTES_STEP = 0.14;
       border-radius: var(--r-pill);
       border: 1px solid color-mix(in oklab, var(--oxblood) 40%, transparent);
       background: transparent;
-      color: var(--oxblood-deep);
+      color: #000;
       font-family: var(--font-body);
       font-size: 0.95rem;
       cursor: pointer;

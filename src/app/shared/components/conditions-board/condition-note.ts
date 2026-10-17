@@ -107,7 +107,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       font-size: 0.66rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: color-mix(in oklab, var(--olive) 70%, var(--text-quiet-light));
+      color: #000;
     }
 
     .note-head {
@@ -218,7 +218,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       background: color-mix(in oklab, var(--oxblood) 5%, var(--ivory));
       font-size: 0.84rem;
       line-height: 1.35;
-      color: var(--oxblood-deep);
+      color: #000;
     }
 
     @media (prefers-reduced-motion: reduce) {

@@ -228,7 +228,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
       font-size: 0.72rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: var(--oxblood);
+      color: #000;
     }
 
     .gauge-panel {
@@ -357,7 +357,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
       color: var(--text-quiet-light);
     }
     .gauge-node-label.is-active {
-      color: var(--oxblood);
+      color: #000;
       font-weight: 600;
     }
   `,

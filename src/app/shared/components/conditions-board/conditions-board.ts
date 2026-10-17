@@ -78,7 +78,7 @@ const INITIAL_NOTES = 8;
       border-radius: var(--r-pill);
       border: 1px solid color-mix(in oklab, var(--oxblood) 40%, transparent);
       background: transparent;
-      color: var(--oxblood-deep);
+      color: #000;
       font-family: var(--font-body);
       font-size: 0.95rem;
       cursor: pointer;
