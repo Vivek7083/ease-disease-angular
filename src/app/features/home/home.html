@@ -43,6 +43,19 @@
     </p>
   </div>
 
+  <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
+       symptom → condition → root-cause trace. Sits right after the hero and
+       the inter-quote, above "Our philosophy". Stays on the same ivory
+       canvas as every other section — oxblood/ink carry the "seriousness"
+       here, not an inverted dark panel. ============ -->
+  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
+    <div class="scene-inner">
+      <app-root-map (bookRequested)="bookConsultation()" />
+    </div>
+  </section>
+
+  <app-section-transition variant="curtain" />
+
   <!-- Shared card copy (desktop deck + mobile stack): title and body typed in
        word by word, with an optional "Read more" for long bodies. -->
   <ng-template #hookCopy let-point let-i="i">
@@ -499,18 +512,6 @@
   </section>
 
   <app-section-transition variant="vine" />
-
-  <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
-       symptom → condition → root-cause trace. Stays on the same ivory
-       canvas as every other section — oxblood/ink carry the "seriousness"
-       here, not an inverted dark panel. ============ -->
-  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
-    <div class="scene-inner">
-      <app-root-map (bookRequested)="bookConsultation()" />
-    </div>
-  </section>
-
-  <app-section-transition variant="curtain" />
 
   <!-- ============ PROGRAMME — packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">

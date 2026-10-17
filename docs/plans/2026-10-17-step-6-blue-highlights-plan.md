@@ -50,8 +50,12 @@ Both are same-size replacements, so `home.scss` stays under its 32kB style budge
 
 After approval: one commit with a one-line message, e.g. `Blue #00AEEF highlights for "listen" and the hook phrase`.
 
+## Step 7 status: move the conditions section up (built, awaiting approval to commit)
+
+Template-only change in `home.html`: the `#root-map` section and the `curtain` divider that follows it now sit between the inter-quote and `#hook`. The `vine` divider stays where it was (between Testimonials and Programmes), so every junction keeps exactly one divider. The guide describes the divider as sitting above the section; in this codebase the divider next to the section is the curtain below it, so that is the one that moved with it. Verified in Chromium at 1280 and 375 wide: order is hero, inter-quote, root-map, curtain, hook, dots, treat, sprout, results, testimonials, vine, programme, wave, experts, events; no console errors; type-check clean. No CSS changed. Note `.hook` still has zero top padding (it was written for the hero handing straight into it), but the screenshot shows the curtain divider and heading spacing looking fine.
+
 ## Remaining steps (from the guide)
 
-7 move "Symptoms and conditions" up, 8 philosophy as alternating rows, 9 new palette, 10 E.A.S.E timeline, 11 conditions map spacing, 12 conditions tree map, 13 testimonials below programmes, 14 remove founders billboard, 15 navy expert cards, 16 hero title and subtitle, 17 philosophy intro, 18 em dashes to hyphens, 19 "Optimum Health." pop, 20 remove vine divider, 21 booking form, 22-28 new section wording and the "E.A.S.E. Root Cause Assessment" name.
+8 philosophy as alternating rows, 9 new palette, 10 E.A.S.E timeline, 11 conditions map spacing, 12 conditions tree map, 13 testimonials below programmes, 14 remove founders billboard, 15 navy expert cards, 16 hero title and subtitle, 17 philosophy intro, 18 em dashes to hyphens, 19 "Optimum Health." pop, 20 remove vine divider, 21 booking form, 22-28 new section wording and the "E.A.S.E. Root Cause Assessment" name.
 
 Steps 1 to 5 are done: ivory, solid background, caps logo, bigger logo, black text. The Mac wordmark spacing is on hold for the user's feedback.
