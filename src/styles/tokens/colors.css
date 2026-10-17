@@ -12,7 +12,7 @@
 /* Sanctioned gradient — primary CTA only */
 --gradient-ember:linear-gradient(135deg,var(--terracotta) 0%,var(--ember-a) 50%,var(--ember-b) 100%);
 /* Roles */
---highlight-honey:var(--honey);--evidence:var(--evidence-blue);--rule-on-dark:#7A3A3F;--rule-on-light:#DCCBB5;
+--highlight-honey:var(--honey);--highlight-blue:#00AEEF;--evidence:var(--evidence-blue);--rule-on-dark:#7A3A3F;--rule-on-light:#DCCBB5;
 /* Deep surfaces — the ONLY place oxblood appears. Darkness is a surface, never the canvas.
    Use for: the root-cause scene panel, the menu overlay, the footer close block,
    the chat header, and dark cards. Ivory text on them runs 12.8–17:1. */

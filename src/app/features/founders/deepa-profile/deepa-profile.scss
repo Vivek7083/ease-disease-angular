@@ -178,7 +178,7 @@ a.founders-tab:hover {
 .mark {
   font-style: normal;
   font-weight: 600;
-  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  background: linear-gradient(transparent 52%, var(--highlight-blue) 52%);
   padding: 0 4px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;

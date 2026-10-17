@@ -53,10 +53,10 @@ export type DisplayAlign = 'left' | 'center';
     }
     .highlight {
       padding: 0 0.06em;
-      background: linear-gradient(to top, var(--honey) 0 26%, transparent 26%);
+      background: linear-gradient(to top, var(--highlight-blue) 0 26%, transparent 26%);
     }
     .highlight.dark {
-      background: linear-gradient(to top, var(--honey) 0 0.1em, transparent 0.1em);
+      background: linear-gradient(to top, var(--highlight-blue) 0 0.1em, transparent 0.1em);
     }
     .body {
       margin: 0;

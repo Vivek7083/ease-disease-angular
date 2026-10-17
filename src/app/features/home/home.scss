@@ -117,9 +117,9 @@
 
 .hero-headline .mark {
   font-style: normal;
-  /* Yellow highlighter swipe (honey) behind the key word. */
+  /* Blue highlighter swipe behind the key word. */
   font-weight: 600;
-  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  background: linear-gradient(transparent 52%, var(--highlight-blue) 52%);
   padding: 0 4px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -876,13 +876,13 @@
   max-width: 28ch;
 }
 
-/* Each word fills in with a honey (yellow) highlight — identical to the
+/* Each word fills in with the blue highlight — identical to the
    browser's ::selection colour — as it scrolls into view. --fill is a
    continuous 0..1 value recomputed every scroll frame so the sweep is
    genuinely tied to the scroll gesture, not a fixed-duration timer. */
 .hook-close-word {
   --fill: 0;
-  background: color-mix(in oklab, var(--honey) calc(var(--fill) * 100%), transparent);
+  background: color-mix(in oklab, var(--highlight-blue) calc(var(--fill) * 100%), transparent);
   padding-block: 0.06em;
   transition: background var(--dur-micro) linear;
 }
