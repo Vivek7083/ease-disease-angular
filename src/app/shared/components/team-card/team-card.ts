@@ -69,29 +69,24 @@ export interface TeamMember {
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
             </button>
           } @else {
-            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
+            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostLight" (pressed)="connectRequested.emit()" />
           }
         </div>
       </div>
     </article>
   `,
   styles: `
-    /* Hospitality look: a warm champagne-to-parchment card with a honey-gold
-       hairline and a fine inner frame, like a welcome card at a good hotel
-       or spa — warm and inviting rather than clinical. Solid (no blur), so
-       the colour never shifts with whatever scrolls behind it. */
+    /* Solid deep navy with white text, matching the footer and the result
+       panels, with a fine inner frame. Solid (no blur), so the colour never
+       shifts with whatever scrolls behind it. */
     .team-card {
       position: relative;
       overflow: hidden;
-      background: linear-gradient(
-        158deg,
-        color-mix(in oklab, var(--honey) 18%, var(--ivory)) 0%,
-        color-mix(in oklab, var(--honey) 8%, var(--parchment)) 100%
-      );
-      color: var(--ink);
+      background: var(--oxblood);
+      color: #fff;
       border-radius: var(--r-lg);
       padding: var(--sp-8) var(--sp-6) var(--sp-6);
-      border: 1px solid color-mix(in oklab, var(--honey) 60%, var(--parchment));
+      border: 1px solid var(--oxblood);
       outline: 1px solid color-mix(in oklab, var(--honey) 45%, transparent);
       outline-offset: -9px;
       box-shadow:
@@ -127,10 +122,10 @@ export interface TeamMember {
       width: 130px;
       height: 130px;
       fill: none;
-      stroke: var(--olive);
+      stroke: #d6e2ec; /* the old navy-on-navy stroke would vanish on the dark card */
       stroke-width: 2.5;
       stroke-linecap: round;
-      opacity: 0.4;
+      opacity: 0.18;
     }
     .foliage-a {
       bottom: -18px;
@@ -156,7 +151,7 @@ export interface TeamMember {
       background: var(--terracotta);
       offset-path: border-box;
       offset-rotate: 0deg;
-      opacity: 0.4;
+      opacity: 0.35;
       filter: drop-shadow(0 0 3px color-mix(in oklab, var(--terracotta) 55%, transparent));
       animation: card-energy-travel 9s linear infinite;
     }
@@ -205,7 +200,7 @@ export interface TeamMember {
     h3 {
       margin-top: var(--sp-5);
       font-size: var(--fs-display-s);
-      color: var(--ink);
+      color: #fff;
     }
 
     .role {
@@ -214,18 +209,18 @@ export interface TeamMember {
       font-size: 0.72rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: #000;
+      color: #fff;
     }
 
     .credential {
       margin-top: var(--sp-2);
       font-size: 0.82rem;
-      color: var(--text-quiet-light);
+      color: var(--text-quiet-dark);
     }
 
     .bio {
       margin-top: var(--sp-4);
-      color: var(--text-quiet-light);
+      color: var(--text-quiet-dark);
       font-size: 0.9rem;
       line-height: var(--lh-body);
       max-width: 32ch;
@@ -258,13 +253,13 @@ export interface TeamMember {
       margin-top: var(--sp-6);
       padding: 0 0 2px;
       border: none;
-      border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
       background: none;
       width: fit-content;
       font-family: var(--font-body);
       font-weight: 500;
       font-size: 0.94rem;
-      color: #000;
+      color: #fff;
       cursor: pointer;
       transition:
         gap var(--dur-micro) var(--ease),
@@ -284,14 +279,14 @@ export interface TeamMember {
     .cta-link:hover,
     .cta-link:focus-visible {
       gap: var(--sp-3);
-      border-color: var(--oxblood);
+      border-color: #fff;
     }
     .cta-link:hover svg,
     .cta-link:focus-visible svg {
       transform: translateX(2px);
     }
     .cta-link:focus-visible {
-      outline: 2px solid var(--oxblood);
+      outline: 2px solid #fff;
       outline-offset: 3px;
     }
 
