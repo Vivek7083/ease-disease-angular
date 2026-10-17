@@ -351,7 +351,7 @@ const NOTES_STEP = 0.14;
     }
 
     .root-map-layer-label {
-      margin-bottom: var(--sp-3);
+      margin-bottom: 14px;
       text-align: center;
       font-family: var(--font-mono);
       font-size: 0.74rem;
@@ -375,7 +375,7 @@ const NOTES_STEP = 0.14;
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: var(--sp-2);
+      gap: 14px 12px;
     }
 
     .root-map-node {
@@ -562,7 +562,7 @@ const NOTES_STEP = 0.14;
        read as one tidy map on a narrow screen. */
     @media (max-width: 899px) {
       .root-map {
-        gap: 30px;
+        gap: 40px;
       }
 
       .root-map-node {
@@ -583,11 +583,11 @@ const NOTES_STEP = 0.14;
 
       .root-map-layer-label {
         font-size: 0.72rem;
-        margin-bottom: 6px;
+        margin-bottom: 10px;
       }
 
       .root-map-nodes {
-        gap: 6px;
+        gap: 10px 8px;
       }
 
       .root-map-wrap {
@@ -657,8 +657,8 @@ const NOTES_STEP = 0.14;
 
     .rm-stage {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 580px) minmax(0, 1fr);
-      gap: var(--sp-6);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 650px) minmax(0, 1fr);
+      gap: 32px;
       align-items: center;
     }
 
@@ -667,13 +667,13 @@ const NOTES_STEP = 0.14;
     }
 
     .rm-stage .root-map {
-      gap: var(--sp-8);
+      gap: 52px;
     }
 
     .rm-stage .root-map-node {
       font-size: 0.94rem;
-      min-height: 38px;
-      padding: 0 16px;
+      min-height: 42px;
+      padding: 0 20px;
     }
 
     .rm-stage .root-map-caption {
