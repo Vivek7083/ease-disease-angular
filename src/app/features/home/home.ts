@@ -8,6 +8,7 @@ import { BookingCtaService } from '../../core/services/booking-cta';
 import { Wordmark } from '../../shared/components/wordmark/wordmark';
 import { CtaPill } from '../../shared/components/cta-pill/cta-pill';
 import { EyebrowLabel } from '../../shared/components/eyebrow-label/eyebrow-label';
+import { Philosophy } from '../../shared/components/philosophy/philosophy';
 import { EvidenceTick } from '../../shared/components/evidence-tick/evidence-tick';
 import { GutHub } from '../../shared/components/gut-hub/gut-hub';
 import { type Level } from '../../shared/components/level-card/level-card';
@@ -56,6 +57,7 @@ interface TreatStep {
     Wordmark,
     CtaPill,
     EyebrowLabel,
+    Philosophy,
     EvidenceTick,
     GutHub,
     LevelSelector,
