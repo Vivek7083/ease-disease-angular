@@ -85,10 +85,13 @@
   flex-direction: column;
   justify-content: center;
   gap: var(--sp-6);
+  /* Extra room between the header logo and the title. */
+  padding-top: 32px;
 }
 
 @media (min-width: 900px) {
   .hero-copy {
+    padding-top: 40px;
     padding-right: clamp(var(--sp-4), 4vw, var(--sp-10));
   }
 }
