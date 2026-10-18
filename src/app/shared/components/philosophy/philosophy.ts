@@ -18,6 +18,16 @@ export interface PhilosophyPoint {
       <header class="phil-head">
         <span class="phil-eyebrow">Root-cause, not symptoms</span>
         <h2 class="phil-title" id="hook-heading">Our philosophy</h2>
+        <div class="phil-intro">
+          <p>Every thought you think sends a message to your body - to heal, to grow, or to remain stuck.</p>
+          <p>For every dis-ease, there is a cause. When you remove the cause, the effect cannot remain.</p>
+          <p>With the right knowledge and choices - nutrition, lifestyle, and mindset - you can support your body’s natural ability to heal.</p>
+          <p class="phil-formula">
+            <!-- &ngsp; keeps the spaces: Angular drops whitespace-only text between elements. -->
+            <span class="pf-part">Right Knowledge</span>&ngsp;<span class="pf-part"><span class="pf-op">+</span>&ngsp;Right Action</span>&ngsp;<span class="pf-part"><span class="pf-op">=</span>&ngsp;<span class="pf-goal">Optimum Health.</span></span>
+          </p>
+          <p class="phil-faith">Healing begins the moment you choose FAITH over Fear.</p>
+        </div>
       </header>
 
       <div class="phil-rows">
@@ -74,6 +84,37 @@ export interface PhilosophyPoint {
       margin: 14px 0 0;
       color: #000;
     }
+    /* Intro text under the heading; the formula line is a little larger, in the heading font. */
+    .phil-intro {
+      max-width: 640px;
+      margin: 28px auto 0;
+    }
+    .phil-intro p {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: #000;
+      margin: 0 0 12px;
+    }
+    .phil-intro .phil-formula {
+      font-family: var(--font-display);
+      font-size: clamp(22px, 2.4vw, 28px);
+      line-height: 1.3;
+      letter-spacing: -0.01em;
+      margin: 26px 0 10px;
+    }
+    .phil-intro .phil-faith {
+      font-style: italic;
+      margin-bottom: 0;
+    }
+    @media (min-width: 761px) {
+      /* One line, centred even where it is a little wider than the 640px text column. */
+      .phil-intro .phil-formula {
+        white-space: nowrap;
+        margin-inline: -40px;
+      }
+    }
+
     .phil-row {
       display: grid;
       gap: 64px;
@@ -148,6 +189,12 @@ export interface PhilosophyPoint {
       }
       .phil-head {
         margin-bottom: 24px;
+      }
+      .phil-intro {
+        margin-top: 20px;
+      }
+      .phil-intro p {
+        font-size: 17px;
       }
       .phil-row,
       .phil-row:nth-child(odd),
