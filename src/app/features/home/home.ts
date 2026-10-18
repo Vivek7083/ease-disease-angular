@@ -1304,13 +1304,13 @@ export class Home implements AfterViewInit {
   protected readonly levels: readonly Level[] = [
     {
       tag: 'Start here',
-      name: 'One-time consult. 3-week plan.',
+      name: 'The E.A.S.E. Root Cause Assessment',
       price: MAIN_PLAN.price,
       originalPrice: MAIN_PLAN.originalPrice,
-      priceNote: '30 minutes',
+      priceNote: '30 minutes · Includes a 3-week plan',
       ctaLabel: 'BOOK YOUR CONSULTATION',
       recommended: true,
-      description: 'Understand your underlying root cause.',
+      description: 'A personalized, one-time consultation to explore your health concerns, understand your symptoms in context, and identify the next steps that make sense for you.',
     },
     {
       // Stays locked until first consultation is tracked (needs a backend).
