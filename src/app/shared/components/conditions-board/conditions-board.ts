@@ -17,7 +17,7 @@ const INITIAL_NOTES = 8;
   imports: [ScrollRevealDirective, ConditionNoteCard],
   template: `
     <p class="board-hint">Tap a note for the full list</p>
-    <ul class="board" id="board-notes" aria-label="Conditions we treat">
+    <ul class="board" id="board-notes" aria-label="Conditions we support">
       @for (note of visibleNotes(); track note.id; let i = $index) {
         <li class="slot reveal" [appScrollReveal]="0" [revealRepeat]="true" [class.is-odd]="i % 2 === 0">
           <app-condition-note [note]="note" [tilt]="i" [open]="openId() === note.id" (toggled)="toggle(note.id)" />

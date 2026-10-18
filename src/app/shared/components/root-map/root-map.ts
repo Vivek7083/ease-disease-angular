@@ -119,7 +119,7 @@ const NOTES_STEP = 0.14;
           </svg>
 
           <div class="root-map-layer">
-            <p class="root-map-layer-label">Conditions we treat</p>
+            <p class="root-map-layer-label">Tap any condition to trace it down to its root ↓</p>
             <div class="root-map-nodes" (pointerdown)="dismissHint()">
               @for (node of symptoms; track node.id; let i = $index) {
                 <button
@@ -147,10 +147,6 @@ const NOTES_STEP = 0.14;
                 </button>
               }
             </div>
-            <p class="root-map-prompt" [class.is-gone]="rootsRevealed()" [attr.aria-hidden]="rootsRevealed() ? 'true' : null">
-              <span class="root-map-prompt-arrow" aria-hidden="true">↑</span>
-              Tap any condition to trace it down to its root
-            </p>
           </div>
 
           <div class="root-map-layer" [class.layer-hidden]="!showConditions()">
@@ -181,12 +177,13 @@ const NOTES_STEP = 0.14;
            the notes. Which notes are showing is just their opacity/rise
            following scroll progress - nothing is added or removed, so
            scrolling back up un-pins them in reverse. -->
+      <header class="rm-head">
+        <app-eyebrow-label text="The bigger picture" />
+        <h2 id="root-map-heading" class="root-map-heading">What Your Body May Be Telling You</h2>
+        <p class="rm-sub">You may have questions about recurring symptoms, changes in your well-being, or why you still don't feel your best. It can be frustrating when you don't know what to do next.</p>
+      </header>
       <div class="rm-pin" #deskPin [style.height.vh]="deskPinVh">
         <div class="rm-viewport">
-          <header class="rm-head">
-            <app-eyebrow-label text="Conditions we treat" />
-            <h2 id="root-map-heading" class="root-map-heading">Symptoms and conditions we treat at the root</h2>
-          </header>
           <div class="rm-stage">
             <div class="rm-col rm-col--left">
               @for (note of leftNotes; track note.id; let i = $index) {
@@ -247,9 +244,9 @@ const NOTES_STEP = 0.14;
            fighting the content around it, and a phone has no spare width
            for a heading to sit beside anything anyway. -->
       <div class="root-map-lead">
-        <app-eyebrow-label text="Conditions we treat" />
-        <h2 id="root-map-heading" class="root-map-heading">Symptoms and conditions we treat at the root</h2>
-        <p class="root-map-intro">Many conditions, many names. Scroll to see where they meet.</p>
+        <app-eyebrow-label text="The bigger picture" />
+        <h2 id="root-map-heading" class="root-map-heading">What Your Body May Be Telling You</h2>
+        <p class="root-map-intro">You may have questions about recurring symptoms, changes in your well-being, or why you still don't feel your best. It can be frustrating when you don't know what to do next.</p>
       </div>
       <ng-container [ngTemplateOutlet]="mapTpl" />
       <app-conditions-board class="root-map-board" />
