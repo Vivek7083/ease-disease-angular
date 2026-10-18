@@ -33,7 +33,7 @@
     </div>
   </section>
 
-  <!-- ============ INTER-QUOTE — sits in the 20px gap between hero and hook,
+  <!-- ============ INTER-QUOTE - sits in the 20px gap between hero and hook,
        fills in word by word as it scrolls into view. ============ -->
   <div class="inter-quote">
     <p class="hook-close" #closeQuote>
@@ -43,10 +43,10 @@
     </p>
   </div>
 
-  <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
+  <!-- ============ THE ROOT MAP - diseases & categories, as an interactive
        symptom → condition → root-cause trace. Sits right after the hero and
        the inter-quote, above "Our philosophy". Stays on the same ivory
-       canvas as every other section — oxblood/ink carry the "seriousness"
+       canvas as every other section - oxblood/ink carry the "seriousness"
        here, not an inverted dark panel. ============ -->
   <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
     <div class="scene-inner">
@@ -106,7 +106,7 @@
 
   <app-section-transition variant="dots" />
 
-  <!-- ============ HOW WE TREAT (process steps) — mobile-first, step 1 only
+  <!-- ============ HOW WE TREAT (process steps) - mobile-first, step 1 only
        for now. Normal document flow, no scroll-jacking, each beat revealed
        once via appScrollReveal as it enters view (same primitive the rest
        of the site uses). ============ -->
@@ -116,7 +116,7 @@
 
   <app-section-transition variant="sprout" />
 
-  <!-- ============ RESULTS — how you feel after the work, plus the large
+  <!-- ============ RESULTS - how you feel after the work, plus the large
        client quote (PRD §4 + §5). Plain stacked flow with a light
        appScrollReveal, deliberately NOT pinned: it follows two pinned
        sections and should read as a calmer beat. ============ -->
@@ -128,13 +128,13 @@
 
   <app-section-transition variant="vine" />
 
-  <!-- ============ PROGRAMME — packages, picked by depth ============ -->
+  <!-- ============ PROGRAMME - packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="How it starts" />
       <h2 id="programme-heading" class="t-display">Start where you are. Go as deep as you need.</h2>
       <p class="t-body lede">
-        One consultation. Three months. Choose where to begin — drag or tap to explore what each level covers.
+        One consultation. Three months. Choose where to begin - drag or tap to explore what each level covers.
       </p>
       <app-level-selector [levels]="levels" (booked)="bookConsultation()" />
       <p class="levels-fallback">
@@ -167,7 +167,7 @@
           <span class="programme-billboard-ground" aria-hidden="true"></span>
         </div>
 
-        <!-- The highway car-pass was commented out — it played before the
+        <!-- The highway car-pass was commented out - it played before the
              billboard was even in frame on most scroll speeds, so it added
              motion without actually being seen. The road/car markup is kept
              (see home.scss) in case it's worth revisiting with a different
@@ -190,7 +190,7 @@
     </div>
   </section>
 
-  <!-- ============ TESTIMONIALS — a real client message shown as it was
+  <!-- ============ TESTIMONIALS - a real client message shown as it was
        received, a WhatsApp thread, rather than a styled pull-quote. Same
        canvas stop as the end of Results (flat, not chained). Sits right
        after the Programmes section. ============ -->
@@ -202,7 +202,7 @@
 
   <app-section-transition variant="wave" />
 
-  <!-- ============ TEAM — meet the experts ============ -->
+  <!-- ============ TEAM - meet the experts ============ -->
   <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="Meet the experts" />
@@ -215,7 +215,7 @@
     </div>
   </section>
 
-  <!-- ============ EVENTS & RETREATS — invite to the events page ============ -->
+  <!-- ============ EVENTS & RETREATS - invite to the events page ============ -->
   <section class="scene events-invite" id="events" appCanvasStop from="var(--canvas-team-to)" to="var(--canvas-team-to)" aria-labelledby="events-invite-heading">
     <div class="scene-inner">
       <app-events-invite />
@@ -223,14 +223,14 @@
   </section>
 
   @if (showRemainingSections) {
-  <!-- ============ THE DESCENT — root causes, the deepest beat ============ -->
+  <!-- ============ THE DESCENT - root causes, the deepest beat ============ -->
   <section class="scene descent" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="descent-heading">
     <div class="scene-inner">
       <div class="deep-panel">
         <app-eyebrow-label text="Where it often starts" />
         <h2 id="descent-heading" class="t-display on-dark">Different symptoms often grow from the same roots.</h2>
         <p class="t-body on-dark panel-lede">
-          Most people treat each symptom on its own — a cream for the skin, an antacid for the bloating.
+          Most people treat each symptom on its own - a cream for the skin, an antacid for the bloating.
           Underneath, fewer things are actually going on.
         </p>
         <div class="hub-frame">
@@ -249,14 +249,14 @@
     </div>
   </section>
 
-  <!-- ============ THE TURN — ember dawn, the path out ============ -->
+  <!-- ============ THE TURN - ember dawn, the path out ============ -->
   <section class="scene turn" appCanvasStop from="var(--canvas-turn-from)" to="var(--canvas-turn-to)" aria-labelledby="turn-heading">
     <div class="scene-inner turn-grid">
       <div>
         <app-eyebrow-label text="The turn · why this works" />
         <h2 id="turn-heading" class="t-display">Root-cause healing vs. symptom management.</h2>
         <p class="t-body lede">
-          Conventional care treats what is in front of it. Root-cause care asks why it is there — and builds
+          Conventional care treats what is in front of it. Root-cause care asks why it is there - and builds
           a plan around your bloodwork, your history and your life, not a standard protocol.
         </p>
       </div>
@@ -277,7 +277,7 @@
     </div>
   </section>
 
-  <!-- ============ CLOSE — booking ============ -->
+  <!-- ============ CLOSE - booking ============ -->
   <section class="scene close" id="book" appCanvasStop from="var(--canvas-close-from)" to="var(--canvas-close-to)" aria-labelledby="close-heading">
     <div class="scene-inner close-inner">
       <app-wordmark class="close-wordmark" />

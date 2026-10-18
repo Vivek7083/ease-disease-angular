@@ -3,14 +3,14 @@ import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
 import { ConditionNoteCard } from './condition-note';
 import { NOTES } from './conditions-data';
 
-/** How many notes show before the "more" button — the first half of the PRD list. */
+/** How many notes show before the "more" button - the first half of the PRD list. */
 const INITIAL_NOTES = 8;
 
 /**
  * Mobile "pinboard" under the root map: a single column of notes, the first
- * half to start with and the rest on request. Normal flow, no pin — a calm
+ * half to start with and the rest on request. Normal flow, no pin - a calm
  * beat after the map. (Large screens place the same notes around the
- * pinned map instead — see root-map.ts.)
+ * pinned map instead - see root-map.ts.)
  */
 @Component({
   selector: 'app-conditions-board',
@@ -93,10 +93,10 @@ const INITIAL_NOTES = 8;
 export class ConditionsBoard {
   protected readonly hiddenCount = NOTES.length - INITIAL_NOTES;
 
-  /** One note open at a time — opening another closes the last, so the board never grows into a wall of text. */
+  /** One note open at a time - opening another closes the last, so the board never grows into a wall of text. */
   protected readonly openId = signal<string | null>(null);
 
-  /** Only the first half show until the reader asks for the rest — newly shown notes arrive through the usual scroll reveal. */
+  /** Only the first half show until the reader asks for the rest - newly shown notes arrive through the usual scroll reveal. */
   protected readonly showAll = signal(false);
   protected readonly visibleNotes = computed(() => (this.showAll() ? NOTES : NOTES.slice(0, INITIAL_NOTES)));
 
@@ -105,7 +105,7 @@ export class ConditionsBoard {
     const wasOpen = this.showAll();
     this.showAll.set(!wasOpen);
     if (wasOpen) {
-      // Collapsing shortens the page under the reader — keep the button, and the reader, in place.
+      // Collapsing shortens the page under the reader - keep the button, and the reader, in place.
       this.openId.set(null);
       requestAnimationFrame(() => button.scrollIntoView({ block: 'center', behavior: 'smooth' }));
     }

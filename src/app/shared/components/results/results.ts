@@ -7,7 +7,7 @@ interface Outcome {
   readonly body: string;
 }
 
-// PRD §4 outcomes, worded as "can" / "many people" rather than guarantees —
+// PRD §4 outcomes, worded as "can" / "many people" rather than guarantees -
 // same softening the content doc applies to the remission line. The
 // medication line explicitly keeps the doctor in the loop.
 const OUTCOMES: readonly Outcome[] = [
@@ -30,7 +30,7 @@ export class Results implements AfterViewInit {
 
   protected readonly outcomes = OUTCOMES;
 
-  /** 0..1 — how far down the list the reader has scrolled; the mobile stem grows to match. */
+  /** 0..1 - how far down the list the reader has scrolled; the mobile stem grows to match. */
   protected readonly stemProgress = signal(0);
 
   ngAfterViewInit(): void {

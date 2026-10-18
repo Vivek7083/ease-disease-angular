@@ -71,7 +71,7 @@ export class CanvasStoryService {
 
     for (const stop of this.stops) {
       const rect = stop.element.getBoundingClientRect();
-      // Blend only across the boundary — one viewport height of scroll (or the
+      // Blend only across the boundary - one viewport height of scroll (or the
       // section's own height, if shorter). A section can be arbitrarily tall
       // (e.g. a pinned scrollytelling track) without dragging out its color
       // transition or stalling the next section's; the canvas always finishes

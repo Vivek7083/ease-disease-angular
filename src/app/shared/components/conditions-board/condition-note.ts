@@ -5,7 +5,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
  * One pinned note: group name, a one-line preview, and (for the longer
  * lists) a tap to open the full set as chips. Open/closed state lives with
  * the parent, so only one note is open at a time across a whole board.
- * Used by the mobile column, the desktop pinboard and the desktop grid —
+ * Used by the mobile column, the desktop pinboard and the desktop grid -
  * the same note everywhere, only its placement changes.
  */
 @Component({
@@ -234,7 +234,7 @@ export class ConditionNoteCard {
   readonly note = input.required<ConditionNote>();
   readonly open = input(false);
   readonly compact = input(false);
-  /** Any number — only its parity matters, to alternate the tilt direction between neighbouring notes. */
+  /** Any number - only its parity matters, to alternate the tilt direction between neighbouring notes. */
   readonly tilt = input(0);
   readonly toggled = output<void>();
 

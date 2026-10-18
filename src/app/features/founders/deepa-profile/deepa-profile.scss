@@ -204,7 +204,7 @@ a.founders-tab:hover {
 /* ---------- book ---------- */
 /* A gradient "frame" (padding-box content on top of a border-box gradient)
    ties the card to the E.A.S.E. Dis-ease tile's ember colour without
-   washing the whole card in it — the long description still needs to read
+   washing the whole card in it - the long description still needs to read
    as plain dark-on-light text. */
 .book-feature {
   margin-top: var(--sp-10);
@@ -229,7 +229,7 @@ a.founders-tab:hover {
 
 .book-cover {
   position: relative;
-  /* Matches the cover artwork's own ratio (243 × 371) — combined with
+  /* Matches the cover artwork's own ratio (243 × 371) - combined with
      object-fit: contain below, the whole cover is always visible, at any
      screen size, instead of object-fit: cover cropping a mismatched box. */
   aspect-ratio: 243 / 371;
@@ -237,7 +237,7 @@ a.founders-tab:hover {
   width: min(156px, 100%);
   margin-inline: auto;
   border-radius: var(--r-md);
-  /* A 1px gradient frame — padding-box left transparent so the card's own
+  /* A 1px gradient frame - padding-box left transparent so the card's own
      background shows through rather than adding a fill colour of its own. */
   background: linear-gradient(160deg, var(--terracotta), color-mix(in oklab, var(--terracotta) 40%, var(--honey))) border-box;
   border: 1px solid transparent;
@@ -344,7 +344,7 @@ a.founders-tab:hover {
 }
 
 /* Same off-white champagne-to-parchment treatment as the team-card shell in
-   the home page's experts section — both programme cards share this exact
+   the home page's experts section - both programme cards share this exact
    colour (no per-card variant); they're told apart by their copy, not a
    colour-coded system. */
 .programme-card {

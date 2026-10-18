@@ -136,7 +136,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       }
     }
     /* Every other pill: the whole button content flips over, front (label)
-       to back (duration + price) — the button is sized to fit the wider of
+       to back (duration + price) - the button is sized to fit the wider of
        the two faces and never changes size, so revealing never "grows" it. */
     .cta-flip {
       display: inline-grid;
@@ -173,7 +173,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       opacity: 0.85;
     }
     /* On a device that actually has hover, hovering/focusing flips the
-       button over on demand — it shows the settled ₹499 plainly (not a
+       button over on demand - it shows the settled ₹499 plainly (not a
        replay of the one-time ₹999 scratch, which only ever plays once per
        visitor regardless of how often this is hovered). */
     @media (hover: hover) and (pointer: fine) {
@@ -190,7 +190,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
     .meta-sep {
       opacity: 0.6;
     }
-    /* The price "turns over" on its own, on a long, randomized timer — it is
+    /* The price "turns over" on its own, on a long, randomized timer - it is
        a passive, ambient price-anchor (show ₹999, settle on ₹499), not an
        interaction affordance, so it has to work identically with no hover
        or press at all, which is what actually fixes this on touch devices. */
@@ -230,7 +230,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
       background: currentColor;
       transform: scaleX(0);
       transform-origin: left;
-      /* Matches CtaPill.STRIKE_DRAW_MS exactly — the scratch is driven by a
+      /* Matches CtaPill.STRIKE_DRAW_MS exactly - the scratch is driven by a
          single shared timing everywhere it appears. */
       transition: transform 2000ms linear;
     }
@@ -268,7 +268,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
     }
     .primary {
       color: var(--ivory);
-      /* The design system's one sanctioned gradient (colors.css) — terracotta
+      /* The design system's one sanctioned gradient (colors.css) - terracotta
          easing through ember, kept to this single token so every primary CTA
          on the site shares the exact same gradient rather than each button
          rolling its own. */
@@ -323,7 +323,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
     }
     /* The compact chrome pill lives permanently in the top corner, so at
        narrow widths its reveal grows a second line underneath instead of
-       widening sideways (there's no room to grow into) — a dedicated
+       widening sideways (there's no room to grow into) - a dedicated
        vertical-stack layout, rather than the horizontal unfurl every other
        pill (and this one, above 480px) uses. */
     @media (max-width: 480px) {
@@ -336,7 +336,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
         text-align: center;
         transition: padding-inline 260ms var(--ease-out-soft);
       }
-      /* "₹999 · 30 min" is wider than "Book now" — the tight 2px resting
+      /* "₹999 · 30 min" is wider than "Book now" - the tight 2px resting
          padding would crowd it right up to the pill's edge, so the sides
          ease open in step with the meta reveal below instead of staying
          fixed. */
@@ -362,7 +362,7 @@ export type CtaVariant = 'primary' | 'ghostDark' | 'ghostLight';
         opacity: 1;
         margin-top: 2px;
       }
-      /* Lead with the price — the turnover is the part worth noticing,
+      /* Lead with the price - the turnover is the part worth noticing,
          "30 min" is secondary context after it. */
       .cta.compact .price-flip {
         order: 1;
@@ -392,7 +392,7 @@ export class CtaPill implements OnInit {
   readonly price = input<string | undefined>(undefined);
   readonly originalPrice = input<string | undefined>(undefined);
   /** Distinguishes this pill's one-time reveal from every other pill's on
-   *  the page — required whenever `price`/`originalPrice` are set, since
+   *  the page - required whenever `price`/`originalPrice` are set, since
    *  several pills can share the same label. */
   readonly revealKey = input<string | undefined>(undefined);
   readonly variant = input<CtaVariant>('primary');
@@ -410,7 +410,7 @@ export class CtaPill implements OnInit {
   private static readonly CYCLE_MAX_INTERVAL_MS = 20_000;
   /** Total time the reveal stays on screen, start to collapse. */
   private static readonly CYCLE_VISIBLE_MS = 5_000;
-  /** Scratch begins the instant the ₹999 text appears — no pause first. */
+  /** Scratch begins the instant the ₹999 text appears - no pause first. */
   private static readonly PRE_STRIKE_MS = 0;
   private static readonly STRIKE_DRAW_MS = 2_000;
   private static readonly SETTLE_HOLD_MS = CtaPill.CYCLE_VISIBLE_MS - CtaPill.PRE_STRIKE_MS - CtaPill.STRIKE_DRAW_MS;
@@ -440,12 +440,12 @@ export class CtaPill implements OnInit {
     try {
       window.localStorage.setItem(CtaPill.STORAGE_PREFIX + key, '1');
     } catch {
-      /* private browsing / quota — not worth failing over, it'll just replay next visit */
+      /* private browsing / quota - not worth failing over, it'll just replay next visit */
     }
   }
 
-  /** Every price pill: rests as just the label, then — once, on a visitor's
-   *  first visit only — reveals "30 min · ₹999", scratches the ₹999 off,
+  /** Every price pill: rests as just the label, then - once, on a visitor's
+   *  first visit only - reveals "30 min · ₹999", scratches the ₹999 off,
    *  settles on ₹499, holds a moment, and collapses back down to just the
    *  label again for good. */
   private scheduleReveal(key: string): void {

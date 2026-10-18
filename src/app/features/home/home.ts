@@ -42,7 +42,7 @@ interface HookPoint {
 interface TreatStep {
   readonly title: string;
   readonly body: string;
-  /** Shorter version used on the desktop timeline only — four columns of
+  /** Shorter version used on the desktop timeline only - four columns of
    *  full mobile-length body copy left no room for the illustration to
    *  actually read as the focus, so desktop gets the condensed version. */
   readonly bodyShort: string;
@@ -81,7 +81,7 @@ export class Home implements AfterViewInit {
   /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
   protected readonly showRemainingSections = false;
 
-  /** The main offer every primary CTA shows — Level 1. */
+  /** The main offer every primary CTA shows - Level 1. */
   protected readonly plan = MAIN_PLAN;
 
   constructor() {
@@ -110,7 +110,7 @@ export class Home implements AfterViewInit {
   private static readonly BILLBOARD_CURSOR_TILT_MAX_DEG = 6;
 
   /**
-   * Direct DOM write, not a signal — this just feeds a CSS custom property
+   * Direct DOM write, not a signal - this just feeds a CSS custom property
    * the idle-wiggle keyframes already read (see `--cursor-tilt` in
    * home.scss), so there's nothing for Angular to re-render on every
    * mousemove.
@@ -133,7 +133,7 @@ export class Home implements AfterViewInit {
 
   /**
    * Carves the booking CTA out of step 1's own body copy (the literal
-   * phrase "30-minute call") instead of tacking on a separate button —
+   * phrase "30-minute call") instead of tacking on a separate button -
    * one less element competing for space/height in the node column, and
    * one less thing that can wrap onto its own line oddly. body/bodyShort
    * stay the single source of truth for the text; this just finds where
@@ -147,11 +147,11 @@ export class Home implements AfterViewInit {
     return { before: text.slice(0, index), link: phrase, after: text.slice(index + phrase.length) };
   }
 
-  /** How We Treat · Step 1 — topics that surface one by one during the call illustration. */
+  /** How We Treat · Step 1 - topics that surface one by one during the call illustration. */
   protected readonly treatStepOneTags = ['Diet', 'Sleep', 'Past reports', 'Lifestyle', 'Goals'] as const;
 
   /**
-   * Desktop's landscape (16:9) illustrations — generated separately from
+   * Desktop's landscape (16:9) illustrations - generated separately from
    * the mobile portrait set, not cropped from them. Step 1's already has
    * its own window chrome (macOS traffic lights, call controls) baked
    * into the image itself, so the surrounding markup doesn't draw a
@@ -167,21 +167,21 @@ export class Home implements AfterViewInit {
   /**
    * ---------------- How We Treat · pinned step sequence ----------------
    * Same pinned, scroll-scrubbed deck mechanic as the Hook section's
-   * desktop track, but on mobile — each step's content and illustration
+   * desktop track, but on mobile - each step's content and illustration
    * share one spot and cross-dissolve into the next as you scroll, rather
    * than stacking one after another down the page.
    *
    * The plateau is deliberately wide (most of each step's travel): the
    * illustration needs to actually hold fully visible for a readable beat,
    * not just flash past mid-crossfade. A connecting line grows beneath the
-   * active step's badge during that same hold (see treatLineProgress) —
+   * active step's badge during that same hold (see treatLineProgress) -
    * once it finishes growing, a short, quick burst (the narrow remaining
    * fade) swaps in the next step. So the "wait" is spent watching the line
    * connect forward, not watching two steps smear through each other.
    */
   /**
    * bodyShort is deliberately staged to render as exactly one line fewer
-   * per step — 4 lines, 3, 2, 1 at the desktop column width — not just
+   * per step - 4 lines, 3, 2, 1 at the desktop column width - not just
    * trimmed by feel. That's what reads as "a sequence of steps" on the
    * desktop timeline: each node starts at the same line (title/content/
    * image share the same .treat-node-copy gap in every column, see
@@ -194,8 +194,8 @@ export class Home implements AfterViewInit {
   protected readonly treatSteps: readonly TreatStep[] = [
     {
       title: 'You speak, we listen',
-      body: 'A full conversation about your symptoms, your current diet, sleep, stress, past reports and lifestyle — and your goals. Nothing is rushed, nothing assumed.',
-      bodyShort: 'Your symptoms, diet, sleep, stress and past reports — we go through all of it together.',
+      body: 'A full conversation about your symptoms, your current diet, sleep, stress, past reports and lifestyle - and your goals. Nothing is rushed, nothing assumed.',
+      bodyShort: 'Your symptoms, diet, sleep, stress and past reports - we go through all of it together.',
     },
     {
       title: 'Getting to the Root Cause',
@@ -204,7 +204,7 @@ export class Home implements AfterViewInit {
     },
     {
       title: 'Digest with Ease',
-      body: "We use food as medicine, and nutrient supplements where your results show a need, to support your body through dis-ease. When your body gets the nutrition it's been missing, it can begin to recover. Food comes first — supplements only when your tests and history point to them.",
+      body: "We use food as medicine, and nutrient supplements where your results show a need, to support your body through dis-ease. When your body gets the nutrition it's been missing, it can begin to recover. Food comes first - supplements only when your tests and history point to them.",
       bodyShort: 'Food as medicine first. Supplements added only when your results and history call for them.',
     },
     {
@@ -223,37 +223,37 @@ export class Home implements AfterViewInit {
   }));
 
   /**
-   * Scroll budget per step, in vh — the pin's total height is this × step
+   * Scroll budget per step, in vh - the pin's total height is this × step
    * count. Balances two pulls in opposite directions: a step needs to hold
    * still long enough to actually read the body copy (too little and it
    * flashes past mid-scroll), but on a phone, scroll distance is physical
-   * effort (each screen-height is roughly a swipe) — three steps at 150vh
+   * effort (each screen-height is roughly a swipe) - three steps at 150vh
    * each meant ~4-5 swipes just to get through this one section, which is
    * exactly the "takes a lot of effort" complaint. This is the middle
    * ground: a real, readable hold per step without turning the section
    * into a long haul.
    */
-  protected readonly treatVhPerStep = 120; // mobile scroll budget per step — shortened so the next step arrives sooner
+  protected readonly treatVhPerStep = 120; // mobile scroll budget per step - shortened so the next step arrives sooner
 
   /**
    * Same trailing-hold trick as HOOK_DRAG_PHASE: the drag through all steps
    * only uses this fraction of the pin's scrollable range, so the last step
    * reaches full view and then actually holds still for a beat before the
    * pin releases, instead of arriving and being yanked away in the same
-   * instant. Halved from the original 0.18 hold (0.82 phase) — once step 4
+   * instant. Halved from the original 0.18 hold (0.82 phase) - once step 4
    * is visible and read, there's nothing left to wait for, so continuing to
    * scroll should reach the next section sooner.
    */
   private static readonly TREAT_DRAG_PHASE = 0.91;
   /**
-   * Mobile steps crossfade in place, one "current" step at a time — a step
+   * Mobile steps crossfade in place, one "current" step at a time - a step
    * fades/rises in over the last (1 - TREAT_STACK_HOLD) of its share of the
    * scroll, after holding fully visible for TREAT_STACK_HOLD of the one
    * before it, so each step gets a moment to be read before the next one
    * starts to arrive. Kept low (was 0.4) so the next step starts arriving
    * almost as soon as you resume scrolling past the current one, instead of
    * needing a long dead scroll first. (Previously these slid up as opaque
-   * stacked sheets leaving a strip of each earlier step showing — that
+   * stacked sheets leaving a strip of each earlier step showing - that
    * card-stack look read as a swipeable carousel, which it isn't, and the
    * opaque sheets had to fill the whole pinned viewport height to stay
    * covered, which left a lot of dead white space under any step shorter
@@ -268,7 +268,7 @@ export class Home implements AfterViewInit {
   protected readonly treatDragProgress = computed(() => Home.clamp01(this.treatPinProgress() / Home.TREAT_DRAG_PHASE));
   protected readonly treatDragUnits = computed(() => this.treatDragProgress() * (this.treatSteps.length - 1));
 
-  /** 0..1 — how "arrived" step i is (step 1 starts there). Eased out so it settles. */
+  /** 0..1 - how "arrived" step i is (step 1 starts there). Eased out so it settles. */
   private treatStackProgress(i: number): number {
     if (i === 0) {
       return 1;
@@ -277,18 +277,18 @@ export class Home implements AfterViewInit {
     return 1 - (1 - raw) ** 3;
   }
 
-  /** Binary, not a crossfade — only the current step is shown at all, no opacity blend with its neighbour. The slide (treatCardTransform) carries the whole transition. */
+  /** Binary, not a crossfade - only the current step is shown at all, no opacity blend with its neighbour. The slide (treatCardTransform) carries the whole transition. */
   protected treatCardOpacity(i: number): number {
     return this.treatStackActive(i) ? 1 : 0;
   }
 
-  /** A small rise-in on arrival — the only transition now (see treatCardOpacity). */
+  /** A small rise-in on arrival - the only transition now (see treatCardOpacity). */
   protected treatCardTransform(i: number): string {
     const rise = (1 - this.treatStackProgress(i)) * 16;
     return `translateY(${rise.toFixed(2)}px)`;
   }
 
-  /** The step now in front — the only one that takes taps and isn't aria-hidden. */
+  /** The step now in front - the only one that takes taps and isn't aria-hidden. */
   protected treatStackActive(i: number): boolean {
     const last = this.treatSteps.length - 1;
     return this.treatStackProgress(i) > 0.5 && (i === last || this.treatStackProgress(i + 1) <= 0.5);
@@ -301,7 +301,7 @@ export class Home implements AfterViewInit {
   });
 
   /** Tapping a progress dot scrolls the page to the point in the pin's scroll
-   *  range where that step is fully arrived — the mechanic is still driven
+   *  range where that step is fully arrived - the mechanic is still driven
    *  by scroll position (updateTreatScroll), this just moves the scrollbar
    *  there for you, the same way a video scrubber tap jumps playback. */
   protected scrollToTreatStep(i: number): void {
@@ -324,7 +324,7 @@ export class Home implements AfterViewInit {
 
   /**
    * Same "Scroll for more" cue as the Hook section's end-of-pin hint
-   * (hookHintAtEnd) — rises in as step 4 finishes arriving, then fades back
+   * (hookHintAtEnd) - rises in as step 4 finishes arriving, then fades back
    * out over the first 60% of the trailing hold, so continuing to scroll
    * visibly dismisses it instead of it just vanishing in a cut when the
    * section releases.
@@ -363,7 +363,7 @@ export class Home implements AfterViewInit {
    * Below HOOK_HORIZONTAL_BREAKPOINT, the mobile pinned deck above handles
    * this (one step fully visible at a time, crossfading into the next).
    * On a wide screen there's room to lay all four steps out left to right
-   * instead — each one reveals in place as its turn in the scroll comes up,
+   * instead - each one reveals in place as its turn in the scroll comes up,
    * a connecting line grows from its badge toward the next one, and
    * (unlike the mobile deck) nothing ever fades back out: by the end all
    * four sit on screen together as one finished timeline, the line
@@ -371,18 +371,18 @@ export class Home implements AfterViewInit {
    */
   protected readonly treatHorizontal = signal(false);
 
-  /** Shorter than the mobile per-step budget — a wheel-scroll on desktop
+  /** Shorter than the mobile per-step budget - a wheel-scroll on desktop
    *  covers distance faster than a phone swipe, and there's no illustration
    *  to hold fully visible here the way the mobile deck does (each node
    *  stays small and simply accumulates), so less scroll is needed per
    *  node for it to read as deliberate rather than rushed. */
-  protected readonly treatDesktopVhPerStep = 131.25; // 70 × 1.25 × 1.5 — desktop hold per step
+  protected readonly treatDesktopVhPerStep = 131.25; // 70 × 1.25 × 1.5 - desktop hold per step
 
-  /** Same trailing-hold idea as TREAT_DRAG_PHASE — the last node finishes
+  /** Same trailing-hold idea as TREAT_DRAG_PHASE - the last node finishes
    *  revealing and the pin holds briefly before releasing into Root Map. */
   private static readonly TREAT_DESKTOP_DRAG_PHASE = 0.82;
 
-  /** How much of a unit's travel the reveal ramp takes — the rest of the
+  /** How much of a unit's travel the reveal ramp takes - the rest of the
    *  unit (after a node is fully visible) is spent just advancing toward
    *  the next node's own ramp, since this node has nothing left to animate. */
   private static readonly TREAT_NODE_RISE = 0.6;
@@ -398,7 +398,7 @@ export class Home implements AfterViewInit {
 
   /**
    * 0..1, ramping as this node's turn arrives and staying at 1 forever
-   * after — unlike the mobile deck's treatCardVisibility, there's no
+   * after - unlike the mobile deck's treatCardVisibility, there's no
    * departure fade, because nothing here ever needs to make room for
    * what's next (all four sit side by side, not stacked in the same spot).
    */
@@ -420,7 +420,7 @@ export class Home implements AfterViewInit {
 
   /**
    * 0..1 growth of the horizontal line from node i's badge toward node
-   * i+1's — same idea as the mobile deck's treatLineProgress, just read
+   * i+1's - same idea as the mobile deck's treatLineProgress, just read
    * left-to-right instead of top-to-bottom.
    */
   protected treatNodeLineProgress(i: number): number {
@@ -451,32 +451,32 @@ export class Home implements AfterViewInit {
   /**
    * The hook · a pinned scrollytelling track, active at every breakpoint.
    * Desktop (>=HOOK_HORIZONTAL_BREAKPOINT): a continuous horizontal slide,
-   * one card per full drag of scroll — image panel one side, info the other.
+   * one card per full drag of scroll - image panel one side, info the other.
    * Mobile: the pin holds and cards crossfade discretely, one per scroll
    * segment. Either way, `position: sticky` on the viewport means the pin
    * releases itself and normal scroll continues once the last card has held
-   * — no extra bookkeeping needed for "let the user scroll on" after.
+   * - no extra bookkeeping needed for "let the user scroll on" after.
    */
   private static readonly HOOK_HORIZONTAL_BREAKPOINT = 900;
 
   /**
-   * How much pinned scroll each card gets, on desktop — the pin's total
+   * How much pinned scroll each card gets, on desktop - the pin's total
    * height is this × the card count. The middle cards (not the first, which
    * also gets a free head start from the pre-lock entry reveal, or the
    * last, which gets its own trailing hold below) only ever get their share
    * of this budget, so raising it is what actually gives them real
    * breathing room before the next one starts crossfading in, without
    * touching the shape of the crossfade curve itself (still smooth either
-   * way — this only stretches it out).
+   * way - this only stretches it out).
    */
   protected readonly hookVhPerCard = 125;
 
   /**
    * On desktop, the drag through all cards uses only this fraction of the
-   * pin's scrollable range — the rest is a trailing hold at the last card's
+   * pin's scrollable range - the rest is a trailing hold at the last card's
    * fully-arrived position. Without it, the last card reaches full view at
    * the exact same scroll pixel where the pin releases (progress hits 1 at
-   * both), so it never actually sits still — it arrives and is immediately
+   * both), so it never actually sits still - it arrives and is immediately
    * yanked away into whatever (currently empty) comes next. Cards 1..N-1
    * don't have this problem since the drag keeps moving into the next card.
    */
@@ -484,7 +484,7 @@ export class Home implements AfterViewInit {
 
   /**
    * The heading holds still for this opening slice of the pin's scroll
-   * range before any card is shown at all — scrolling into the hook first
+   * range before any card is shown at all - scrolling into the hook first
    * reads as "the question arriving", then the cards answer it one by one
    * once that finishes. cardsPhaseProgress remaps the remaining range back
    * to a clean 0..1 for everything downstream (active-card index, the
@@ -494,7 +494,7 @@ export class Home implements AfterViewInit {
   /**
    * No longer gates the heading's own reveal (that's hookEntryProgress,
    * driven separately as the section scrolls into view and finishes before
-   * the pin ever locks) — kept at 0 so the card sequence starts moving the
+   * the pin ever locks) - kept at 0 so the card sequence starts moving the
    * instant pinned scrolling begins, with no extra dead scroll tacked on
    * after the heading's already fully typed.
    */
@@ -505,10 +505,10 @@ export class Home implements AfterViewInit {
   /**
    * Before the pin is fully "stuck" at the top of the viewport, its sticky
    * child (the heading) still sits at the pin's own natural position in the
-   * document — which means it's already scrolling into view from the
+   * document - which means it's already scrolling into view from the
    * bottom of the screen well before hookProgress starts moving. Gating the
    * heading's reveal on hookProgress alone left that whole entry stretch
-   * showing nothing (the heading sat there fully clipped) — a blank gap
+   * showing nothing (the heading sat there fully clipped) - a blank gap
    * between the hero leaving and the pin engaging. This tracks that entry
    * directly (0 when the pin's top is at the bottom edge of the viewport, 1
    * once it reaches the top and sticks) so the heading can start typing in
@@ -522,11 +522,11 @@ export class Home implements AfterViewInit {
     Home.clamp01((this.hookProgress() - Home.HEADING_REVEAL_PHASE) / (1 - Home.HEADING_REVEAL_PHASE)),
   );
   /**
-   * 0..1 as the hook section scrolls into view — the heading/eyebrow
+   * 0..1 as the hook section scrolls into view - the heading/eyebrow
    * reveal left-to-right as this climbs, like a line being typed out, then
    * hold fully revealed once it hits 1 (which happens right as the pin
    * engages, handing off cleanly into the card sequence). Eased (fast
-   * start, settling in) rather than linear — a linear map spends its first
+   * start, settling in) rather than linear - a linear map spends its first
    * stretch of scroll producing barely-visible progress, which read as a
    * plain blank section for a beat before anything seemed to happen.
    */
@@ -535,13 +535,13 @@ export class Home implements AfterViewInit {
   );
   /**
    * The card track's own fade-in used to key off hookProgress, which only
-   * starts moving once the pin is fully stuck — but the pin's sticky child
+   * starts moving once the pin is fully stuck - but the pin's sticky child
    * is visible (and the heading is already typing) for the whole entry
    * stretch before that. That gap meant the heading could finish typing
    * with the track still sitting at opacity 0, a blank stretch right where
    * the first card should already be waiting. Tying it to the same
    * entry-driven, eased signal as the heading means the track is already
-   * fully opaque by the moment the pin locks — the first card is "already
+   * fully opaque by the moment the pin locks - the first card is "already
    * loaded" the instant its viewport is reached, exactly like the heading.
    */
   protected readonly cardsOpacity = computed(() => (this.headingRevealProgress() < 0.95 ? 0 : 1));
@@ -552,7 +552,7 @@ export class Home implements AfterViewInit {
     return Home.clamp01(this.cardsPhaseProgress() / Home.HOOK_DRAG_PHASE);
   });
 
-  /** Continuous 0..(count-1) position along the desktop drag — the single
+  /** Continuous 0..(count-1) position along the desktop drag - the single
    *  number every card's visibility/parallax below is computed from. No
    *  dwell/hold mapping on top of it: scroll maps to motion proportionally
    *  the whole way, which is what actually reads as smooth rather than a
@@ -563,24 +563,24 @@ export class Home implements AfterViewInit {
    * Desktop card deck: every card is stacked in the same spot (position:
    * absolute) rather than laid out side by side on a wide track. Each one's
    * opacity/position/blur is a continuous function of its distance from the
-   * current drag position — full strength on a plateau right at its own
+   * current drag position - full strength on a plateau right at its own
    * "turn", fading out over the approach/departure. Because a card's fade-out
    * and its neighbor's fade-in both happen across that same window, they
    * cross-dissolve through each other rather than handing off with a cut.
    */
   /**
-   * Adjacent cards sit 1 unit apart, so plateau + fade must not exceed 0.5 —
+   * Adjacent cards sit 1 unit apart, so plateau + fade must not exceed 0.5 -
    * otherwise both neighbors are still within each other's plateau/fade
    * range at the midpoint and briefly sit at (or near) full opacity at the
    * same time, reading as two cards' text stacked on top of each other
    * instead of one handing off to the next. Keeping the sum at exactly 0.5
    * means a card reaches zero right as its neighbor starts rising from zero
-   * — a clean, quick swap with no double-exposure — while still giving each
+   * - a clean, quick swap with no double-exposure - while still giving each
    * card the bulk of its turn (the plateau) fully legible and still.
    */
   private static readonly HOOK_CARD_PLATEAU = 0.35;
   private static readonly HOOK_CARD_FADE = 0.15;
-  /** Blur is only ever applied to the image (see cardImageFilter) — blurring
+  /** Blur is only ever applied to the image (see cardImageFilter) - blurring
    *  the copy made two overlapping paragraphs of blurred text during a
    *  crossfade, which read as noise, not depth. */
   private static readonly HOOK_CARD_MAX_BLUR_PX = 5;
@@ -600,7 +600,7 @@ export class Home implements AfterViewInit {
     return 'none';
   }
 
-  /** Incoming/outgoing card's image settles in with a gentle scale (0.96 → 1) rather than a flat dissolve — physical weight instead of a slideshow cut. */
+  /** Incoming/outgoing card's image settles in with a gentle scale (0.96 → 1) rather than a flat dissolve - physical weight instead of a slideshow cut. */
   protected cardImageTransform(i: number): string {
     const scale = 0.96 + 0.04 * this.cardVisibility(i);
     return `scale3d(${scale}, ${scale}, 1)`;
@@ -623,7 +623,7 @@ export class Home implements AfterViewInit {
 
   /**
    * Clicking a rail number scrolls the page to the exact scroll position
-   * where that card sits at the centre of its plateau (cardVisibility = 1) —
+   * where that card sits at the centre of its plateau (cardVisibility = 1) -
    * worked out by inverting the same chain updateHookScroll uses to go the
    * other way (scroll position -> hookDragUnits). The pin itself never
    * moves; what moves is the page scroll position underneath it.
@@ -647,20 +647,20 @@ export class Home implements AfterViewInit {
   }
 
   /**
-   * "Scroll to explore" cue for the desktop deck — visible once the heading
+   * "Scroll to explore" cue for the desktop deck - visible once the heading
    * and first card have faded in, then fades away itself as soon as the
    * reader starts actually progressing through the cards. Mirrors the
    * mobile carousel's own swipe hint, just for the scroll-driven track.
    * It reappears (reworded) once the last card has arrived, since the pin's
    * own trailing hold (HOOK_DRAG_PHASE) means there's still real scroll
-   * distance left before the next section begins — without this, that hold
+   * distance left before the next section begins - without this, that hold
    * reads as "the page is stuck" rather than "keep scrolling".
    */
   private readonly hookHintAtStart = computed(() => 1 - Home.clamp01(this.hookDragUnits() / 0.35));
   /**
    * Rises to full as the last card settles into place (right as the pin's
    * trailing hold begins), then fades back out over the first ~60% of that
-   * hold itself — so continuing to scroll through the hold visibly
+   * hold itself - so continuing to scroll through the hold visibly
    * dismisses the hint, instead of it sitting at full opacity, static, for
    * the entire hold and only disappearing in a cut when the section ends.
    */
@@ -680,7 +680,7 @@ export class Home implements AfterViewInit {
   /**
    * ---------------- Mobile · swipeable card carousel ----------------
    * Touch users reach for a swipe gesture on a stacked card, not a scroll
-   * gesture — a pinned scroll-hijacked track reads as broken/stuck on a
+   * gesture - a pinned scroll-hijacked track reads as broken/stuck on a
    * phone. Below HOOK_HORIZONTAL_BREAKPOINT the hook section is plain,
    * normal-height content: scrolling the page always just scrolls the page,
    * and cards only change in response to a real horizontal swipe or a drag
@@ -692,7 +692,7 @@ export class Home implements AfterViewInit {
   private readonly mobileDragOffset = signal(0);
   protected readonly isCarouselDragging = signal(false);
 
-  /** Keep in sync with .hook-carousel-track's own `gap` in home.scss — baked into the step distance so each index still lands exactly on the next slide. */
+  /** Keep in sync with .hook-carousel-track's own `gap` in home.scss - baked into the step distance so each index still lands exactly on the next slide. */
   private static readonly HOOK_CARD_GAP_PX = 12;
 
   /**
@@ -812,7 +812,7 @@ export class Home implements AfterViewInit {
     return this.erasingCard() === i;
   }
 
-  /** Title words type first, so the body waits for them — except once the reader has paged, when the title is long done. */
+  /** Title words type first, so the body waits for them - except once the reader has paged, when the title is long done. */
   protected bodyLead(title: string): number {
     return this.hasToggledCopy ? 0 : this.words(title).length;
   }
@@ -820,7 +820,7 @@ export class Home implements AfterViewInit {
   /**
    * "Read more" / "Read less": the current page erases back-to-front (words
    * fade out in reverse, caret running backwards), then the next page types
-   * in with the same fill — the card keeps its size, only the text changes.
+   * in with the same fill - the card keeps its size, only the text changes.
    */
   protected advanceCopy(): void {
     const i = this.pagedCardIndex();
@@ -840,14 +840,14 @@ export class Home implements AfterViewInit {
     }, eraseMs);
   }
 
-  /** Flips on the first touch/tap/key on the stack — the "swipe / tap" hint then fades away. */
+  /** Flips on the first touch/tap/key on the stack - the "swipe / tap" hint then fades away. */
   protected readonly hookHintDismissed = signal(false);
 
   /** How far each card behind the front one peeks out to the right, px. */
   private static readonly HOOK_STACK_PEEK_PX = 18;
   /** Each step deeper in the stack shrinks the card by this much. */
   private static readonly HOOK_STACK_SHRINK = 0.045;
-  /** Card width + gap, px — captured on pointerdown so a drag follows the finger 1:1. */
+  /** Card width + gap, px - captured on pointerdown so a drag follows the finger 1:1. */
   private carouselStep = 320;
 
   /**
@@ -899,7 +899,7 @@ export class Home implements AfterViewInit {
 
   /** Fraction of the track's own width a drag must cross to commit to the next/previous card instead of springing back. */
   private static readonly HOOK_SWIPE_COMMIT_FRACTION = 0.22;
-  /** A fast flick commits even under that distance threshold — px/ms. */
+  /** A fast flick commits even under that distance threshold - px/ms. */
   private static readonly HOOK_SWIPE_VELOCITY_COMMIT = 0.5;
   /** Dragging past the first/last card still "gives" a little instead of stopping dead. */
   private static readonly HOOK_RUBBER_BAND_FACTOR = 0.35;
@@ -960,7 +960,7 @@ export class Home implements AfterViewInit {
 
     let next = index;
     if (event.type === 'pointercancel') {
-      // The browser took the gesture (e.g. a vertical page scroll) — spring back.
+      // The browser took the gesture (e.g. a vertical page scroll) - spring back.
     } else if (Math.abs(dx) < Home.HOOK_TAP_MAX_MOVE_PX) {
       // A tap, not a swipe: left side steps back, anywhere else steps forward.
       const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
@@ -980,7 +980,7 @@ export class Home implements AfterViewInit {
   }
 
   /**
-   * The pill below the cards — a small, single filled bar (not dots), like a
+   * The pill below the cards - a small, single filled bar (not dots), like a
    * loading bar: empty at card 1, full at the last card. It's draggable too:
    * tap anywhere to jump proportionally, or drag for the fill to track your
    * finger continuously while the carousel snaps card-by-card underneath it.
@@ -1035,7 +1035,7 @@ export class Home implements AfterViewInit {
   }
 
   /**
-   * Off by default — a hardcoded switch, not a user preference, so turning
+   * Off by default - a hardcoded switch, not a user preference, so turning
    * gentle auto-advance on later is a one-line flip rather than new work.
    * Paused automatically while the reader's finger is actually on the
    * carousel or the pill.
@@ -1060,7 +1060,7 @@ export class Home implements AfterViewInit {
   /**
    * As the reader leaves the hero, the gut illustration simply dims out
    * (no separate minimized icon to manage) and the booking button hands off
-   * to the app-chrome's copy — continuously cross-fading against scroll
+   * to the app-chrome's copy - continuously cross-fading against scroll
    * position (via BookingCtaService) rather than snapping in at a
    * threshold, so the handoff reads as one button "arriving" in the corner
    * instead of two buttons swapping.
@@ -1071,7 +1071,7 @@ export class Home implements AfterViewInit {
   /**
    * Fades across the ENTIRE hero exit (not just the first 70% of it) so the
    * gut illustration is still visibly dimming right up to the moment the
-   * hook's pin takes over and its heading appears — no scroll stretch where
+   * hook's pin takes over and its heading appears - no scroll stretch where
    * both are gone and the screen just shows blank canvas in between.
    */
   protected readonly heroGutOpacity = computed(() => 1 - Home.clamp01(this.heroExitProgress()));
@@ -1085,7 +1085,7 @@ export class Home implements AfterViewInit {
    * which is a fixed 100svh. Reading that child's own height keeps the scroll
    * math locked to it; documentElement.clientHeight instead changes while a
    * phone's address bar slides in or out mid-scroll, nudging the progress
-   * back and forth — visible as jitter on a slow scroll.
+   * back and forth - visible as jitter on a slow scroll.
    */
   private static stickyViewportHeight(pin: HTMLElement): number {
     const sticky = pin.firstElementChild as HTMLElement | null;
@@ -1098,10 +1098,10 @@ export class Home implements AfterViewInit {
 
   /**
    * The closing line fills in word by word as it scrolls up through the
-   * middle of the viewport — muted ink brightening to full oxblood, rather
+   * middle of the viewport - muted ink brightening to full oxblood, rather
    * than a plain fade-in. `closeFillProgress` is 0 while the line's top is
    * still low in the viewport and 1 once it has scrolled up near the top.
-   * Each word's fill is a continuous 0..1 value (not a hard on/off flip) —
+   * Each word's fill is a continuous 0..1 value (not a hard on/off flip) -
    * recomputed every scroll frame and bound straight to a CSS custom
    * property, so the color genuinely sweeps across the sentence instead of
    * snapping word by word. WORD_FILL_SPAN > one word's share of the
@@ -1136,10 +1136,10 @@ export class Home implements AfterViewInit {
   }
 
   /**
-   * Mobile heading reveal — a plain IntersectionObserver fade-in (the old
+   * Mobile heading reveal - a plain IntersectionObserver fade-in (the old
    * appScrollReveal directive) snaps on at a fixed trigger point and then
    * runs on its own fixed-duration timer, independent of how fast the
-   * reader is actually scrolling — which is exactly what read as abrupt.
+   * reader is actually scrolling - which is exactly what read as abrupt.
    * This instead recomputes every scroll frame from the heading's own
    * position, the same way updateCloseFill already does for the closing
    * quote, so the reveal is genuinely tied 1:1 to the scroll gesture.
@@ -1227,7 +1227,7 @@ export class Home implements AfterViewInit {
 
     const rect = pin.getBoundingClientRect();
     // documentElement.clientHeight (not window.innerHeight) to match the
-    // svh unit the pin/viewport are sized in — on mobile, innerHeight shifts
+    // svh unit the pin/viewport are sized in - on mobile, innerHeight shifts
     // as the browser chrome shows/hides mid-scroll, which drifted out of
     // sync with where `position: sticky` actually releases, releasing the
     // pin early and skipping the last card's hold.
@@ -1248,7 +1248,7 @@ export class Home implements AfterViewInit {
   protected readonly hookPoints: readonly HookPoint[] = [
     {
       title: 'Why root-cause healing?',
-      body: 'Every dis-ease has a cause. Have you ever asked — why do I have this dis-ease?',
+      body: 'Every dis-ease has a cause. Have you ever asked - why do I have this dis-ease?',
       icon: 'root',
       image: 'images/hook/root-cause.webp',
       imageAlt: 'A plant with leafy growth above the soil line and a deep, branching root system below it.',
@@ -1262,7 +1262,7 @@ export class Home implements AfterViewInit {
     },
     {
       title: 'Your personal health guide',
-      body: 'The Ease guide is available around the clock — ask it anything about your symptoms, your food, or your results. It connects the dots between what you are experiencing and what your body may be telling you.',
+      body: 'The Ease guide is available around the clock - ask it anything about your symptoms, your food, or your results. It connects the dots between what you are experiencing and what your body may be telling you.',
       icon: 'ai',
       image: 'images/hook/ai-chat.webp',
       imageAlt: 'A chat interface showing a guided health conversation.',
@@ -1285,7 +1285,7 @@ export class Home implements AfterViewInit {
     {
       name: 'Blood-sugar swings',
       symptoms: 'Fatigue · poor sleep · cravings',
-      description: 'Energy that crashes by 4pm is rarely about willpower — it is often about what and when you eat.',
+      description: 'Energy that crashes by 4pm is rarely about willpower - it is often about what and when you eat.',
     },
     {
       name: 'Hormone imbalance',
@@ -1339,7 +1339,7 @@ export class Home implements AfterViewInit {
       role: 'Founder, Awaken Your Soul',
       credential: 'IFM (USA) certified · Gut health & mindset coach',
       initials: 'D',
-      bio: 'Helps people with gut issues and misaligned inner states — not just healing symptoms, but reprogramming how they think, feel, digest and heal, through her 90-day transformation journey, Becoming Creators of a F.A.B. L.I.F.E.',
+      bio: 'Helps people with gut issues and misaligned inner states - not just healing symptoms, but reprogramming how they think, feel, digest and heal, through her 90-day transformation journey, Becoming Creators of a F.A.B. L.I.F.E.',
       ctaLabel: 'Know more about Deepa',
       ctaStyle: 'link',
       photo: 'images/team/deepa.jpg',

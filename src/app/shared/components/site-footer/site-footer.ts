@@ -17,10 +17,10 @@ interface FooterLink {
 
 /**
  * Oxblood-deep background (the site's one dark surface, same token the Team
- * cards and Descent panel already use) with olive as the secondary accent —
+ * cards and Descent panel already use) with olive as the secondary accent -
  * not the ember CTA gradient, that stays reserved for actual booking CTAs.
  * Socials and legal links are left as "#" placeholders until the founders
- * supply real ones — see need-review/footer-placeholders.md.
+ * supply real ones - see need-review/footer-placeholders.md.
  */
 @Component({
   selector: 'app-site-footer',
@@ -30,7 +30,7 @@ interface FooterLink {
       <div class="footer-top">
         <div class="footer-brand">
           <app-wordmark [onDark]="true" [collapse]="false" />
-          <p class="footer-tagline">Digestion-first, root-cause care — not a replacement for your doctor.</p>
+          <p class="footer-tagline">Digestion-first, root-cause care - not a replacement for your doctor.</p>
           <app-cta-pill label="Book now" variant="ghostLight" (pressed)="bookRequested.emit()" />
         </div>
 
@@ -137,7 +137,7 @@ interface FooterLink {
     }
 
     /* The socials/legal hrefs are still "#" placeholders, which resolve to
-       the current page itself — browsers count that as "visited" on first
+       the current page itself - browsers count that as "visited" on first
        paint, so without this the links would pick up the UA default visited
        color instead of the footer's own palette. */
     .footer-col a:visited {

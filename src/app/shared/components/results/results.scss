@@ -150,7 +150,7 @@
   .results-item {
     --leaf-sweep: 52px;
     grid-template-columns: 1fr;
-    /* start, not the default stretch — otherwise a two-line body in one
+    /* start, not the default stretch - otherwise a two-line body in one
        cell pushes that cell's title off the shared row. */
     align-content: start;
     row-gap: var(--sp-1);
@@ -220,7 +220,7 @@
 }
 
 /* ---------- leaf transitions ---------- */
-/* The stem grows down the page with the reader (mobile — on large screens
+/* The stem grows down the page with the reader (mobile - on large screens
    each row's own stem segment arrives with its leaves). Each leaf then
    unfurls from its twig: it starts as a small, rounded bud and sweeps out
    into its leaf shape as it settles, with a slight spring. The twig and stem

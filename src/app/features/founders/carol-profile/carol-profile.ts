@@ -29,7 +29,7 @@ interface SkillGroup {
 }
 
 /**
- * Routed at /founders/carol — a dedicated portfolio-style page, distinct
+ * Routed at /founders/carol - a dedicated portfolio-style page, distinct
  * from Deepa's (founders.ts), since the two founders' material doesn't fit
  * the same template: Carol's is a LinkedIn-style professional record
  * (experience, certifications, skills), not a single bio paragraph.
@@ -52,13 +52,13 @@ export class CarolProfile {
   protected readonly about =
     'Carol helps people trace chronic conditions back to their root cause, with a focus on type 2 diabetes, ' +
     'autoimmunity, thyroid health and menopause. Her background spans hospital operations and patient care before ' +
-    'functional nutrition — she brings a clinical eye to a field that often skips it.';
+    'functional nutrition - she brings a clinical eye to a field that often skips it.';
 
   protected readonly featuredPost = {
     org: 'HELPED',
     title: 'Understanding Men’s Mental Health',
     subtitle: 'A Conversation on Awareness, Support, and Well-Being',
-    description: 'Certificate of participation — a community mental health webinar Carol attended, reflecting the same whole-person lens she brings to nutrition work: health rarely has just one cause.',
+    description: 'Certificate of participation - a community mental health webinar Carol attended, reflecting the same whole-person lens she brings to nutrition work: health rarely has just one cause.',
   };
 
   protected readonly experience: readonly ExperienceEntry[] = [

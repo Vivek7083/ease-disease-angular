@@ -1,19 +1,19 @@
 :root{
-/* Base — Oxblood & Ember. No colors outside this list.
+/* Base - Oxblood & Ember. No colors outside this list.
    --olive added deliberately for the root map's three-layer trace (symptoms
    → conditions → roots): terracotta carries the symptoms layer, this olive
-   the conditions layer, and oxblood (burgundy) the roots layer — an
+   the conditions layer, and oxblood (burgundy) the roots layer - an
    earthy terracotta/olive/burgundy descent rather than one accent color
    repeated at every depth. Chosen dark enough to carry ivory text at the
    same AA-compliant contrast oxblood already does. */
 --oxblood-deep:#12293B;--oxblood:#213848;--ember-a:#BF3820;--ember-b:#E06F27;--terracotta:#BF3820;--olive:#213848;--parchment:#F0E2CE;--ivory:#FAF7EF;--ink:#000;--sage-soft:#CBD6C4;--honey:#00AEEF;--evidence-blue:#0E86C4;
 /* Semantic ink */
 --text-on-dark:var(--ivory);--text-on-light:var(--ink);--text-quiet-dark:#D6E2EC;--text-quiet-light:#000;
-/* Sanctioned gradient — primary CTA only */
+/* Sanctioned gradient - primary CTA only */
 --gradient-ember:linear-gradient(135deg,var(--terracotta) 0%,var(--ember-a) 50%,var(--ember-b) 100%);
 /* Roles */
 --highlight-honey:var(--honey);--highlight-blue:#00AEEF;--evidence:var(--evidence-blue);--rule-on-dark:#3A5F7D;--rule-on-light:#DCCBB5;
-/* Deep surfaces — the ONLY place oxblood appears. Darkness is a surface, never the canvas.
+/* Deep surfaces - the ONLY place oxblood appears. Darkness is a surface, never the canvas.
    Use for: the root-cause scene panel, the menu overlay, the footer close block,
    the chat header, and dark cards. Ivory text on them runs 12.8–17:1. */
 --surface-deep:var(--oxblood-deep);

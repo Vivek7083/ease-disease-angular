@@ -16,7 +16,7 @@ export interface Level {
   readonly description?: string;
   readonly features?: readonly string[];
   readonly recommended?: boolean;
-  /** Shown but not purchasable yet — the card dims, wears a lock, and its CTA points back to the level that unlocks it. */
+  /** Shown but not purchasable yet - the card dims, wears a lock, and its CTA points back to the level that unlocks it. */
   readonly locked?: boolean;
   readonly lockedNote?: string;
 }
@@ -206,7 +206,7 @@ export interface Level {
       font-size: 0.9rem;
       line-height: 1.5;
       color: var(--text-quiet-light);
-      /* Tight, not --sp-5 — reads as the heading's own subline rather than
+      /* Tight, not --sp-5 - reads as the heading's own subline rather than
          a second, separate point sitting below it. */
       margin: var(--sp-1) 0 0;
     }

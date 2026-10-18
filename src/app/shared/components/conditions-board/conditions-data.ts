@@ -1,24 +1,24 @@
 export interface ConditionNote {
   readonly id: string;
   readonly title: string;
-  /** Which family on the root map this note belongs to — shown as a small caption so the board and the map read as one thing. */
+  /** Which family on the root map this note belongs to - shown as a small caption so the board and the map read as one thing. */
   readonly family: string;
   /** The id of the matching family node on the root map (see SYMPTOMS in root-map.ts), so a note arriving can light its own trace. */
   readonly familyId: string;
   readonly items: readonly string[];
-  /** Overrides the auto-built "first three items" preview — for notes whose items are long sentences, not short condition names. */
+  /** Overrides the auto-built "first three items" preview - for notes whose items are long sentences, not short condition names. */
   readonly preview?: string;
 }
 
 /** Collapsed notes show this many items; anything beyond becomes "+N more". */
 export const PREVIEW_COUNT = 3;
-/** Notes with this many items or fewer just show them all — a "+1 more" toggle isn't worth a tap. */
+/** Notes with this many items or fewer just show them all - a "+1 more" toggle isn't worth a tap. */
 export const SHOW_ALL_MAX = 4;
 
 // Content is the PRD's own "Symptoms and conditions we treat at the root"
 // list, verbatim, in the PRD's order. Wording of the heavier conditions
-// (autoimmune, neurological) is still pending legal review — see
-// need-review notes — so keep edits to this one array.
+// (autoimmune, neurological) is still pending legal review - see
+// need-review notes - so keep edits to this one array.
 export const NOTES: readonly ConditionNote[] = [
   {
     id: 'diabetes',

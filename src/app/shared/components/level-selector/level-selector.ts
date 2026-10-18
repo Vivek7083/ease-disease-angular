@@ -3,9 +3,9 @@ import { LevelCard, type Level } from '../level-card/level-card';
 
 /**
  * A depth gauge, not a pinned scrollytelling drag like the Hook section's
- * slider — a small, static control the reader drags or taps directly. The
+ * slider - a small, static control the reader drags or taps directly. The
  * thumb tracks the pointer continuously (any position, not just the three
- * stops), and only snaps to the nearest stop on release — a native
+ * stops), and only snaps to the nearest stop on release - a native
  * <input type="range"> can't do that (its step snaps live, mid-drag), so
  * this is a custom pointer-driven control instead, with role="slider" for
  * the same keyboard/screen-reader behaviour a native one would give for free.
@@ -40,7 +40,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
         <!-- Ticks sit in the same 0–100% coordinate space as the thumb (absolute,
              not flex space-between) so tick 1/3 line up exactly under the thumb
              at its two end positions, not inset by half a tick's own width.
-             Each one is its own button — clicking a number opens that package
+             Each one is its own button - clicking a number opens that package
              directly, same as dragging the thumb to it. -->
         <div class="gauge-ticks">
           @for (level of levels(); track level.name; let i = $index) {
@@ -59,7 +59,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
         </div>
         <p class="gauge-active-label" aria-hidden="true">{{ levels()[activeIndex()].tag }}</p>
 
-        <!-- Swipe left/right over the package card also moves between packages —
+        <!-- Swipe left/right over the package card also moves between packages -
              a tap still reaches the card's own CTA button normally, only a real
              horizontal drag past the threshold changes the selection. -->
         <div class="gauge-panel-wrap" (pointerdown)="onPanelPointerDown($event)" (pointerup)="onPanelPointerUp($event)">
@@ -69,7 +69,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
         </div>
       </div>
 
-      <!-- Desktop (≥900px): scrollytelling instead of drag/swipe — all three
+      <!-- Desktop (≥900px): scrollytelling instead of drag/swipe - all three
            packages sit stacked in normal flow on the right, and scrolling past
            each one is what changes the selection (an IntersectionObserver on
            each card, not a scroll-position calculation). The node tracker on
@@ -122,7 +122,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
       display: none;
     }
 
-    /* Inset from the component's own edges (not padding — percentage
+    /* Inset from the component's own edges (not padding - percentage
        positions for the absolutely-positioned thumb/ticks resolve against
        this element's own box, so padding wouldn't shrink that coordinate
        space, margin does) so the end stops clear the page's fixed scroll
@@ -145,13 +145,13 @@ import { LevelCard, type Level } from '../level-card/level-card';
 
     /* The track's own hit area stays a full 44px tap target (touch target
        minimum), but focus should ring the thin visible line, not that whole
-       invisible box — otherwise focus reads as a big bordered pill. Scoped to
+       invisible box - otherwise focus reads as a big bordered pill. Scoped to
        :focus-visible so a mouse drag/click never shows it, only keyboard. */
     .gauge-track:focus-visible .gauge-groove {
       box-shadow: 0 0 0 3px color-mix(in oklab, var(--oxblood) 35%, transparent);
     }
 
-    /* A simple, fully-filled oxblood line — not a progress bar, the triangle
+    /* A simple, fully-filled oxblood line - not a progress bar, the triangle
        alone marks the current position. Not the ember CTA gradient; that
        stays reserved for actual CTAs. */
     .gauge-groove {
@@ -161,7 +161,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
       transition: box-shadow var(--dur-micro) var(--ease);
     }
 
-    /* A triangular marker instead of a round handle — points down into the
+    /* A triangular marker instead of a round handle - points down into the
        groove like a level/depth flag. Olive against the oxblood line for the
        same two-accent pairing used elsewhere. Purely visual: the track
        element underneath handles all pointer input across its full width. */
@@ -282,8 +282,8 @@ import { LevelCard, type Level } from '../level-card/level-card';
       display: block;
       scroll-margin-top: 30vh;
     }
-    /* Package 1 gets extra room below it before package 2 can take over —
-       about a second longer to read at an ordinary scroll speed — since it's
+    /* Package 1 gets extra room below it before package 2 can take over -
+       about a second longer to read at an ordinary scroll speed - since it's
        the first thing the reader meets and needs a beat to land, where 2 and
        3 are already oriented by then. */
     .gauge-stack-card.is-first {
@@ -334,7 +334,7 @@ import { LevelCard, type Level } from '../level-card/level-card';
       color: #fff6ef;
       font-weight: 600;
     }
-    /* The line between two nodes — filled the same oxblood once both nodes
+    /* The line between two nodes - filled the same oxblood once both nodes
        it joins are filled, so clicking node 3 reads as "1 through 3", the
        whole path lighting up, not just the one node you tapped. */
     .gauge-node-connector {
@@ -396,7 +396,7 @@ export class LevelSelector {
           }
         },
         // A card "becomes current" once it crosses the vertical middle third
-        // of the viewport, not merely on entering it — this is what makes
+        // of the viewport, not merely on entering it - this is what makes
         // scrolling past the long gap under package 1 still land cleanly.
         { rootMargin: '-40% 0px -40% 0px', threshold: 0 },
       );

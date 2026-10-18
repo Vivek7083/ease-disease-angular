@@ -14,14 +14,14 @@ interface MapNode {
 interface MapLink {
   readonly from: string;
   readonly to: string;
-  /** 'sr' = symptom→condition, 'rt' = condition→root — which layer reveal gates this link's own draw-in, independent of whether it's "lit" (traced). */
+  /** 'sr' = symptom→condition, 'rt' = condition→root - which layer reveal gates this link's own draw-in, independent of whether it's "lit" (traced). */
   readonly kind: 'sr' | 'rt';
 }
 
-// Draft data — an illustrative pattern map, not a clinical claim. Top layer
+// Draft data - an illustrative pattern map, not a clinical claim. Top layer
 // is the seven families the PRD's condition list folds into (the full list
 // lives on the notes in app-conditions-board); the bottom layer is a single
-// root — minerals & vitamin deficiencies — per the PRD. The middle layer
+// root - minerals & vitamin deficiencies - per the PRD. The middle layer
 // is deliberately short. For the Ease Disease team to review and refine,
 // same as the "not a diagnosis" disclaimer used elsewhere on the page.
 const SYMPTOMS: readonly MapNode[] = [
@@ -45,7 +45,7 @@ const CONDITIONS: readonly MapNode[] = [
   { id: 'nervous', label: 'Stress & nervous system' },
 ];
 
-// One root for everything — the point of the map is that the lines converge.
+// One root for everything - the point of the map is that the lines converge.
 const ROOTS: readonly MapNode[] = [{ id: 'deficiency', label: 'Minerals & Vitamin deficiencies' }];
 
 // Each family traces to a single mechanism.
@@ -70,7 +70,7 @@ const CONDITION_TO_ROOT: Readonly<Record<string, readonly string[]>> = {
 const STEP_ACTIVATION_LINE_MOBILE = 0.8;
 const DESKTOP_BREAKPOINT = 900;
 
-/** Large screens: the notes pinned around the map, in PRD order — three each side — and everything after them behind "see more". */
+/** Large screens: the notes pinned around the map, in PRD order - three each side - and everything after them behind "see more". */
 const PINNED_NOTE_COUNT = 6;
 const PINNED_NOTES = NOTES.slice(0, PINNED_NOTE_COUNT);
 const MORE_NOTES = NOTES.slice(PINNED_NOTE_COUNT);
@@ -90,7 +90,7 @@ const NOTES_STEP = 0.14;
 
 /**
  * The interactive root map. Families of conditions trace down through the
- * mechanisms behind them to one root — minerals and vitamin deficiencies.
+ * mechanisms behind them to one root - minerals and vitamin deficiencies.
  * Large screens: the map sits pinned in the centre while the PRD's condition
  * notes pin themselves around it, one by one, as you scroll. Mobile: the
  * map, then a column of the same notes. Both end on the same "fact" block
@@ -101,7 +101,7 @@ const NOTES_STEP = 0.14;
   imports: [NgTemplateOutlet, ScrollRevealDirective, ConditionNoteCard, ConditionsBoard, EyebrowLabel],
   template: `
     <!-- The map itself, declared once and placed by whichever layout is
-         showing — pinned in the centre stage on large screens, in plain
+         showing - pinned in the centre stage on large screens, in plain
          flow on mobile. -->
     <ng-template #mapTpl>
       <div class="root-map-wrap">
@@ -134,7 +134,7 @@ const NOTES_STEP = 0.14;
                   (click)="toggleSymptom(node.id)"
                 >
                   {{ node.label }}
-                  <!-- A one-time simulated tap on the first pill — the only
+                  <!-- A one-time simulated tap on the first pill - the only
                        hint that these are tappable at all. Dismisses itself
                        once its animation finishes, or the instant the reader
                        actually touches/clicks anything in this row. -->
@@ -179,7 +179,7 @@ const NOTES_STEP = 0.14;
     @if (isDesktop()) {
       <!-- Large screens: ONE pinned viewport holds the heading, the map and
            the notes. Which notes are showing is just their opacity/rise
-           following scroll progress — nothing is added or removed, so
+           following scroll progress - nothing is added or removed, so
            scrolling back up un-pins them in reverse. -->
       <div class="rm-pin" #deskPin [style.height.vh]="deskPinVh">
         <div class="rm-viewport">
@@ -260,11 +260,11 @@ const NOTES_STEP = 0.14;
       display: block;
     }
 
-    /* Mobile: no sticky, no fixed height, no background — just a plain
+    /* Mobile: no sticky, no fixed height, no background - just a plain
        block sitting after the narration and before the closing card, sized
        to whatever its (fully-revealed) content actually needs. A fixed-height
        sticky box here kept overflowing into the narration no matter how far
-       it was stretched or how compact the pills got — three full layers of
+       it was stretched or how compact the pills got - three full layers of
        pills plus the connecting lines just don't fit in a partial-viewport
        box on a small screen. Letting it take its natural height removes the
        constraint that was causing the overlap in the first place. */
@@ -291,7 +291,7 @@ const NOTES_STEP = 0.14;
       pointer-events: none;
     }
 
-    /* Every link between two *revealed* layers draws in faintly on its own —
+    /* Every link between two *revealed* layers draws in faintly on its own -
        this is the map's actual illustration, the thing that makes it read
        as "roots" rather than three unrelated rows of pills. The .lit class is a
        brighter highlight layered on top for whichever path is currently
@@ -316,7 +316,7 @@ const NOTES_STEP = 0.14;
       stroke-dashoffset: 0;
     }
 
-    /* Colored by which layer the link is arriving at, not which it leaves —
+    /* Colored by which layer the link is arriving at, not which it leaves -
        symptom→condition traces end in olive, condition→root traces end in
        burgundy, echoing the same terracotta/olive/oxblood layering the
        nodes themselves use below. */
@@ -361,7 +361,7 @@ const NOTES_STEP = 0.14;
     }
 
     /* Each layer caption picks up a whisper of its own layer's color
-       (olive/burgundy), matching the nodes and links beneath it — just
+       (olive/burgundy), matching the nodes and links beneath it - just
        enough to read as a hint of that layer's identity, not a loud label. */
     .root-map-layer-label--conditions {
       color: #000;
@@ -398,7 +398,7 @@ const NOTES_STEP = 0.14;
         opacity var(--dur-base) var(--ease);
     }
 
-    /* One-time simulated tap on the first pill — approaches, presses down
+    /* One-time simulated tap on the first pill - approaches, presses down
        (a ripple confirms the "click"), then fades for good. Dismissed on
        animation end or the instant the reader touches/clicks anything in
        the row (see dismissHint in root-map.ts). */
@@ -527,7 +527,7 @@ const NOTES_STEP = 0.14;
       border-color: var(--oxblood);
     }
 
-    /* Conditions layer — the middle "what's really going on" row — carries
+    /* Conditions layer - the middle "what's really going on" row - carries
        its own olive tint even at rest, so the three layers read as three
        distinct depths rather than one repeated style. */
     .root-map-node--static {
@@ -542,7 +542,7 @@ const NOTES_STEP = 0.14;
       border-color: color-mix(in oklab, var(--oxblood) 45%, transparent);
     }
 
-    /* Default (symptoms layer, the buttons) lights up terracotta — the
+    /* Default (symptoms layer, the buttons) lights up terracotta - the
        warmest, most immediate tone, for the layer the reader interacts
        with directly. */
     /* Terracotta deepened a touch toward oxblood: plain terracotta under
@@ -689,7 +689,7 @@ const NOTES_STEP = 0.14;
     /* Laptops and tablets in landscape (900-1199px): the 580px map plus
        two note columns doesn't fit inside the page gutters, so the stage
        breaks out to nearly the full viewport width, the map narrows, and
-       the pills tighten — otherwise the side columns squeeze to under
+       the pills tighten - otherwise the side columns squeeze to under
        150px and the notes overflow the pinned viewport. */
     @media (min-width: 900px) and (max-width: 1199px) {
       .rm-viewport {
@@ -771,7 +771,7 @@ const NOTES_STEP = 0.14;
       outline-offset: 3px;
     }
 
-    /* The rest of the notes, spread across the page width — the same notes
+    /* The rest of the notes, spread across the page width - the same notes
        as the mobile column, laid out horizontally. */
     .rm-more-grid {
       margin-top: var(--sp-10);
@@ -831,7 +831,7 @@ export class RootMap implements AfterViewInit {
     motionQuery.addEventListener('change', onMotionChange);
     this.destroyRef.onDestroy(() => motionQuery.removeEventListener('change', onMotionChange));
 
-    // Fallback in case `animationend` never fires — the hint is a one-time
+    // Fallback in case `animationend` never fires - the hint is a one-time
     // nudge, not something that should linger indefinitely either way.
     const dismissTimer = window.setTimeout(() => this.dismissHint(), 2600);
     this.destroyRef.onDestroy(() => window.clearTimeout(dismissTimer));
@@ -859,7 +859,7 @@ export class RootMap implements AfterViewInit {
   protected readonly openId = signal<string | null>(null);
   protected readonly showMore = signal(false);
 
-  /** What's lit on the map: whatever the reader tapped, else (large screens) the family of the note that just arrived — so each note shows its own trace. */
+  /** What's lit on the map: whatever the reader tapped, else (large screens) the family of the note that just arrived - so each note shows its own trace. */
   protected readonly focusSet = computed<ReadonlySet<string>>(() => {
     if (this.selected().size > 0) {
       return this.selected();
@@ -945,7 +945,7 @@ export class RootMap implements AfterViewInit {
     const wasOpen = this.showMore();
     this.showMore.set(!wasOpen);
     if (wasOpen) {
-      // Collapsing shortens the page under the reader — keep the button, and the reader, in place.
+      // Collapsing shortens the page under the reader - keep the button, and the reader, in place.
       this.openId.set(null);
       requestAnimationFrame(() => button.scrollIntoView({ block: 'center', behavior: 'smooth' }));
     }
@@ -1014,7 +1014,7 @@ export class RootMap implements AfterViewInit {
   /**
    * Large screens: everything keys off the pinned stage's own position.
    * The map's layers draw in as the stage approaches and engages, then the
-   * notes arrive one by one across the pinned scroll — a plain function of
+   * notes arrive one by one across the pinned scroll - a plain function of
    * scroll position, so scrolling back up simply reverses it.
    */
   private updateDesktop(): void {
@@ -1043,7 +1043,7 @@ export class RootMap implements AfterViewInit {
   }
 
   /**
-   * On mobile, the map has no pin to sync its reveal against — it's a plain
+   * On mobile, the map has no pin to sync its reveal against - it's a plain
    * block, so the reveal is driven by how far the map itself has scrolled
    * through the viewport: conditions unlock once its top third has passed
    * the activation line, roots once two-thirds have. Only a flip (not every
