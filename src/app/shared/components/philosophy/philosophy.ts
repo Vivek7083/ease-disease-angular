@@ -24,7 +24,8 @@ export interface PhilosophyPoint {
           <p>With the right knowledge and choices - nutrition, lifestyle, and mindset - you can support your body’s natural ability to heal.</p>
           <p class="phil-formula">
             <!-- &ngsp; keeps the spaces: Angular drops whitespace-only text between elements. -->
-            <span class="pf-part">Right Knowledge</span>&ngsp;<span class="pf-part"><span class="pf-op">+</span>&ngsp;Right Action</span>&ngsp;<span class="pf-part"><span class="pf-op">=</span>&ngsp;<span class="pf-goal">Optimum Health.</span></span>
+            <!-- The reveal sits on the inner span: .reveal sets a transform that would undo the centring on the <p>. -->
+            <span class="pf-inner reveal" [appScrollReveal]="0"><span class="pf-part">Right Knowledge</span>&ngsp;<span class="pf-part"><span class="pf-op">+</span>&ngsp;Right Action</span>&ngsp;<span class="pf-part"><span class="pf-op">=</span>&ngsp;<span class="pf-goal">Optimum Health.</span></span></span>
           </p>
           <p class="phil-faith">Healing begins the moment you choose FAITH over Fear.</p>
         </div>
@@ -112,6 +113,51 @@ export interface PhilosophyPoint {
       .phil-intro .phil-formula {
         white-space: nowrap;
         margin-inline: -40px;
+      }
+    }
+    /* Make the formula pop */
+    .phil-intro .phil-formula {
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100vw - 36px);
+      margin: 36px 0 18px;
+      padding: 18px 8px;
+      font-family: Fraunces, Georgia, serif;
+      font-size: clamp(28px, 3.2vw, 42px);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      color: #000;
+      white-space: normal;
+      text-align: center;
+    }
+    .pf-inner {
+      display: block;
+    }
+    .pf-part {
+      white-space: nowrap;
+    }
+    .pf-op {
+      display: inline-block;
+      margin: 0 0.18em;
+      font-weight: 500;
+      background: linear-gradient(135deg, #bf3820, #e06f27);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .pf-goal {
+      font-style: italic;
+      background-image: linear-gradient(transparent 56%, #00aeef 56%);
+      padding: 0 0.08em;
+    }
+    @media (max-width: 760px) {
+      .phil-intro .phil-formula {
+        line-height: 1.35;
+      }
+      .pf-part {
+        display: block;
       }
     }
 
