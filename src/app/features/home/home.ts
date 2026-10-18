@@ -1308,7 +1308,7 @@ export class Home implements AfterViewInit {
       price: MAIN_PLAN.price,
       originalPrice: MAIN_PLAN.originalPrice,
       priceNote: '30 minutes',
-      ctaLabel: MAIN_PLAN.label,
+      ctaLabel: 'BOOK YOUR CONSULTATION',
       recommended: true,
       description: 'Understand your underlying root cause.',
     },
