@@ -112,6 +112,14 @@ Follow-up on Step 21 (user): (1) The form is now ONE step only: name, WhatsApp, 
 
 Text only, in `shared/components/results/results.html`: eyebrow "We empower you,", heading "When YOU take the right action, YOU transform", and the new paragraph beside it, with the tags, classes and ids unchanged. One code comment in `home.html` that said "after the work" was reworded so no old phrase is left anywhere in `src`. Type-check clean and the dev server still serves the app; no screenshots taken, as requested.
 
+## Step 23 status: sprout divider removed (done)
+
+Template edit in `home.html`: deleted the only `<app-section-transition variant="sprout" />` (between the `#treat` timeline and `#results`); there were no other sprout matches. The section-transition component and its other variants are untouched. Remaining dividers on the home page: curtain (after the conditions map), dots (after Our philosophy) and wave (after Testimonials). Type-check clean, dev server still serves the app; no screenshots.
+
+## Step 24 status: new wording for the Programmes section (done, edited by the user in the editor, committed as `9a651d6`)
+
+Text edits in `home.html` and `home.ts`, made by the user directly: eyebrow "How it starts" became "Your Journey Starts Here."; heading "Start where you are. Go as deep as you need." became "Take the First Step."; the paragraph "One consultation. Three months. Choose where to begin - drag or tap to explore what each level covers." became "Every transformation begins with a conversation. Let's understand what your body is telling you, explore your concerns, and discover the right next steps for you."; and the main programme card's button label in `home.ts` (`ctaLabel`) became the fixed text `BOOK YOUR CONSULTATION` instead of the shared `MAIN_PLAN.label` ("Book a consultation"). A search of `src` finds none of the old phrases left. Two small things to be aware of: the new paragraph uses a straight apostrophe in "Let's" while the rest of the site uses curly ones, and the button label is now hard-coded, so changing `MAIN_PLAN.label` will no longer change that one button. I did not review the rest of this step's text in a browser.
+
 ## Remaining steps (from the guide)
 
 12 conditions tree map (DEFERRED to last by the user, needs a lot of rework; a first working version, including the 6 root causes and the "only taps highlight" behaviour, is saved in `git stash` as "step-12-tree-map (deferred to last)", restore with `git stash pop`; the six root-cause links are health claims for Deepa or Carol to review), 14 remove founders billboard, 15 navy expert cards, 16 hero title and subtitle, 17 philosophy intro, 18 em dashes to hyphens, 19 "Optimum Health." pop, 20 remove vine divider, 21 booking form, 22-28 new section wording and the "E.A.S.E. Root Cause Assessment" name.
