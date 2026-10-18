@@ -5,17 +5,11 @@ import { ConditionNoteCard } from '../conditions-board/condition-note';
 import { ConditionsBoard } from '../conditions-board/conditions-board';
 import { NOTES } from '../conditions-board/conditions-data';
 import { EyebrowLabel } from '../eyebrow-label/eyebrow-label';
+import { DESKTOP_TREE, MOBILE_TREE, buildTree } from './root-map-tree';
 
 interface MapNode {
   readonly id: string;
   readonly label: string;
-}
-
-interface MapLink {
-  readonly from: string;
-  readonly to: string;
-  /** 'sr' = symptom→condition, 'rt' = condition→root - which layer reveal gates this link's own draw-in, independent of whether it's "lit" (traced). */
-  readonly kind: 'sr' | 'rt';
 }
 
 // Draft data - an illustrative pattern map, not a clinical claim. Top layer
@@ -45,8 +39,15 @@ const CONDITIONS: readonly MapNode[] = [
   { id: 'nervous', label: 'Stress & nervous system' },
 ];
 
-// One root for everything - the point of the map is that the lines converge.
-const ROOTS: readonly MapNode[] = [{ id: 'deficiency', label: 'Minerals & Vitamin deficiencies' }];
+// Six root causes, shown below the ground line; each condition traces to the roots behind it.
+const ROOTS: readonly MapNode[] = [
+  { id: 'deficiency', label: 'Nutritional deficiencies' },
+  { id: 'stress', label: 'Stress & trauma' },
+  { id: 'sleep', label: 'Lack of sleep' },
+  { id: 'toxins', label: 'Toxins & medications' },
+  { id: 'infections', label: 'Infections' },
+  { id: 'genetics', label: 'Genetics' },
+];
 
 // Each family traces to a single mechanism.
 const SYMPTOM_TO_CONDITION: Readonly<Record<string, readonly string[]>> = {
@@ -60,14 +61,13 @@ const SYMPTOM_TO_CONDITION: Readonly<Record<string, readonly string[]>> = {
 };
 
 const CONDITION_TO_ROOT: Readonly<Record<string, readonly string[]>> = {
-  digestion: ['deficiency'],
-  inflammation: ['deficiency'],
-  bloodsugar: ['deficiency'],
-  hormonal: ['deficiency'],
-  nervous: ['deficiency'],
+  digestion: ['deficiency', 'infections', 'toxins'],
+  inflammation: ['toxins', 'infections', 'stress', 'genetics'],
+  bloodsugar: ['deficiency', 'sleep', 'stress', 'genetics'],
+  hormonal: ['stress', 'sleep', 'toxins', 'deficiency'],
+  nervous: ['stress', 'sleep', 'deficiency'],
 };
 
-const STEP_ACTIVATION_LINE_MOBILE = 0.8;
 const DESKTOP_BREAKPOINT = 900;
 
 /** Large screens: the notes pinned around the map, in PRD order - three each side - and everything after them behind "see more". */
@@ -105,66 +105,98 @@ const NOTES_STEP = 0.14;
          flow on mobile. -->
     <ng-template #mapTpl>
       <div class="root-map-wrap">
-        <div class="root-map" [class.focus]="selected().size > 0" #mapBox>
-          <svg class="root-map-links" #linksSvg aria-hidden="true">
-            @for (link of links; track link.from + '>' + link.to; let i = $index) {
-              <path
-                pathLength="1"
-                [attr.d]="pathData()[i] ?? ''"
-                [class.visible]="isLinkVisible(link)"
-                [class.lit]="isLinkLit(link)"
-                [class.kind-rt]="link.kind === 'rt'"
-              />
+        <div class="root-map" [class.focus]="active() !== null">
+          <p class="root-map-layer-label root-map-tap">Tap any condition to trace it down to its root ↓</p>
+          <div
+            class="tree"
+            [style.aspect-ratio]="geo().w + ' / ' + geo().h"
+            [style.--tw]="geo().w"
+            [style.--th]="geo().h"
+            [style.--fs]="geo().fs + 'cqw'"
+            [style.--ch]="geo().ch + 'cqw'"
+            [style.--pad]="geo().pad + 'cqw'"
+            (pointerdown)="dismissHint()"
+          >
+            <svg class="tree-art" [attr.viewBox]="'0 0 ' + geo().w + ' ' + geo().h" aria-hidden="true">
+              <g class="grey">
+                <path [attr.d]="art().canopy" />
+                @for (b of art().branches; track b.key) {
+                  <path [attr.d]="b.d" />
+                }
+                <path [attr.d]="art().trunkLeft" />
+                <path [attr.d]="art().trunkRight" />
+                <path [attr.d]="art().ground" />
+                @for (r of art().roots; track r.key) {
+                  <path [attr.d]="r.d" />
+                }
+              </g>
+              <g class="blue-lines">
+                @for (t of art().twigs; track t.key) {
+                  <path class="blue" pathLength="1" style="--d: 0ms" [attr.d]="t.d" [class.on]="active() === t.fruit" />
+                }
+                @for (b of art().branches; track b.key) {
+                  <path class="blue" pathLength="1" style="--d: 250ms" [attr.d]="b.d" [class.on]="activeSymptoms().includes(b.key)" />
+                }
+                <path class="blue" pathLength="1" style="--d: 500ms" [attr.d]="art().trunk" [class.on]="active() !== null" />
+                @for (r of art().roots; track r.key) {
+                  <path class="blue" pathLength="1" style="--d: 750ms" [attr.d]="r.d" [class.on]="activeRoots().includes(r.key)" />
+                }
+              </g>
+            </svg>
+
+            @for (node of symptoms; track node.id; let i = $index) {
+              <button
+                type="button"
+                class="root-map-node tree-chip"
+                [style.left.%]="at(geo().fruits[node.id]).left"
+                [style.top.%]="at(geo().fruits[node.id]).top"
+                [attr.data-id]="node.id"
+                [class.lit]="isLit(node.id)"
+                [class.selected]="active() === node.id"
+                [class.nudge]="!rootsRevealed() && !reducedMotion()"
+                [style.--nudge-delay]="i * 140 + 'ms'"
+                [attr.aria-pressed]="active() === node.id"
+                (click)="toggleSymptom(node.id)"
+              >
+                {{ node.label }}
+                <!-- A one-time simulated tap on the first pill - the only
+                     hint that these are tappable at all. Dismisses itself
+                     once its animation finishes, or the instant the reader
+                     actually touches/clicks anything in the tree. -->
+                @if (i === 0 && showClickHint() && !reducedMotion()) {
+                  <span class="click-hint" aria-hidden="true">
+                    <span class="click-hint-ripple"></span>
+                    <span class="click-hint-dot" (animationend)="dismissHint()"></span>
+                  </span>
+                }
+              </button>
             }
-          </svg>
 
-          <div class="root-map-layer">
-            <p class="root-map-layer-label">Tap any condition to trace it down to its root ↓</p>
-            <div class="root-map-nodes" (pointerdown)="dismissHint()">
-              @for (node of symptoms; track node.id; let i = $index) {
-                <button
-                  type="button"
-                  class="root-map-node"
-                  [attr.data-id]="node.id"
-                  [class.lit]="isLit(node.id)"
-                  [class.selected]="selected().has(node.id)"
-                  [class.nudge]="!rootsRevealed() && !reducedMotion()"
-                  [style.--nudge-delay]="i * 140 + 'ms'"
-                  [attr.aria-pressed]="selected().has(node.id)"
-                  (click)="toggleSymptom(node.id)"
-                >
-                  {{ node.label }}
-                  <!-- A one-time simulated tap on the first pill - the only
-                       hint that these are tappable at all. Dismisses itself
-                       once its animation finishes, or the instant the reader
-                       actually touches/clicks anything in this row. -->
-                  @if (i === 0 && showClickHint() && !reducedMotion()) {
-                    <span class="click-hint" aria-hidden="true">
-                      <span class="click-hint-ripple"></span>
-                      <span class="click-hint-dot" (animationend)="dismissHint()"></span>
-                    </span>
-                  }
-                </button>
-              }
-            </div>
-          </div>
+            <span class="tree-label" [style.left.%]="at(geo().howLabel).left" [style.top.%]="at(geo().howLabel).top">How it shows up</span>
+            @for (node of conditions; track node.id) {
+              <span
+                class="root-map-node root-map-node--static tree-chip"
+                style="--d: 250ms"
+                [style.left.%]="at(geo().symptoms[node.id]).left"
+                [style.top.%]="at(geo().symptoms[node.id]).top"
+                [attr.data-id]="node.id"
+                [class.lit]="isLit(node.id)"
+                >{{ node.label }}</span
+              >
+            }
 
-          <div class="root-map-layer" [class.layer-hidden]="!showConditions()">
-            <p class="root-map-layer-label root-map-layer-label--conditions">How it shows up</p>
-            <div class="root-map-nodes">
-              @for (node of conditions; track node.id) {
-                <span class="root-map-node root-map-node--static" [attr.data-id]="node.id" [class.lit]="isLit(node.id)">{{ node.label }}</span>
-              }
-            </div>
-          </div>
-
-          <div class="root-map-layer" [class.layer-hidden]="!showRoots()">
-            <p class="root-map-layer-label root-map-layer-label--roots">Why it happens</p>
-            <div class="root-map-nodes">
-              @for (node of roots; track node.id) {
-                <span class="root-map-node root-map-node--root" [attr.data-id]="node.id" [class.lit]="isLit(node.id)">{{ node.label }}</span>
-              }
-            </div>
+            <span class="tree-label" [style.left.%]="at(geo().whyLabel).left" [style.top.%]="at(geo().whyLabel).top">Why it happens</span>
+            @for (node of roots; track node.id) {
+              <span
+                class="root-map-node root-map-node--root tree-chip"
+                style="--d: 1000ms"
+                [style.left.%]="at(geo().roots[node.id]).left"
+                [style.top.%]="at(geo().roots[node.id]).top"
+                [attr.data-id]="node.id"
+                [class.lit]="isLit(node.id)"
+                >{{ node.label }}</span
+              >
+            }
           </div>
 
           <p class="root-map-caption">* This map shows common patterns, not a diagnosis. Please speak to our qualified practitioner for your diagnosis.</p>
@@ -279,72 +311,8 @@ const NOTES_STEP = 0.14;
       gap: var(--sp-10);
     }
 
-    .root-map-links {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-      pointer-events: none;
-    }
-
-    /* Every link between two *revealed* layers draws in faintly on its own -
-       this is the map's actual illustration, the thing that makes it read
-       as "roots" rather than three unrelated rows of pills. The .lit class is a
-       brighter highlight layered on top for whichever path is currently
-       traced (hover/select/example), not a gate on visibility itself.
-       pathLength="1" (set in the template) means dasharray/dashoffset of 1
-       always mean "whole path", regardless of each path's real pixel
-       length, so one dashoffset transition draws every link in evenly. */
-    .root-map-links path {
-      fill: none;
-      stroke: color-mix(in oklab, var(--oxblood) 13%, transparent);
-      stroke-width: 1.4;
-      stroke-dasharray: 1;
-      stroke-dashoffset: 1;
-      transition:
-        stroke-dashoffset 1.1s var(--ease),
-        stroke var(--dur-base) var(--ease),
-        stroke-width var(--dur-base) var(--ease),
-        opacity var(--dur-base) var(--ease);
-    }
-
-    .root-map-links path.visible {
-      stroke-dashoffset: 0;
-    }
-
-    /* Colored by which layer the link is arriving at, not which it leaves -
-       symptom→condition traces end in olive, condition→root traces end in
-       burgundy, echoing the same terracotta/olive/oxblood layering the
-       nodes themselves use below. */
-    .root-map-links path.lit {
-      stroke: var(--highlight-blue);
-      stroke-width: 2.2;
-    }
-
-    .root-map-links path.lit.kind-rt {
-      stroke: var(--highlight-blue);
-    }
-
-    .root-map.focus .root-map-links path.visible:not(.lit) {
-      opacity: 0.4;
-    }
-
     .root-map.focus .root-map-node:not(.lit):not(.selected) {
       opacity: 0.45;
-    }
-
-    .root-map-layer {
-      position: relative;
-      z-index: 1;
-      transition:
-        opacity var(--dur-scene) var(--ease-out-soft),
-        transform var(--dur-scene) var(--ease-out-soft);
-    }
-
-    .root-map-layer.layer-hidden {
-      opacity: 0;
-      transform: translateY(10px);
     }
 
     .root-map-layer-label {
@@ -355,24 +323,6 @@ const NOTES_STEP = 0.14;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
       color: var(--text-quiet-light);
-    }
-
-    /* Each layer caption picks up a whisper of its own layer's color
-       (olive/burgundy), matching the nodes and links beneath it - just
-       enough to read as a hint of that layer's identity, not a loud label. */
-    .root-map-layer-label--conditions {
-      color: #000;
-    }
-
-    .root-map-layer-label--roots {
-      color: #000;
-    }
-
-    .root-map-nodes {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 14px 12px;
     }
 
     .root-map-node {
@@ -489,37 +439,6 @@ const NOTES_STEP = 0.14;
       }
     }
 
-    .root-map-prompt {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--sp-2);
-      margin: var(--sp-4) 0 0;
-      max-height: 3em;
-      overflow: hidden;
-      font-family: var(--font-body);
-      font-size: 0.88rem;
-      color: #000;
-      transition:
-        opacity var(--dur-base) var(--ease),
-        max-height var(--dur-scene) var(--ease-out-soft),
-        margin var(--dur-scene) var(--ease-out-soft);
-    }
-    .root-map-prompt.is-gone {
-      opacity: 0;
-      max-height: 0;
-      margin-top: 0;
-    }
-    .root-map-prompt-arrow {
-      display: inline-block;
-      animation: root-map-prompt-bob 1.6s ease-in-out infinite;
-    }
-    @keyframes root-map-prompt-bob {
-      50% {
-        transform: translateY(-3px);
-      }
-    }
-
     button.root-map-node:hover {
       border-color: var(--oxblood);
     }
@@ -555,36 +474,27 @@ const NOTES_STEP = 0.14;
       color: #000;
     }
 
-    /* Mobile: compact pills and tighter layer gaps so the three layers
-       read as one tidy map on a narrow screen. */
+    /* Mobile: compact pills so the whole tree fits a narrow screen. */
     @media (max-width: 899px) {
-      .root-map {
-        gap: 40px;
-      }
-
       .root-map-node {
-        font-size: 0.8rem;
-        padding: 0 10px;
-        min-height: 30px;
+        font-size: 0.75rem;
+        padding: 0 9px;
+        min-height: 28px;
       }
 
       button.root-map-node {
-        min-height: 36px;
+        min-height: 32px;
       }
 
       .root-map-node--root {
-        font-size: 0.88rem;
-        min-height: 34px;
-        padding: 0 12px;
+        font-size: 0.82rem;
+        min-height: 32px;
+        padding: 0 10px;
       }
 
       .root-map-layer-label {
         font-size: 0.72rem;
         margin-bottom: 10px;
-      }
-
-      .root-map-nodes {
-        gap: 10px 8px;
       }
 
       .root-map-wrap {
@@ -654,23 +564,13 @@ const NOTES_STEP = 0.14;
 
     .rm-stage {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 650px) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 740px) minmax(0, 1fr);
       gap: 32px;
       align-items: center;
     }
 
     .rm-stage .root-map-wrap {
       padding-block: 0;
-    }
-
-    .rm-stage .root-map {
-      gap: 52px;
-    }
-
-    .rm-stage .root-map-node {
-      font-size: 0.94rem;
-      min-height: 42px;
-      padding: 0 20px;
     }
 
     .rm-stage .root-map-caption {
@@ -696,16 +596,6 @@ const NOTES_STEP = 0.14;
       .rm-stage {
         grid-template-columns: minmax(0, 1fr) minmax(0, 440px) minmax(0, 1fr);
         gap: var(--sp-4);
-      }
-
-      .rm-stage .root-map {
-        gap: var(--sp-6);
-      }
-
-      .rm-stage .root-map-node {
-        font-size: 0.84rem;
-        min-height: 34px;
-        padding: 0 12px;
       }
 
       .rm-col {
@@ -783,19 +673,17 @@ const NOTES_STEP = 0.14;
     }
 
     @media (prefers-reduced-motion: reduce) {
-      button.root-map-node.nudge,
-      .root-map-prompt-arrow {
+      button.root-map-node.nudge {
         animation: none;
       }
-      .root-map-links path,
-      .root-map-layer,
       .root-map-node,
-      .rm-note {
-        transition: none;
+      .rm-note,
+      .blue {
+        transition: none !important;
       }
     }
 
-    /* ---- Step 25B ---- */
+    /* ---- Text and spacing around the tree (Step 25) ---- */
     /* Desktop subtext under "What Your Body May Be Telling You" */
     .rm-sub {
       max-width: 60ch;
@@ -810,7 +698,7 @@ const NOTES_STEP = 0.14;
     /* Desktop: heading block sits above the pinned tree, with comfortable spacing */
     @media (min-width: 900px) {
       .rm-head {
-        padding: 72px 0 8px;
+        padding: 72px 0 0;
       }
       .rm-head .root-map-heading {
         margin-top: 14px !important;
@@ -821,84 +709,119 @@ const NOTES_STEP = 0.14;
         max-width: 62ch;
         margin-top: 18px !important;
       }
-    }
-
-    /* Desktop: spacing inside the pinned tree frame */
-    @media (min-width: 900px) {
-      .rm-viewport {
-        padding-block: 14px !important;
-        gap: clamp(10px, 2vh, 22px) !important;
-      }
-      .root-map {
-        gap: clamp(16px, 3.2vh, 36px) !important;
-      }
-      .root-map > .root-map-layer:nth-child(3)::before {
-        top: calc(-1 * clamp(16px, 3.2vh, 36px) - 4px);
-        bottom: calc(-1 * clamp(16px, 3.2vh, 36px) - 4px);
-      }
-    }
-
-    /* The tap instruction now sits at the top of the canopy: hide the old copy below the chips, give the label room */
-    .root-map-prompt {
-      display: none !important;
-    }
-    @media (min-width: 900px) {
-      .root-map > .root-map-layer:nth-child(2) {
-        padding-top: clamp(26px, 4.5vh, 42px);
-      }
-    }
-    @media (max-width: 899px) {
-      .root-map > .root-map-layer:nth-child(2) {
-        padding-top: 36px;
-      }
-      .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
-        padding: 0 18px;
-      }
-    }
-
-    /* Lift the tap instruction a little above the chips */
-    .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
-      margin-bottom: 20px !important;
-      position: relative;
-      top: -6px;
-    }
-    @media (max-width: 899px) {
-      .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
-        margin-bottom: 14px !important;
-        top: -4px;
-      }
-    }
-
-    /* Desktop: start the tree right below the intro text instead of centring it in the screen-high frame */
-    @media (min-width: 900px) {
+      /* Start the tree right below the intro text instead of centring it in the screen-high frame */
       .rm-viewport {
         justify-content: flex-start !important;
-        padding-top: 28px !important;
-      }
-      .rm-head {
-        padding-bottom: 0;
+        padding-block: 28px 14px !important;
       }
     }
 
-    /* Tap instruction sits ABOVE the canopy outline (overrides the "lift" rule above) */
-    .root-map > .root-map-layer:nth-child(2) {
-      margin-top: 34px;
-      padding-top: clamp(18px, 3vh, 28px) !important;
+    /* ---- The tree: ONE box, lines and chips in the same coordinate system ---- */
+    .root-map {
+      display: block;
     }
-    .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
-      position: absolute !important;
-      left: 0;
-      right: 0;
-      top: -30px !important;
-      margin: 0 !important;
-      padding: 0 12px !important;
-      text-align: center;
+    .root-map-tap {
+      margin: 0 0 10px;
+      color: #000;
     }
-    @media (max-width: 899px) {
-      .root-map > .root-map-layer:nth-child(2) {
-        margin-top: 54px;
-        padding-top: 22px !important;
+    .tree {
+      position: relative;
+      width: 100%;
+      margin-inline: auto;
+      container-type: inline-size;
+    }
+    /* Desktop: scale the whole tree so it fits the screen-high pinned frame (tap label to lowest root). */
+    @media (min-width: 900px) {
+      .tree {
+        width: min(100%, calc((100vh - 140px) * var(--tw) / var(--th)));
       }
+    }
+    .tree-art {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      pointer-events: none;
+    }
+    .tree-art path {
+      fill: none;
+      stroke-linecap: round;
+    }
+    .grey path {
+      stroke: #c8c8c8;
+      stroke-width: 1.4;
+    }
+    .grey path:first-child {
+      stroke: #d6d6d6;
+    }
+    /* The traced path: hidden until a condition is clicked, then drawn stage by stage (--d is each stage's start delay). */
+    .blue {
+      stroke: var(--highlight-blue);
+      stroke-width: 2.5;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      opacity: 0;
+      transition:
+        opacity 0.3s ease,
+        stroke-dashoffset 0s linear 0.3s;
+    }
+    .blue.on {
+      stroke-dashoffset: 0;
+      opacity: 1;
+      transition:
+        stroke-dashoffset 250ms linear var(--d, 0ms),
+        opacity 0s;
+    }
+
+    /* Chips are sized in container units, so they scale with the lines: no clamp(), no breakpoint sizes. */
+    .tree-chip,
+    button.root-map-node.tree-chip {
+      position: absolute;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+      height: var(--ch);
+      min-height: 0;
+      padding: 0 var(--pad);
+      font-size: var(--fs);
+      line-height: 1;
+    }
+    .tree-chip.lit {
+      transition-delay: var(--d, 0ms);
+    }
+    .root-map-node--root {
+      background: #fff;
+    }
+
+    .tree-label {
+      position: absolute;
+      z-index: 2;
+      transform: translate(-50%, -50%);
+      padding: 2px 10px;
+      border-radius: 999px;
+      background: var(--ivory);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: var(--ls-eyebrow);
+      text-transform: uppercase;
+      color: #000;
+      white-space: nowrap;
+    }
+
+    /* Nothing is highlighted until a condition is clicked (no auto-lighting while the side notes scroll past). */
+    .root-map:not(.focus) .root-map-node.lit,
+    .root-map:not(.focus) .root-map-node--root.lit {
+      background: color-mix(in oklab, var(--oxblood) 6%, var(--ivory));
+      border-color: color-mix(in oklab, var(--oxblood) 30%, transparent);
+      color: #000;
+    }
+    .root-map:not(.focus) .root-map-node--root.lit {
+      background: #fff;
     }
   `,
 })
@@ -940,84 +863,53 @@ export class RootMap implements AfterViewInit {
     this.destroyRef.onDestroy(() => window.clearTimeout(dismissTimer));
   }
 
-  protected readonly links: readonly MapLink[] = [
-    ...Object.entries(SYMPTOM_TO_CONDITION).flatMap(([from, tos]) => tos.map((to) => ({ from, to, kind: 'sr' as const }))),
-    ...Object.entries(CONDITION_TO_ROOT).flatMap(([from, tos]) => tos.map((to) => ({ from, to, kind: 'rt' as const }))),
-  ];
-
   readonly bookRequested = output<void>();
 
+  /** Only one condition is traced at a time: clicking another switches to it, clicking the same one clears it. */
   protected readonly selected = signal<ReadonlySet<string>>(new Set());
+  protected readonly active = computed<string | null>(() => [...this.selected()][0] ?? null);
 
-  // Large screens reveal the map's layers as the pinned stage engages and
-  // bring the notes in as it scrolls (deskStage / deskNoteCount). Mobile
-  // has no pin, so the layers follow the map's own position as it scrolls
-  // through the viewport instead.
+  /** The middle chips (symptoms) and roots the clicked condition leads to. */
+  protected readonly activeSymptoms = computed<readonly string[]>(() => SYMPTOM_TO_CONDITION[this.active() ?? ''] ?? []);
+  protected readonly activeRoots = computed<readonly string[]>(() => {
+    const roots = new Set<string>();
+    for (const s of this.activeSymptoms()) {
+      for (const r of CONDITION_TO_ROOT[s] ?? []) {
+        roots.add(r);
+      }
+    }
+    return [...roots];
+  });
+
+  // Large screens: the notes arrive as the pinned stage scrolls (deskNoteCount).
   protected readonly isDesktop = signal(typeof window !== 'undefined' && window.innerWidth >= DESKTOP_BREAKPOINT);
-  private readonly mobileConditionsVisible = signal(false);
-  private readonly mobileRootsVisible = signal(false);
-  private readonly deskStage = signal(0);
   private readonly deskNoteCount = signal(0);
 
   protected readonly openId = signal<string | null>(null);
   protected readonly showMore = signal(false);
 
-  /** What's lit on the map: whatever the reader tapped, else (large screens) the family of the note that just arrived - so each note shows its own trace. */
-  protected readonly focusSet = computed<ReadonlySet<string>>(() => {
-    if (this.selected().size > 0) {
-      return this.selected();
-    }
-    const count = this.deskNoteCount();
-    return this.isDesktop() && count > 0 ? new Set([PINNED_NOTES[count - 1].familyId]) : new Set<string>();
-  });
-
-  protected readonly reachedConditionIds = computed(() => {
-    const reached = new Set<string>();
-    for (const id of this.focusSet()) {
-      for (const c of SYMPTOM_TO_CONDITION[id] ?? []) {
-        reached.add(c);
-      }
-    }
-    return reached;
-  });
-
-  protected readonly reachedRootIds = computed(() => {
-    const reached = new Set<string>();
-    for (const id of this.reachedConditionIds()) {
-      for (const r of CONDITION_TO_ROOT[id] ?? []) {
-        reached.add(r);
-      }
-    }
-    return reached;
-  });
-
-  protected readonly showConditions = computed(
-    () => this.selected().size > 0 || (this.isDesktop() ? this.deskStage() >= 1 : this.mobileConditionsVisible()),
-  );
-  /** The deepest layer (the root) stays hidden until the reader first taps a top-level condition, then stays revealed. */
+  /** Set on the first tap; until then the top chips breathe with a soft ring. */
   protected readonly rootsRevealed = signal(false);
-  protected readonly showRoots = computed(() => this.rootsRevealed());
 
-  private readonly mapBox = viewChild<ElementRef<HTMLElement>>('mapBox');
-  private readonly linksSvg = viewChild<ElementRef<SVGSVGElement>>('linksSvg');
   private readonly deskPin = viewChild<ElementRef<HTMLElement>>('deskPin');
 
-  protected readonly pathData = signal<readonly string[]>([]);
+  /** The tree's geometry for the current breakpoint, and every line drawn from it. */
+  protected readonly geo = computed(() => (this.isDesktop() ? DESKTOP_TREE : MOBILE_TREE));
+  protected readonly art = computed(() =>
+    buildTree(this.geo(), { fruitToSymptom: SYMPTOM_TO_CONDITION }),
+  );
 
-  private layoutRaf = 0;
   private scrollRaf = 0;
-  private resizeObserver: ResizeObserver | undefined;
+
+  /** A tree point as percentages of the tree box, for placing a chip. */
+  protected at(p: { readonly x: number; readonly y: number } | undefined): { left: number; top: number } {
+    const g = this.geo();
+    return p ? { left: (p.x / g.w) * 100, top: (p.y / g.h) * 100 } : { left: 0, top: 0 };
+  }
 
   protected isLit(id: string): boolean {
-    return this.focusSet().has(id) || this.reachedConditionIds().has(id) || this.reachedRootIds().has(id);
-  }
-
-  protected isLinkVisible(link: MapLink): boolean {
-    return link.kind === 'sr' ? this.showConditions() : this.showRoots();
-  }
-
-  protected isLinkLit(link: MapLink): boolean {
-    return this.isLit(link.from) && this.isLit(link.to);
+    const active = this.active();
+    return active === id || this.activeSymptoms().includes(id) || this.activeRoots().includes(id);
   }
 
   protected isPinnedShown(noteId: string): boolean {
@@ -1026,17 +918,12 @@ export class RootMap implements AfterViewInit {
 
   protected toggleSymptom(id: string): void {
     this.dismissHint();
-    const next = new Set(this.selected());
-    if (next.has(id)) {
-      next.delete(id);
-    } else {
-      next.add(id);
+    if (this.active() === id) {
+      this.selected.set(new Set());
+      return;
     }
-    this.selected.set(next);
-    if (next.size > 0) {
-      this.rootsRevealed.set(true);
-    }
-    this.queueLayout();
+    this.selected.set(new Set([id]));
+    this.rootsRevealed.set(true);
   }
 
   protected toggleNote(id: string): void {
@@ -1064,61 +951,33 @@ export class RootMap implements AfterViewInit {
         this.update();
       });
     };
-    const onResize = () => {
-      this.update();
-      this.queueLayout();
-    };
+    const onResize = () => this.update();
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onResize, { passive: true });
-
-    this.observeMap();
     this.update();
-    this.queueLayout();
 
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       cancelAnimationFrame(this.scrollRaf);
-      cancelAnimationFrame(this.layoutRaf);
-      this.resizeObserver?.disconnect();
     });
-  }
-
-  /** The map element is re-created whenever the layout flips between mobile and desktop, so the resize observer has to follow it. */
-  private observeMap(): void {
-    this.resizeObserver?.disconnect();
-    const mapEl = this.mapBox()?.nativeElement;
-    if (mapEl && typeof ResizeObserver !== 'undefined') {
-      this.resizeObserver = new ResizeObserver(() => this.queueLayout());
-      this.resizeObserver.observe(mapEl);
-    }
   }
 
   private update(): void {
     const desktop = window.innerWidth >= DESKTOP_BREAKPOINT;
     if (desktop !== this.isDesktop()) {
       this.isDesktop.set(desktop);
-      // The other layout renders on the next frame; re-attach once it has.
-      requestAnimationFrame(() => {
-        this.observeMap();
-        this.update();
-        this.queueLayout();
-      });
       return;
     }
     if (desktop) {
       this.updateDesktop();
-    } else {
-      this.updateMobileMapReveal();
     }
   }
 
   /**
-   * Large screens: everything keys off the pinned stage's own position.
-   * The map's layers draw in as the stage approaches and engages, then the
-   * notes arrive one by one across the pinned scroll - a plain function of
-   * scroll position, so scrolling back up simply reverses it.
+   * Large screens: the notes arrive one by one across the pinned scroll - a
+   * plain function of scroll position, so scrolling back up simply reverses it.
    */
   private updateDesktop(): void {
     const pinEl = this.deskPin()?.nativeElement;
@@ -1127,7 +986,6 @@ export class RootMap implements AfterViewInit {
     }
     const vh = window.innerHeight;
     const rect = pinEl.getBoundingClientRect();
-    const stage = rect.top < vh * 0.2 ? 2 : rect.top < vh * 0.55 ? 1 : 0;
     const scrollable = rect.height - vh;
     const progress = scrollable > 0 ? clamp01(-rect.top / scrollable) : 0;
     const count = this.reducedMotion()
@@ -1136,77 +994,9 @@ export class RootMap implements AfterViewInit {
         ? 0
         : Math.min(PINNED_NOTE_COUNT, Math.floor((progress - NOTES_START) / NOTES_STEP) + 1);
 
-    if (stage !== this.deskStage()) {
-      this.deskStage.set(stage);
-      this.queueLayout();
-    }
     if (count !== this.deskNoteCount()) {
       this.deskNoteCount.set(count);
     }
-  }
-
-  /**
-   * On mobile, the map has no pin to sync its reveal against - it's a plain
-   * block, so the reveal is driven by how far the map itself has scrolled
-   * through the viewport: conditions unlock once its top third has passed
-   * the activation line, roots once two-thirds have. Only a flip (not every
-   * scroll pixel) re-queues the link layout.
-   */
-  private updateMobileMapReveal(): void {
-    const mapEl = this.mapBox()?.nativeElement;
-    if (!mapEl) {
-      return;
-    }
-    const rect = mapEl.getBoundingClientRect();
-    const line = window.innerHeight * STEP_ACTIVATION_LINE_MOBILE;
-    const progress = Math.max(0, Math.min(1, (line - rect.top) / rect.height));
-
-    const conditionsVisible = progress >= 0.3;
-    const rootsVisible = progress >= 0.65;
-
-    if (conditionsVisible !== this.mobileConditionsVisible() || rootsVisible !== this.mobileRootsVisible()) {
-      this.mobileConditionsVisible.set(conditionsVisible);
-      this.mobileRootsVisible.set(rootsVisible);
-      this.queueLayout();
-    }
-  }
-
-  private queueLayout(): void {
-    if (this.layoutRaf) {
-      return;
-    }
-    this.layoutRaf = requestAnimationFrame(() => {
-      this.layoutRaf = 0;
-      this.layout();
-    });
-  }
-
-  private layout(): void {
-    const mapEl = this.mapBox()?.nativeElement;
-    const svg = this.linksSvg()?.nativeElement;
-    if (!mapEl || !svg) {
-      return;
-    }
-    const box = mapEl.getBoundingClientRect();
-    svg.setAttribute('viewBox', `0 0 ${box.width} ${box.height}`);
-
-    const paths = this.links.map((link) => {
-      const elA = mapEl.querySelector<HTMLElement>(`[data-id="${link.from}"]`);
-      const elB = mapEl.querySelector<HTMLElement>(`[data-id="${link.to}"]`);
-      if (!elA || !elB) {
-        return '';
-      }
-      const a = elA.getBoundingClientRect();
-      const b = elB.getBoundingClientRect();
-      const x1 = a.left + a.width / 2 - box.left;
-      const y1 = a.bottom - box.top;
-      const x2 = b.left + b.width / 2 - box.left;
-      const y2 = b.top - box.top;
-      const midY = (y1 + y2) / 2;
-      return `M${x1},${y1} C${x1},${midY} ${x2},${midY} ${x2},${y2}`;
-    });
-
-    this.pathData.set(paths);
   }
 }
 
