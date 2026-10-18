@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
@@ -6,7 +6,7 @@ import { EyebrowLabel } from '../../../shared/components/eyebrow-label/eyebrow-l
 import { CtaPill } from '../../../shared/components/cta-pill/cta-pill';
 import { SiteFooter } from '../../../shared/components/site-footer/site-footer';
 import { SocialLinks, type SocialLink } from '../../../shared/components/social-links/social-links';
-import { openBookingForm } from '../../../core/config/booking';
+import { BookingModalService } from '../../../core/services/booking-modal';
 
 interface Book {
   readonly title: string;
@@ -97,7 +97,9 @@ export class DeepaProfile {
     { quote: 'Made me more positive and open to believing in miracles.', name: 'Laveena Wadhwa' },
   ];
 
+  private readonly bookingModal = inject(BookingModalService);
+
   protected bookConsultation(): void {
-    openBookingForm();
+    this.bookingModal.open();
   }
 }

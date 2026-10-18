@@ -13,6 +13,8 @@ interface FooterLink {
   readonly route?: string;
   /** Opens the booking form instead of navigating. */
   readonly book?: boolean;
+  /** Opens in a new tab (used for the Privacy Policy). */
+  readonly newTab?: boolean;
 }
 
 /**
@@ -85,13 +87,27 @@ interface FooterLink {
         <p class="footer-copyright">&copy; {{ year }} Ease Dis-<span class="ease-mark">ease</span>. All rights reserved.</p>
         <ul class="footer-legal">
           @for (link of legalLinks; track link.label) {
-            <li><a [href]="link.href">{{ link.label }}</a></li>
+            <li>
+              <a [href]="link.href" [attr.target]="link.newTab ? '_blank' : null" [attr.rel]="link.newTab ? 'noopener' : null">
+                {{ link.label }}@if (link.newTab) {<span class="sr-only"> (opens in a new tab)</span>}
+              </a>
+            </li>
           }
         </ul>
       </div>
     </footer>
   `,
   styles: `
+    /* Visually hidden, still read by screen readers. */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
     .site-footer {
       background: var(--surface-deep);
       color: var(--text-quiet-dark);
@@ -259,7 +275,7 @@ export class SiteFooter {
   ];
 
   protected readonly legalLinks: readonly FooterLink[] = [
-    { label: 'Privacy Policy', href: '#' },
+    { label: 'Privacy Policy', href: '/privacy', newTab: true },
     { label: 'Terms of Service', href: '#' },
   ];
 }

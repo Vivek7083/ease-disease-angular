@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/events/events').then((m) => m.Events),
   },
   {
+    path: 'privacy',
+    loadComponent: () => import('./features/privacy/privacy').then((m) => m.Privacy),
+  },
+  {
     path: 'founders',
     redirectTo: 'founders/carol',
     pathMatch: 'full',

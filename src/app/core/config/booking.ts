@@ -1,8 +1,10 @@
 /**
- * Phase 1 booking: every "Book now" style CTA opens this Google Form in a new
- * tab. Google Form link supplied by the founders.
+ * Every "Book now" style CTA opens the on-site booking form (see
+ * BookingModalService and app-booking-form), which replaced the old Google Form.
+ * The form is in demo mode for now: nothing is sent and the payment button only
+ * shows a note, until email delivery (Web3Forms) and the payment link
+ * (Razorpay) are set up.
  */
-export const BOOKING_FORM_URL = 'https://forms.gle/17RboZ41sxWPk9cn7';
 
 /** The one main offer every primary CTA points at - Level 1. */
 export const MAIN_PLAN = {
@@ -11,7 +13,3 @@ export const MAIN_PLAN = {
   price: '₹2499',
   originalPrice: '₹5000',
 } as const;
-
-export function openBookingForm(): void {
-  window.open(BOOKING_FORM_URL, '_blank', 'noopener,noreferrer');
-}

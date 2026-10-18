@@ -3,7 +3,8 @@ import { NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
-import { MAIN_PLAN, openBookingForm } from '../../core/config/booking';
+import { MAIN_PLAN } from '../../core/config/booking';
+import { BookingModalService } from '../../core/services/booking-modal';
 import { BookingCtaService } from '../../core/services/booking-cta';
 import { Wordmark } from '../../shared/components/wordmark/wordmark';
 import { CtaPill } from '../../shared/components/cta-pill/cta-pill';
@@ -76,6 +77,7 @@ interface TreatStep {
 export class Home implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly bookingCta = inject(BookingCtaService);
+  private readonly bookingModal = inject(BookingModalService);
   private readonly router = inject(Router);
 
   /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
@@ -102,9 +104,9 @@ export class Home implements AfterViewInit {
     });
   }
 
-  /** Phase 1: every booking CTA opens the Google Form. */
+  /** Every booking CTA opens the on-site booking form. */
   protected bookConsultation(): void {
-    openBookingForm();
+    this.bookingModal.open();
   }
 
   private static readonly BILLBOARD_CURSOR_TILT_MAX_DEG = 6;
