@@ -794,6 +794,112 @@ const NOTES_STEP = 0.14;
         transition: none;
       }
     }
+
+    /* ---- Step 25B ---- */
+    /* Desktop subtext under "What Your Body May Be Telling You" */
+    .rm-sub {
+      max-width: 60ch;
+      margin: 10px auto 0;
+      text-align: center;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #000;
+    }
+
+    /* Desktop: heading block sits above the pinned tree, with comfortable spacing */
+    @media (min-width: 900px) {
+      .rm-head {
+        padding: 72px 0 8px;
+      }
+      .rm-head .root-map-heading {
+        margin-top: 14px !important;
+      }
+      .rm-sub {
+        font-size: 17px !important;
+        line-height: 1.65;
+        max-width: 62ch;
+        margin-top: 18px !important;
+      }
+    }
+
+    /* Desktop: spacing inside the pinned tree frame */
+    @media (min-width: 900px) {
+      .rm-viewport {
+        padding-block: 14px !important;
+        gap: clamp(10px, 2vh, 22px) !important;
+      }
+      .root-map {
+        gap: clamp(16px, 3.2vh, 36px) !important;
+      }
+      .root-map > .root-map-layer:nth-child(3)::before {
+        top: calc(-1 * clamp(16px, 3.2vh, 36px) - 4px);
+        bottom: calc(-1 * clamp(16px, 3.2vh, 36px) - 4px);
+      }
+    }
+
+    /* The tap instruction now sits at the top of the canopy: hide the old copy below the chips, give the label room */
+    .root-map-prompt {
+      display: none !important;
+    }
+    @media (min-width: 900px) {
+      .root-map > .root-map-layer:nth-child(2) {
+        padding-top: clamp(26px, 4.5vh, 42px);
+      }
+    }
+    @media (max-width: 899px) {
+      .root-map > .root-map-layer:nth-child(2) {
+        padding-top: 36px;
+      }
+      .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
+        padding: 0 18px;
+      }
+    }
+
+    /* Lift the tap instruction a little above the chips */
+    .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
+      margin-bottom: 20px !important;
+      position: relative;
+      top: -6px;
+    }
+    @media (max-width: 899px) {
+      .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
+        margin-bottom: 14px !important;
+        top: -4px;
+      }
+    }
+
+    /* Desktop: start the tree right below the intro text instead of centring it in the screen-high frame */
+    @media (min-width: 900px) {
+      .rm-viewport {
+        justify-content: flex-start !important;
+        padding-top: 28px !important;
+      }
+      .rm-head {
+        padding-bottom: 0;
+      }
+    }
+
+    /* Tap instruction sits ABOVE the canopy outline (overrides the "lift" rule above) */
+    .root-map > .root-map-layer:nth-child(2) {
+      margin-top: 34px;
+      padding-top: clamp(18px, 3vh, 28px) !important;
+    }
+    .root-map > .root-map-layer:nth-child(2) .root-map-layer-label {
+      position: absolute !important;
+      left: 0;
+      right: 0;
+      top: -30px !important;
+      margin: 0 !important;
+      padding: 0 12px !important;
+      text-align: center;
+    }
+    @media (max-width: 899px) {
+      .root-map > .root-map-layer:nth-child(2) {
+        margin-top: 54px;
+        padding-top: 22px !important;
+      }
+    }
   `,
 })
 export class RootMap implements AfterViewInit {
