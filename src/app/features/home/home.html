@@ -141,48 +141,6 @@
         </a>
       </p>
 
-      <div class="programme-highway reveal" [appScrollReveal]="160">
-        <div
-          class="programme-billboard"
-          (pointermove)="onBillboardPointerMove($event)"
-          (pointerleave)="onBillboardPointerLeave($event)"
-        >
-          <figure class="programme-banner">
-            <img
-              ngSrc="images/marketing/founders-banner.png"
-              width="1584"
-              height="672"
-              class="programme-banner-img"
-              alt="Illustrated portraits of Carol and Deepa, Ease Dis-ease's founders, standing among houseplants in a warm consultation room, with the brand's wordmark and tagline: Right Knowledge plus Right Action equals Optimum Health."
-            />
-          </figure>
-          <div class="programme-billboard-post" aria-hidden="true">
-            <span class="programme-billboard-leg programme-billboard-leg-left"></span>
-            <span class="programme-billboard-leg programme-billboard-leg-right"></span>
-          </div>
-          <span class="programme-billboard-ground" aria-hidden="true"></span>
-        </div>
-
-        <!-- The highway car-pass was commented out - it played before the
-             billboard was even in frame on most scroll speeds, so it added
-             motion without actually being seen. The road/car markup is kept
-             (see home.scss) in case it's worth revisiting with a different
-             trigger.
-        <div class="programme-road" aria-hidden="true">
-          <svg class="programme-car" viewBox="0 0 128 56" focusable="false">
-            <ellipse class="programme-car-shadow" cx="64" cy="50" rx="46" ry="5" />
-            <path
-              class="programme-car-body"
-              d="M10 38c0-4 3-7 8-8l10-2 8-10c2-3 6-5 10-5h20c4 0 8 2 10 5l8 10 10 2c5 1 8 4 8 8v6c0 3-2 5-5 5h-4a10 10 0 0 1-20 0H39a10 10 0 0 1-20 0h-4c-3 0-5-2-5-5z"
-            />
-            <path class="programme-car-cabin" d="M40 28l6-9c1-2 3-3 5-3h14c2 0 4 1 5 3l5 9z" />
-            <circle class="programme-car-wheel" cx="34" cy="44" r="8" />
-            <circle class="programme-car-wheel" cx="84" cy="44" r="8" />
-            <circle class="programme-car-light" cx="13" cy="34" r="2.6" />
-          </svg>
-        </div>
-        -->
-      </div>
     </div>
   </section>
 
