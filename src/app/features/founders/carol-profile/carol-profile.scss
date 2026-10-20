@@ -142,26 +142,6 @@ a.founders-tab:hover {
   object-position: center 70%;
 }
 
-.carol-hero-visual .illustration-hero {
-  position: absolute;
-  right: -4%;
-  bottom: -12%;
-  width: 54%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-  transform: rotate(-4deg);
-  pointer-events: none;
-}
-
-@media (min-width: 900px) {
-  .carol-hero-visual .illustration-hero {
-    right: -22%;
-    bottom: -10%;
-    width: 58%;
-  }
-}
-
 /* ---------- about ---------- */
 .carol-about-copy {
   max-width: 68ch;
