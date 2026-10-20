@@ -221,6 +221,29 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       color: #000;
     }
 
+    /* The notes pinned beside the large-screen map: every text element 2px smaller, so they fit their narrow columns. */
+    @media (min-width: 900px) {
+      .note.is-compact .note-family {
+        font-size: calc(0.66rem - 2px);
+      }
+      .note.is-compact .note-title {
+        font-size: calc(1.08rem - 2px);
+      }
+      .note.is-compact .note-preview {
+        font-size: calc(0.84rem - 2px);
+      }
+      .note.is-compact .note-items li {
+        font-size: calc(0.84rem - 2px);
+      }
+      .note.is-compact button.note-head {
+        padding-right: var(--sp-5);
+      }
+      .note.is-compact .note-chevron {
+        width: 18px;
+        height: 18px;
+      }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .note,
       .note-chevron,

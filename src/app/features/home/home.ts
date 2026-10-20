@@ -20,6 +20,8 @@ import { ExpertCarousel } from '../../shared/components/expert-carousel/expert-c
 import { RootMap } from '../../shared/components/root-map/root-map';
 import { Results } from '../../shared/components/results/results';
 import { Testimonials } from '../../shared/components/testimonials/testimonials';
+import { ApproachCompare } from '../../shared/components/approach-compare/approach-compare';
+import { COMMUNITY_WHATSAPP_URL } from '../../core/config/community';
 import { SectionTransition } from '../../shared/components/section-transition/section-transition';
 import { SiteFooter } from '../../shared/components/site-footer/site-footer';
 import { EventsInvite } from '../../shared/components/events-invite/events-invite';
@@ -67,6 +69,7 @@ interface TreatStep {
     RootMap,
     Results,
     Testimonials,
+    ApproachCompare,
     SectionTransition,
     SiteFooter,
     EventsInvite,
@@ -1300,6 +1303,9 @@ export class Home implements AfterViewInit {
       description: 'A nervous system stuck in overdrive keeps digestion, sleep and mood locked in the same holding pattern.',
     },
   ];
+
+  /** The "Join the community" WhatsApp invite (core/config/community.ts); # until it is set. */
+  protected readonly communityWhatsapp = COMMUNITY_WHATSAPP_URL || '#';
 
   protected readonly levels: readonly Level[] = [
     {

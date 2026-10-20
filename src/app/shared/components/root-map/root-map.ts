@@ -119,22 +119,28 @@ const NOTES_STEP = 0.14;
           >
             <svg class="tree-art" [attr.viewBox]="'0 0 ' + geo().w + ' ' + geo().h" aria-hidden="true">
               <g class="grey">
-                <path [attr.d]="art().canopy" />
+                <path class="canopy-fill" [attr.d]="art().canopyFill" />
+                <path class="canopy" [attr.d]="art().canopy" />
+                <path class="tick" [attr.d]="art().ticks" />
                 @for (b of art().branches; track b.key) {
-                  <path [attr.d]="b.d" />
+                  <path class="branch" [attr.d]="b.d" />
                 }
-                <path [attr.d]="art().trunkLeft" />
-                <path [attr.d]="art().trunkRight" />
-                <path [attr.d]="art().ground" />
+                <path class="trunk" [attr.d]="art().trunkLeft" />
+                <path class="trunk" [attr.d]="art().trunkRight" />
+                <path class="trunk" [attr.d]="art().arms" />
+                @for (d of art().bark; track $index) {
+                  <path class="bark" [attr.d]="d" />
+                }
+                <path class="ground" [attr.d]="art().ground" />
                 @for (r of art().roots; track r.key) {
-                  <path [attr.d]="r.d" />
+                  <path class="root" [class.root-off]="!isRootShown(r.key)" [class.root-tease]="isTease(r.key)" [attr.d]="r.d" />
                 }
               </g>
               <g class="blue-lines">
                 @for (t of art().twigs; track t.key) {
                   <path class="blue" pathLength="1" style="--d: 0ms" [attr.d]="t.d" [class.on]="active() === t.fruit" />
                 }
-                @for (b of art().branches; track b.key) {
+                @for (b of art().blueBranches; track b.key) {
                   <path class="blue" pathLength="1" style="--d: 250ms" [attr.d]="b.d" [class.on]="activeSymptoms().includes(b.key)" />
                 }
                 <path class="blue" pathLength="1" style="--d: 500ms" [attr.d]="art().trunk" [class.on]="active() !== null" />
@@ -185,11 +191,14 @@ const NOTES_STEP = 0.14;
               >
             }
 
-            <span class="tree-label" [style.left.%]="at(geo().whyLabel).left" [style.top.%]="at(geo().whyLabel).top">Why it happens</span>
+            <span class="tree-label tree-label--why" [class.root-off]="!anyRootShown()" [style.left.%]="at(geo().whyLabel).left" [style.top.%]="at(geo().whyLabel).top">Why it happens</span>
             @for (node of roots; track node.id) {
               <span
                 class="root-map-node root-map-node--root tree-chip"
                 style="--d: 1000ms"
+                [class.root-off]="!isRootShown(node.id)"
+                [class.root-tease]="isTease(node.id)"
+                [attr.aria-hidden]="isRootShown(node.id) ? null : 'true'"
                 [style.left.%]="at(geo().roots[node.id]).left"
                 [style.top.%]="at(geo().roots[node.id]).top"
                 [attr.data-id]="node.id"
@@ -199,6 +208,13 @@ const NOTES_STEP = 0.14;
             }
           </div>
 
+          @if (isDesktop()) {
+            <div class="rm-more-bar">
+              <button type="button" class="rm-more-btn" [attr.aria-expanded]="showMore()" aria-controls="rm-more-grid" (click)="toggleMore($event)">
+                {{ showMore() ? 'Show fewer conditions' : 'See ' + moreNotes.length + ' more conditions' }}
+              </button>
+            </div>
+          }
           <p class="root-map-caption">* This map shows common patterns, not a diagnosis. Please speak to our qualified practitioner for your diagnosis.</p>
         </div>
       </div>
@@ -251,9 +267,6 @@ const NOTES_STEP = 0.14;
       </div>
 
       <div class="rm-more">
-        <button type="button" class="rm-more-btn" [attr.aria-expanded]="showMore()" aria-controls="rm-more-grid" (click)="toggleMore($event)">
-          {{ showMore() ? 'Show fewer conditions' : 'See ' + moreNotes.length + ' more conditions' }}
-        </button>
         @if (showMore()) {
           <div class="rm-more-grid" id="rm-more-grid">
             @for (note of moreNotes; track note.id; let i = $index) {
@@ -283,6 +296,7 @@ const NOTES_STEP = 0.14;
       <ng-container [ngTemplateOutlet]="mapTpl" />
       <app-conditions-board class="root-map-board" />
     }
+
   `,
   styles: `
     :host {
@@ -575,7 +589,7 @@ const NOTES_STEP = 0.14;
 
     .rm-stage .root-map-caption {
       display: block;
-      margin-top: var(--sp-3);
+      margin-top: 14px;
       text-align: center;
       font-size: 9px;
       line-height: 1.5;
@@ -678,7 +692,8 @@ const NOTES_STEP = 0.14;
       }
       .root-map-node,
       .rm-note,
-      .blue {
+      .blue,
+      .grey .root {
         transition: none !important;
       }
     }
@@ -733,7 +748,7 @@ const NOTES_STEP = 0.14;
     /* Desktop: scale the whole tree so it fits the screen-high pinned frame (tap label to lowest root). */
     @media (min-width: 900px) {
       .tree {
-        width: min(100%, calc((100vh - 140px) * var(--tw) / var(--th)));
+        width: min(100%, calc((100vh - 190px) * var(--tw) / var(--th)));
       }
     }
     .tree-art {
@@ -747,13 +762,37 @@ const NOTES_STEP = 0.14;
     .tree-art path {
       fill: none;
       stroke-linecap: round;
+      stroke-linejoin: round;
     }
-    .grey path {
+    /* Thin grey lines only; a little hierarchy through width alone. */
+    /* The canopy's closed outline is only the area the fruit chips sit inside; the visible edge is a row of curls. */
+    .grey .canopy-fill {
+      stroke: none;
+    }
+    .grey .canopy {
       stroke: #c8c8c8;
-      stroke-width: 1.4;
+      stroke-width: 1.3;
     }
-    .grey path:first-child {
-      stroke: #d6d6d6;
+    .grey .tick {
+      stroke: #d0d0d0;
+      stroke-width: 1.1;
+    }
+    .grey .bark {
+      stroke: #cbcbcb;
+      stroke-width: 1.3;
+    }
+    .grey .trunk {
+      stroke: #bdbdbd;
+      stroke-width: 2;
+    }
+    .grey .branch {
+      stroke: #c8c8c8;
+      stroke-width: 1.3;
+    }
+    .grey .ground,
+    .grey .root {
+      stroke: #c8c8c8;
+      stroke-width: 1.2;
     }
     /* The traced path: hidden until a condition is clicked, then drawn stage by stage (--d is each stage's start delay). */
     .blue {
@@ -791,8 +830,60 @@ const NOTES_STEP = 0.14;
       font-size: var(--fs);
       line-height: 1;
     }
+    /* A lit chip fills in when the blue line reaches it (--d); fading in or out is never delayed. */
     .tree-chip.lit {
-      transition-delay: var(--d, 0ms);
+      transition:
+        background var(--dur-base) var(--ease) var(--d, 0ms),
+        border-color var(--dur-base) var(--ease) var(--d, 0ms),
+        color var(--dur-base) var(--ease) var(--d, 0ms),
+        opacity 0.18s var(--ease) 0ms;
+    }
+
+    /* Roots stay out of sight until a condition is tapped (traced roots then appear as the blue line reaches them),
+       except one teased root, faint, now and then; once the story is done they all stay. */
+    .root-map-node--root,
+    .tree-label--why {
+      transition:
+        opacity 0.18s var(--ease),
+        background var(--dur-base) var(--ease),
+        border-color var(--dur-base) var(--ease),
+        color var(--dur-base) var(--ease);
+    }
+    .root-map-node--root.root-off,
+    .tree-label--why.root-off {
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+    .root-map-node--root.root-tease {
+      opacity: 0.65 !important;
+    }
+    .grey .root {
+      transition: opacity 0.18s var(--ease);
+    }
+    .grey .root.root-off {
+      opacity: 0;
+    }
+    .grey .root.root-tease {
+      opacity: 0.75;
+    }
+    /* Mobile: let the tree use a little of the page gutter so the longest chips fit each side of the trunk. */
+    @media (max-width: 899px) {
+      .tree {
+        width: calc(100% + 24px);
+        margin-inline: -12px;
+      }
+    }
+
+    /* The link and the footnote stack under the tree, centred, with clear space between them. */
+    .rm-more-bar {
+      display: flex;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .rm-more-bar .rm-more-btn {
+      min-height: 36px;
+      padding: 0 var(--sp-5);
+      font-size: 0.88rem;
     }
     .root-map-node--root {
       background: #fff;
@@ -888,6 +979,25 @@ export class RootMap implements AfterViewInit {
   protected readonly openId = signal<string | null>(null);
   protected readonly showMore = signal(false);
 
+  /** Latched once the reader has been through the whole story: every root then stays on show. */
+  private readonly allRoots = signal(false);
+  /** The one root teased (faintly, with its line from the trunk) before any tap. Picked at random, and changes now and then. */
+  private readonly teaseRoot = signal<string | null>(null);
+
+  /**
+   * Before any tap only the teased root shows. The first tap on any condition reveals ALL the roots (they then
+   * stay), and only the roots that condition leads to are filled in blue. Finishing the story shows them all too.
+   */
+  protected isRootShown(id: string): boolean {
+    return this.allRoots() || this.rootsRevealed() || this.teaseRoot() === id;
+  }
+
+  protected isTease(id: string): boolean {
+    return !this.allRoots() && !this.rootsRevealed() && this.teaseRoot() === id;
+  }
+
+  protected readonly anyRootShown = computed(() => this.allRoots() || this.rootsRevealed() || this.teaseRoot() !== null);
+
   /** Set on the first tap; until then the top chips breathe with a soft ring. */
   protected readonly rootsRevealed = signal(false);
 
@@ -938,6 +1048,9 @@ export class RootMap implements AfterViewInit {
       // Collapsing shortens the page under the reader - keep the button, and the reader, in place.
       this.openId.set(null);
       requestAnimationFrame(() => button.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+    } else {
+      // The link sits in the pinned frame, so take the reader to the notes it just revealed.
+      requestAnimationFrame(() => document.getElementById('rm-more-grid')?.scrollIntoView({ block: 'start', behavior: 'smooth' }));
     }
   }
 
@@ -957,14 +1070,36 @@ export class RootMap implements AfterViewInit {
     window.addEventListener('resize', onResize, { passive: true });
     this.update();
 
+    const pickTease = () => {
+      const ids = this.roots.map((r) => r.id).filter((id) => id !== this.teaseRoot());
+      this.teaseRoot.set(ids[Math.floor(Math.random() * ids.length)]);
+    };
+    pickTease();
+    const teaseTimer = window.setInterval(() => {
+      if (!this.reducedMotion() && !this.rootsRevealed() && !this.allRoots()) {
+        pickTease();
+      }
+    }, 2800);
+
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onResize);
       cancelAnimationFrame(this.scrollRaf);
+      window.clearInterval(teaseTimer);
+      document.documentElement.classList.remove('rm-tree-on-screen');
     });
   }
 
+  /** On small screens the site's fixed scroll rail (right edge) would sit on top of the tree, so hide it while the tree is on screen. */
+  private syncRail(): void {
+    const tree = document.querySelector('app-root-map .tree');
+    const rect = tree?.getBoundingClientRect();
+    const overlaps = !!rect && window.innerWidth < DESKTOP_BREAKPOINT && rect.bottom > 0 && rect.top < window.innerHeight;
+    document.documentElement.classList.toggle('rm-tree-on-screen', overlaps);
+  }
+
   private update(): void {
+    this.syncRail();
     const desktop = window.innerWidth >= DESKTOP_BREAKPOINT;
     if (desktop !== this.isDesktop()) {
       this.isDesktop.set(desktop);
@@ -972,6 +1107,11 @@ export class RootMap implements AfterViewInit {
     }
     if (desktop) {
       this.updateDesktop();
+    } else {
+      const rect = document.querySelector('app-root-map .tree')?.getBoundingClientRect();
+      if (rect && rect.bottom < window.innerHeight * 0.25) {
+        this.allRoots.set(true);
+      }
     }
   }
 
@@ -996,6 +1136,9 @@ export class RootMap implements AfterViewInit {
 
     if (count !== this.deskNoteCount()) {
       this.deskNoteCount.set(count);
+    }
+    if (count >= PINNED_NOTE_COUNT) {
+      this.allRoots.set(true);
     }
   }
 }

@@ -53,6 +53,9 @@
 .hero-grid {
   position: relative;
   z-index: 1;
+  /* A flex item of .hero-frame: without this it shrinks to its content, which on screens wider than the
+     container leaves it narrower (and so further in from the edges) than the header logo above it. */
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--sp-6);
@@ -2223,4 +2226,45 @@ app-expert-carousel {
   .hook-carousel-slide .hook-image {
     transition: none;
   }
+}
+
+/* ---------- the E.A.S.E. community ---------- */
+.community-intro {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-4);
+  max-width: 62ch;
+  margin-bottom: var(--sp-12);
+}
+
+.community-intro .lede {
+  max-width: 62ch;
+}
+
+/* "Join the community": a centred call to action under the comparison. */
+.community-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-12);
+}
+
+/* The same plain hyperlink as the rest of the page (.source-link: one underline, an arrow), with WhatsApp's icon in its own green. */
+.community-link .wa-icon {
+  width: 22px;
+  height: 22px;
+  fill: #25d366;
+  stroke: none;
+}
+
+.community-link:hover .wa-icon {
+  transform: none;
+}
+
+.community-link .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

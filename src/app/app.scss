@@ -153,3 +153,11 @@
     border-radius: var(--r-pill);
   }
 }
+
+/* Small screens: the scroll rail would sit on top of the conditions tree, so it steps aside while the tree is on screen. */
+@media (max-width: 899px) {
+  :host-context(html.rm-tree-on-screen) .chrome-progress {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
