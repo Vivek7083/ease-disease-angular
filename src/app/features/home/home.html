@@ -5,11 +5,11 @@
       <div class="scene-inner hero-grid">
         <div class="hero-copy">
           <h1 id="hero-heading" class="hero-headline">
-            Your body has been<br />
-            <em>speaking in symptoms.</em><br />
-            <span class="hero-headline-sub">It's time to <span class="mark">listen</span></span>
+            Your Body Is<br />
+            <em>Speaking.</em><br />
+            <span class="hero-headline-sub">It’s Time to <span class="mark">Listen.</span></span>
           </h1>
-          <p class="lede">Decide whether you want to treat the cause or manage the symptoms for a lifetime.</p>
+          <p class="lede">Understand the signals. Explore the root causes. Take a more informed approach to your well-being.</p>
           <div class="hero-cta-row">
             <app-cta-pill
               [label]="plan.label"
@@ -33,7 +33,7 @@
     </div>
   </section>
 
-  <!-- ============ INTER-QUOTE — sits in the 20px gap between hero and hook,
+  <!-- ============ INTER-QUOTE - sits in the 20px gap between hero and hook,
        fills in word by word as it scrolls into view. ============ -->
   <div class="inter-quote">
     <p class="hook-close" #closeQuote>
@@ -42,6 +42,19 @@
       }
     </p>
   </div>
+
+  <!-- ============ THE ROOT MAP - diseases & categories, as an interactive
+       symptom → condition → root-cause trace. Sits right after the hero and
+       the inter-quote, above "Our philosophy". Stays on the same ivory
+       canvas as every other section - oxblood/ink carry the "seriousness"
+       here, not an inverted dark panel. ============ -->
+  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
+    <div class="scene-inner">
+      <app-root-map (bookRequested)="bookConsultation()" />
+    </div>
+  </section>
+
+  <app-section-transition variant="curtain" />
 
   <!-- Shared card copy (desktop deck + mobile stack): title and body typed in
        word by word, with an optional "Read more" for long bodies. -->
@@ -88,396 +101,20 @@
 
   <!-- ============ THE HOOK ============ -->
   <section class="scene hook" id="hook" appCanvasStop from="var(--canvas-hook-from)" to="var(--canvas-hook-to)" aria-labelledby="hook-heading">
-    @if (hookHorizontal()) {
-      <!-- Desktop/laptop — a pinned scrollytelling deck: the heading reveals
-           once, then each card cross-dissolves into the next with a subtle
-           parallax drift as the reader scrolls. Every card is stacked in the
-           same spot (not laid out side by side) so there's never a hard cut
-           or a dead/frozen stretch — scroll maps to visibility/position
-           continuously and proportionally the whole way. -->
-      <div class="hook-pin is-horizontal" #hookPin [style.height.vh]="hookPoints.length * hookVhPerCard">
-        <div class="hook-viewport">
-          <div class="hook-stack">
-            <div
-              class="hook-heading-row reveal"
-              [appScrollReveal]="0"
-              [style.clip-path]="'inset(0 ' + (100 - headingRevealProgress() * 100) + '% 0 0)'"
-            >
-              <app-eyebrow-label text="Root-cause, not symptoms" />
-              <h2 id="hook-heading" class="hook-heading">Our philosophy</h2>
-            </div>
-
-            <div class="hook-rail" [style.opacity]="cardsOpacity()">
-              @for (point of hookPoints; track point.title; let i = $index) {
-                <span class="hook-rail-step" [style.--fill]="cardVisibility(i)">
-                  <button
-                    type="button"
-                    class="hook-rail-num"
-                    [attr.aria-current]="cardVisibility(i) > 0.5 ? 'step' : null"
-                    [attr.aria-label]="'Go to: ' + point.title"
-                    (click)="jumpToHookCard(i)"
-                  >
-                    {{ '0' + (i + 1) }}
-                  </button>
-                  <span class="hook-rail-line" aria-hidden="true"></span>
-                </span>
-              }
-            </div>
-
-            <div class="hook-deck" [style.opacity]="cardsOpacity()">
-              @for (point of hookPoints; track point.title; let i = $index) {
-                <div
-                  class="hook-deck-card"
-                  [style.opacity]="cardVisibility(i)"
-                  [style.transform]="cardDeckTransform(i)"
-                  [style.pointer-events]="cardPointerEvents(i)"
-                >
-                  <div class="hook-card" [class]="'icon-' + point.icon">
-                    <div
-                      class="hook-image"
-                      [style.transform]="cardImageTransform(i)"
-                      [style.filter]="cardImageFilter(i)"
-                    >
-                      <img [ngSrc]="point.image" fill alt="" />
-                    </div>
-                    <p class="sr-only">Illustration: {{ point.imageAlt }}</p>
-                    <div class="hook-copy" [style.transform]="cardCopyTransform(i)">
-                      <ng-container *ngTemplateOutlet="hookCopy; context: { $implicit: point, i: i }" />
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-          <p class="hook-scroll-hint" [style.opacity]="hookScrollHintOpacity()" aria-hidden="true">
-            <span>{{ hookScrollHintLabel() }}</span>
-            <svg class="hook-scroll-hint-arrow" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 6l5 5 5-5" /></svg>
-          </p>
-        </div>
-      </div>
-    } @else {
-      <!-- Mobile/tablet — normal document flow, no scroll capture at all.
-           Cards are a real swipeable carousel; the pill below doubles as a
-           progress indicator and a drag-to-scrub control. -->
-      <div class="hook-mobile">
-        <div
-          class="hook-heading-row"
-          #mobileHookHeading
-          [style.opacity]="mobileHeadingRevealProgress()"
-          [style.transform]="'translateY(' + (1 - mobileHeadingRevealProgress()) * 24 + 'px)'"
-        >
-          <app-eyebrow-label text="Root-cause, not symptoms" />
-          <h2 id="hook-heading" class="hook-heading">Our philosophy</h2>
-        </div>
-
-        <div class="hook-carousel reveal" [appScrollReveal]="150">
-          <div class="hook-carousel-viewport">
-            <div
-              class="hook-carousel-track"
-              #carouselTrack
-              tabindex="0"
-              role="group"
-              aria-roledescription="carousel"
-              aria-label="Why functional medicine — use left and right arrow keys to change card"
-              [class.dragging]="isCarouselDragging()"
-              (pointerdown)="onCarouselPointerDown($event)"
-              (pointermove)="onCarouselPointerMove($event)"
-              (pointerup)="onCarouselPointerUp($event)"
-              (pointercancel)="onCarouselPointerUp($event)"
-              (keydown)="onCarouselKeydown($event)"
-            >
-              @for (point of hookPoints; track point.title; let i = $index) {
-                <div
-                  class="hook-carousel-slide"
-                  [style]="cardStackStyle(i)"
-                  [attr.aria-hidden]="i === mobileActiveCard() ? null : 'true'"
-                >
-                  <div class="hook-card" [class]="'icon-' + point.icon">
-                    <div class="hook-image">
-                      <img [ngSrc]="point.image" fill alt="" />
-                    </div>
-                    <p class="sr-only">Illustration: {{ point.imageAlt }}</p>
-                    <div class="hook-copy">
-                      <ng-container *ngTemplateOutlet="hookCopy; context: { $implicit: point, i: i }" />
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-
-          <p class="hook-hint" [class.is-hidden]="hookHintDismissed()" aria-hidden="true">
-            <span class="hook-hint-item"><span class="hook-hint-arrow">→</span> Swipe to see more</span>
-            <span class="hook-hint-dot">·</span>
-            <span class="hook-hint-item">Tap to reveal next</span>
-          </p>
-
-          <div
-            class="hook-pill"
-            [class.dragging]="isPillDragging()"
-            role="slider"
-            aria-label="Card"
-            [attr.aria-valuemin]="1"
-            [attr.aria-valuemax]="hookPoints.length"
-            [attr.aria-valuenow]="mobileActiveCard() + 1"
-            (pointerdown)="onPillPointerDown($event)"
-            (pointermove)="onPillPointerMove($event)"
-            (pointerup)="onPillPointerUp($event)"
-            (pointercancel)="onPillPointerUp($event)"
-          >
-            <span class="hook-pill-fill" [style.width.%]="pillFillPercent()"></span>
-          </div>
-        </div>
-      </div>
-    }
-
+    <app-philosophy [points]="hookPoints" />
   </section>
 
   <app-section-transition variant="dots" />
 
-  <!-- ============ HOW WE TREAT (process steps) — mobile-first, step 1 only
+  <!-- ============ HOW WE TREAT (process steps) - mobile-first, step 1 only
        for now. Normal document flow, no scroll-jacking, each beat revealed
        once via appScrollReveal as it enters view (same primitive the rest
        of the site uses). ============ -->
   <section class="scene treat" id="treat" appCanvasStop from="var(--canvas-hook-to)" to="var(--canvas-treat-to)" aria-labelledby="treat-heading">
-    <!-- Both ng-templates below are declared once here but used by either
-         branch further down, including the desktop one that sits OUTSIDE
-         .scene-inner (see the comment on .treat-pin-desktop) — a template
-         reference variable is visible anywhere in this component's
-         template, not just inside the div it's declared in. -->
-    <div class="scene-inner treat-inner">
-      <!-- Shared between mobile (sits above the pin, in normal flow) and
-           desktop (sits inside the sticky viewport, alongside the nodes —
-           same as the Hook section's heading staying visible with its
-           cards instead of scrolling away before the pin even engages). -->
-      <ng-template #treatHeading>
-        <div class="treat-heading-row reveal" [appScrollReveal]="0">
-          <app-eyebrow-label text="Built with you, not for you" />
-          <h2 id="treat-heading" class="treat-heading">Transform with E.A.S.E</h2>
-          @if (treatHorizontal()) {
-            <p class="treat-subtext">Four steps. Every one grounded in what your body is actually telling us.</p>
-          } @else {
-            <p class="treat-subtext">Four steps — grounded in what your body is actually telling us, not a generic protocol.</p>
-          }
-        </div>
-      </ng-template>
-
-      <!-- Shared between the mobile deck and the desktop timeline below —
-           the illustration markup is identical either way, only the
-           surrounding mechanic differs. -->
-      <ng-template #stepIllustration let-i="i">
-        @if (i === 0) {
-          <div class="treat-phone" aria-hidden="true">
-            <div class="treat-phone-notch"></div>
-            <div class="treat-phone-screen">
-              <div class="treat-call-header">
-                <span class="treat-call-dot"></span>
-                <span class="treat-call-timer">12:47</span>
-              </div>
-              <div class="treat-call-stage">
-                <div class="treat-call-tile treat-call-tile-main">
-                  <img ngSrc="images/treat-step1-nutritionist.webp" fill alt="" class="treat-portrait" />
-                </div>
-                <div class="treat-call-tile treat-call-tile-self">
-                  <svg class="treat-avatar treat-avatar-self" viewBox="0 0 24 24" aria-hidden="true">
-                    <circle cx="12" cy="9" r="4" />
-                    <path d="M4 20c0-4.4 3.6-7 8-7s8 2.6 8 7" />
-                  </svg>
-                  <div class="treat-cloud-stack">
-                    @for (tag of treatStepOneTags; track tag) {
-                      <span class="treat-cloud">{{ tag }}</span>
-                    }
-                  </div>
-                </div>
-              </div>
-              <div class="treat-call-controls">
-                <span class="treat-call-btn">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-                  </svg>
-                </span>
-                <span class="treat-call-btn">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <rect x="3" y="7" width="12" height="10" rx="2" /><path d="M15 10l6-3v10l-6-3z" />
-                  </svg>
-                </span>
-                <span class="treat-call-btn treat-call-btn-end">
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                      d="M7 2c-.6 0-1 .4-1 1 0 7.7 6.3 14 14 14 .6 0 1-.4 1-1v-3.2c0-.5-.3-.9-.8-1l-3.6-.9c-.4-.1-.9 0-1.1.4l-.9 1.3c-2-.9-3.6-2.5-4.5-4.5l1.3-.9c.4-.3.5-.7.4-1.1L10.9 2.8c-.1-.5-.5-.8-1-.8H7z"
-                    />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>
-          <p class="sr-only">
-            Illustration: a video consultation call. Topics discussed: diet, sleep, past reports, lifestyle and goals.
-          </p>
-        } @else if (i === 1) {
-          <div class="treat-illustration-card" aria-hidden="true">
-            <img ngSrc="images/treat-step2-bloodtest.webp" fill alt="" class="treat-illustration-img" />
-          </div>
-          <p class="sr-only">Illustration: hands holding a blood test vial and a lab result checklist card.</p>
-        } @else if (i === 2) {
-          <div class="treat-illustration-card" aria-hidden="true">
-            <img ngSrc="images/treat-step3-food.webp" fill alt="" class="treat-illustration-img" />
-          </div>
-          <p class="sr-only">Illustration: hands holding a bowl of whole foods and a supplement bottle — food first, supplements only where needed.</p>
-        } @else if (i === 3) {
-          <div class="treat-illustration-card" aria-hidden="true">
-            <img ngSrc="images/treat-step4-checkins.webp" fill alt="" class="treat-illustration-img" />
-          </div>
-          <p class="sr-only">Illustration: hands holding an open journal with a checked-off list beside a cup of tea — regular check-ins that keep the plan working.</p>
-        }
-      </ng-template>
-
-      @if (!treatHorizontal()) {
-        <ng-container *ngTemplateOutlet="treatHeading" />
-        <!-- Mobile — a pinned, scroll-scrubbed deck. Each step's content
-             and illustration share one spot and cross-dissolve into the
-             next as you scroll, rather than stacking down the page.
-             Scrolling back up reverses it, same as any pin; scrolling
-             past the last step holds it in place for a beat before the
-             pin releases into Root Map. -->
-        <div class="treat-pin" #treatPin [style.height.vh]="treatSteps.length * treatVhPerStep">
-          <div class="treat-viewport">
-            <!-- Replaces the old peeking card-stack as the step-count cue —
-                 that stack visually resembled the swipeable expert carousel
-                 above it, but dragging it did nothing (this section advances
-                 by scrolling, not swiping). Plain numbered dots read as
-                 "step 2 of 4" without implying a gesture this isn't. -->
-            <div class="treat-progress" role="group" aria-label="Jump to a step">
-              @for (step of treatSteps; track step.title; let i = $index; let last = $last) {
-                <button
-                  type="button"
-                  class="treat-progress-dot"
-                  [class.is-active]="i === treatActiveStepIndex()"
-                  [class.is-done]="i < treatActiveStepIndex()"
-                  [attr.aria-label]="'Jump to step ' + (i + 1) + ': ' + step.title"
-                  [attr.aria-pressed]="i === treatActiveStepIndex()"
-                  (click)="scrollToTreatStep(i)"
-                >
-                  {{ i + 1 }}
-                </button>
-                @if (!last) {
-                  <span class="treat-progress-line" [class.is-filled]="i < treatActiveStepIndex()" aria-hidden="true"></span>
-                }
-              }
-            </div>
-            <div class="treat-deck">
-              @for (step of treatSteps; track step.title; let i = $index) {
-                <div
-                  class="treat-deck-card"
-                  [class.is-active]="treatStackActive(i)"
-                  [style.opacity]="treatCardOpacity(i)"
-                  [style.transform]="treatCardTransform(i)"
-                  [style.pointer-events]="treatStackActive(i) ? 'auto' : 'none'"
-                  [attr.aria-hidden]="!treatStackActive(i)"
-                >
-                  <div class="treat-step-main">
-                    <div class="treat-step-rail" aria-hidden="true">
-                      <span class="treat-step-badge">{{ '0' + (i + 1) }}</span>
-                    </div>
-                    <div class="treat-step-content">
-                      <div class="treat-step-copy">
-                        <h3 class="treat-step-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
-                        @let ctaSplit = i === 0 ? splitBodyAroundCta(step.body, '30-minute call') : null;
-                        <p class="treat-step-body">
-                          @if (ctaSplit) {
-                            {{ ctaSplit.before
-                            }}<button type="button" class="inline-cta" (click)="bookConsultation()">{{ ctaSplit.link }}</button
-                            >{{ ctaSplit.after }}
-                          } @else {
-                            {{ step.body }}
-                          }
-                        </p>
-                      </div>
-
-                      <div class="treat-step-visual">
-                        <ng-container *ngTemplateOutlet="stepIllustration; context: { i: i }" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              }
-            </div>
-            <p class="treat-scroll-hint" aria-hidden="true" [style.opacity]="treatHintOpacity()">
-              {{ treatHintLabel() }} <span class="treat-scroll-hint-arrow">↓</span>
-            </p>
-          </div>
-        </div>
-      }
-    </div>
-
-    @if (treatHorizontal()) {
-      <!-- Desktop — sits directly under .scene, NOT inside .scene-inner,
-           same as .hook-pin.is-horizontal: it needs to own the full
-           section width and do its own single-level max-width/gutter
-           centering (.treat-viewport-desktop .treat-heading-row,
-           .treat-timeline). Nesting it inside .scene-inner.treat-inner
-           (which already applies max-width/padding-inline) double-applied
-           that constraint and shifted this section's content ~64px to
-           the right of Hook's, despite both having identical padding-top/
-           heading markup — the vertical position always matched, it was
-           the horizontal centering that was off.
-           All four steps lay out left to right. Each one reveals in
-           place (fades/rises up) as its turn in the scroll comes around,
-           and a line grows from its badge toward the next one. Nothing
-           fades back out: by the time the pin releases, the whole
-           01→02→03→04 chain sits on screen as one finished timeline. -->
-      <div class="treat-pin-desktop" #treatPinDesktop [style.height.vh]="treatSteps.length * treatDesktopVhPerStep">
-        <div class="treat-viewport-desktop">
-          <ng-container *ngTemplateOutlet="treatHeading" />
-          <div class="treat-timeline">
-            @for (step of treatSteps; track step.title; let i = $index) {
-              <div
-                class="treat-node"
-                [style.opacity]="treatNodeVisibility(i)"
-                [style.transform]="treatNodeTransform(i)"
-              >
-                <div class="treat-node-rail" aria-hidden="true">
-                  <span class="treat-node-badge">{{ '0' + (i + 1) }}</span>
-                  @if (i < treatSteps.length - 1) {
-                    <span class="treat-node-line" [style.transform]="'scaleX(' + treatNodeLineProgress(i) + ')'"></span>
-                  }
-                </div>
-                <div class="treat-node-copy">
-                  <h3 class="treat-node-title"><span class="sr-only">Step {{ i + 1 }}: </span>{{ step.title }}</h3>
-                  @let ctaSplit = i === 0 ? splitBodyAroundCta(step.bodyShort, '30-minute call') : null;
-                  <p class="treat-node-body">
-                    @if (ctaSplit) {
-                      {{ ctaSplit.before
-                      }}<button type="button" class="inline-cta" (click)="bookConsultation()">{{ ctaSplit.link }}</button
-                      >{{ ctaSplit.after }}
-                    } @else {
-                      {{ step.bodyShort }}
-                    }
-                  </p>
-                </div>
-                <div class="treat-node-visual">
-                  <!-- No extra frame drawn here — step 1's image already
-                       has its own window chrome (macOS traffic lights,
-                       call controls) baked in, and steps 2-4 carry a
-                       thin border already, so wrapping them in another
-                       frame would double up. -->
-                  <div class="treat-node-image" aria-hidden="true">
-                    <img [ngSrc]="treatDesktopImages[i].src" fill alt="" class="treat-node-img" />
-                  </div>
-                  <p class="sr-only">{{ treatDesktopImages[i].alt }}</p>
-                </div>
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    }
+    <app-transform-timeline [steps]="treatTimelineSteps" />
   </section>
 
-  <app-section-transition variant="sprout" />
-
-  <!-- ============ RESULTS — how you feel after the work, plus the large
+  <!-- ============ RESULTS - how you feel once the work is done, plus the large
        client quote (PRD §4 + §5). Plain stacked flow with a light
        appScrollReveal, deliberately NOT pinned: it follows two pinned
        sections and should read as a calmer beat. ============ -->
@@ -487,38 +124,13 @@
     </div>
   </section>
 
-  <!-- ============ TESTIMONIALS — a real client message shown as it was
-       received, a WhatsApp thread, rather than a styled pull-quote. Same
-       canvas stop as the end of Results (flat, not chained) so inserting
-       this section doesn't disturb the canvas handoff into the root map
-       below it. ============ -->
-  <section class="scene testimonials" id="testimonials" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="testimonials-heading">
-    <div class="scene-inner">
-      <app-testimonials />
-    </div>
-  </section>
-
-  <app-section-transition variant="vine" />
-
-  <!-- ============ THE ROOT MAP — diseases & categories, as an interactive
-       symptom → condition → root-cause trace. Stays on the same ivory
-       canvas as every other section — oxblood/ink carry the "seriousness"
-       here, not an inverted dark panel. ============ -->
-  <section class="scene root-map-scene" id="root-map" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-descent-to)" aria-labelledby="root-map-heading">
-    <div class="scene-inner">
-      <app-root-map (bookRequested)="bookConsultation()" />
-    </div>
-  </section>
-
-  <app-section-transition variant="curtain" />
-
-  <!-- ============ PROGRAMME — packages, picked by depth ============ -->
+  <!-- ============ PROGRAMME - packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
-      <app-eyebrow-label text="How it starts" />
-      <h2 id="programme-heading" class="t-display">Start where you are. Go as deep as you need.</h2>
+      <app-eyebrow-label text="Your Journey Starts Here." />
+      <h2 id="programme-heading" class="t-display">Take the First Step.</h2>
       <p class="t-body lede">
-        One consultation. Three months. Choose where to begin — drag or tap to explore what each level covers.
+        Every transformation begins with a conversation. Let's understand what your body is telling you, explore your concerns, and discover the right next steps for you.
       </p>
       <app-level-selector [levels]="levels" (booked)="bookConsultation()" />
       <p class="levels-fallback">
@@ -529,67 +141,58 @@
         </a>
       </p>
 
-      <div class="programme-highway reveal" [appScrollReveal]="160">
-        <div
-          class="programme-billboard"
-          (pointermove)="onBillboardPointerMove($event)"
-          (pointerleave)="onBillboardPointerLeave($event)"
-        >
-          <figure class="programme-banner">
-            <img
-              ngSrc="images/marketing/founders-banner.png"
-              width="1584"
-              height="672"
-              class="programme-banner-img"
-              alt="Illustrated portraits of Carol and Deepa, Ease Dis-ease's founders, standing among houseplants in a warm consultation room, with the brand's wordmark and tagline: Right Knowledge plus Right Action equals Optimum Health."
-            />
-          </figure>
-          <div class="programme-billboard-post" aria-hidden="true">
-            <span class="programme-billboard-leg programme-billboard-leg-left"></span>
-            <span class="programme-billboard-leg programme-billboard-leg-right"></span>
-          </div>
-          <span class="programme-billboard-ground" aria-hidden="true"></span>
-        </div>
+    </div>
+  </section>
 
-        <!-- The highway car-pass was commented out — it played before the
-             billboard was even in frame on most scroll speeds, so it added
-             motion without actually being seen. The road/car markup is kept
-             (see home.scss) in case it's worth revisiting with a different
-             trigger.
-        <div class="programme-road" aria-hidden="true">
-          <svg class="programme-car" viewBox="0 0 128 56" focusable="false">
-            <ellipse class="programme-car-shadow" cx="64" cy="50" rx="46" ry="5" />
-            <path
-              class="programme-car-body"
-              d="M10 38c0-4 3-7 8-8l10-2 8-10c2-3 6-5 10-5h20c4 0 8 2 10 5l8 10 10 2c5 1 8 4 8 8v6c0 3-2 5-5 5h-4a10 10 0 0 1-20 0H39a10 10 0 0 1-20 0h-4c-3 0-5-2-5-5z"
-            />
-            <path class="programme-car-cabin" d="M40 28l6-9c1-2 3-3 5-3h14c2 0 4 1 5 3l5 9z" />
-            <circle class="programme-car-wheel" cx="34" cy="44" r="8" />
-            <circle class="programme-car-wheel" cx="84" cy="44" r="8" />
-            <circle class="programme-car-light" cx="13" cy="34" r="2.6" />
-          </svg>
-        </div>
-        -->
-      </div>
+  <!-- ============ TESTIMONIALS - a real client message shown as it was
+       received, a WhatsApp thread, rather than a styled pull-quote. Same
+       canvas stop as the end of Results (flat, not chained). Sits right
+       after the Programmes section. ============ -->
+  <section class="scene testimonials" id="testimonials" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="testimonials-heading">
+    <div class="scene-inner">
+      <app-testimonials />
     </div>
   </section>
 
   <app-section-transition variant="wave" />
 
-  <!-- ============ TEAM — meet the experts ============ -->
+  <!-- ============ THE E.A.S.E. COMMUNITY - conventional vs functional medicine, side by side ============ -->
+  <section class="scene community" id="community" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="community-heading">
+    <div class="scene-inner">
+      <div class="community-intro reveal" [appScrollReveal]="0">
+        <app-eyebrow-label text="The E.A.S.E. Community" />
+        <h2 id="community-heading" class="t-display">Learn, Connect, and Discover</h2>
+        <p class="t-body lede">
+          Explore upcoming events, expert-led sessions, and wellness experiences designed to deepen your understanding of health, introduce new perspectives, and inspire more informed choices for your well-being.
+        </p>
+      </div>
+      <app-approach-compare />
+      <div class="community-cta">
+        <a class="source-link community-link" [href]="communityWhatsapp" target="_blank" rel="noopener">
+          <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+          </svg>
+          <span>Join the community</span>
+          <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
+          <span class="sr-only"> on WhatsApp (opens in a new tab)</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TEAM - meet the experts ============ -->
   <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="Meet the experts" />
-      <h2 id="team-heading" class="t-display">Every programme is reviewed, not improvised.</h2>
+      <h2 id="team-heading" class="t-display">Understanding Your Health, Together</h2>
       <p class="t-body lede">
-        Whether you are newly diagnosed, struggling with chronic symptoms, or seeking deeper transformation, there
-        is a path for you here.
+        Our team looks beyond individual symptoms, connecting the dots between your lifestyle, health history, and everyday habits to understand your unique needs and guide you toward an informed and personalised health journey.
       </p>
       <app-expert-carousel [members]="team" (connectRequested)="onExpertConnect($event)" />
     </div>
   </section>
 
-  <!-- ============ EVENTS & RETREATS — invite to the events page ============ -->
+  <!-- ============ EVENTS & RETREATS - invite to the events page ============ -->
   <section class="scene events-invite" id="events" appCanvasStop from="var(--canvas-team-to)" to="var(--canvas-team-to)" aria-labelledby="events-invite-heading">
     <div class="scene-inner">
       <app-events-invite />
@@ -597,14 +200,14 @@
   </section>
 
   @if (showRemainingSections) {
-  <!-- ============ THE DESCENT — root causes, the deepest beat ============ -->
+  <!-- ============ THE DESCENT - root causes, the deepest beat ============ -->
   <section class="scene descent" appCanvasStop from="var(--canvas-descent-from)" to="var(--canvas-descent-to)" aria-labelledby="descent-heading">
     <div class="scene-inner">
       <div class="deep-panel">
         <app-eyebrow-label text="Where it often starts" />
         <h2 id="descent-heading" class="t-display on-dark">Different symptoms often grow from the same roots.</h2>
         <p class="t-body on-dark panel-lede">
-          Most people treat each symptom on its own — a cream for the skin, an antacid for the bloating.
+          Most people treat each symptom on its own - a cream for the skin, an antacid for the bloating.
           Underneath, fewer things are actually going on.
         </p>
         <div class="hub-frame">
@@ -623,14 +226,14 @@
     </div>
   </section>
 
-  <!-- ============ THE TURN — ember dawn, the path out ============ -->
+  <!-- ============ THE TURN - ember dawn, the path out ============ -->
   <section class="scene turn" appCanvasStop from="var(--canvas-turn-from)" to="var(--canvas-turn-to)" aria-labelledby="turn-heading">
     <div class="scene-inner turn-grid">
       <div>
         <app-eyebrow-label text="The turn · why this works" />
         <h2 id="turn-heading" class="t-display">Root-cause healing vs. symptom management.</h2>
         <p class="t-body lede">
-          Conventional care treats what is in front of it. Root-cause care asks why it is there — and builds
+          Conventional care treats what is in front of it. Root-cause care asks why it is there - and builds
           a plan around your bloodwork, your history and your life, not a standard protocol.
         </p>
       </div>
@@ -651,7 +254,7 @@
     </div>
   </section>
 
-  <!-- ============ CLOSE — booking ============ -->
+  <!-- ============ CLOSE - booking ============ -->
   <section class="scene close" id="book" appCanvasStop from="var(--canvas-close-from)" to="var(--canvas-close-to)" aria-labelledby="close-heading">
     <div class="scene-inner close-inner">
       <app-wordmark class="close-wordmark" />

@@ -6,7 +6,7 @@ const STEPS = 6;
 
 /**
  * Deterministic pseudo-random (fixed seed) so server and client render the
- * same markup — irregular enough to read as an organic drift rather than an
+ * same markup - irregular enough to read as an organic drift rather than an
  * obviously mechanical curve, but stable across renders/hydration.
  */
 function makeRandom(seed: number): () => number {
@@ -37,7 +37,7 @@ function buildPath(): string {
 }
 
 /**
- * A single, quiet line drifting top to bottom behind the page content — just
+ * A single, quiet line drifting top to bottom behind the page content - just
  * enough of the gut-hub's own thread language to keep the gaps between
  * sections from reading as empty canvas, without turning into a design
  * element of its own. Fixed to the viewport (like app.scss's

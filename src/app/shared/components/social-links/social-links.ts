@@ -4,7 +4,7 @@ export type SocialPlatform = 'linkedin' | 'instagram' | 'facebook' | 'youtube';
 
 export interface SocialLink {
   readonly platform: SocialPlatform;
-  /** Omitted while the real URL isn't available yet — renders as a disabled "coming soon" item instead of a dead link. */
+  /** Omitted while the real URL isn't available yet - renders as a disabled "coming soon" item instead of a dead link. */
   readonly url?: string;
 }
 
@@ -52,7 +52,7 @@ const LABELS: Record<SocialPlatform, string> = {
               }
             </a>
           } @else {
-            <span class="social-link social-link-pending" [attr.aria-label]="LABELS[link.platform] + ' — coming soon'">
+            <span class="social-link social-link-pending" [attr.aria-label]="LABELS[link.platform] + ' - coming soon'">
               @switch (link.platform) {
                 @case ('linkedin') {
                   <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -104,7 +104,7 @@ const LABELS: Record<SocialPlatform, string> = {
       border-radius: 50%;
       border: 1.5px solid var(--rule-on-light);
       background: var(--surface-card-light);
-      color: var(--oxblood);
+      color: #000;
       transition:
         background var(--dur-micro) var(--ease),
         border-color var(--dur-micro) var(--ease);

@@ -2,7 +2,7 @@
   display: block;
 }
 
-/* One fixed vertical rhythm for every section boundary on the page — every
+/* One fixed vertical rhythm for every section boundary on the page - every
    section uses this same padding-block unless explicitly overridden below
    (hero and hook are, so the hero's visual can hand off to the hook's
    heading with no gap between them; every other boundary gets this same
@@ -30,7 +30,7 @@
 }
 
 .hero-frame {
-  /* No local background here — the hero sits on the single shared scroll
+  /* No local background here - the hero sits on the single shared scroll
      canvas (CanvasStoryService via appCanvasStop) like every other section.
      A local gradient here would paint over the canvas and create a visible
      seam the moment the hero scrolls away and the canvas shows through. */
@@ -41,7 +41,7 @@
 }
 
 .hero-frame {
-  /* Full viewport tall at every breakpoint — the hook section below is now
+  /* Full viewport tall at every breakpoint - the hook section below is now
      its own full-viewport block on mobile too (see .hook-mobile), not a
      giant scroll-driven pin providing its own scroll distance, so the hero
      needs to hold the full first screen itself or its heading and the
@@ -53,11 +53,14 @@
 .hero-grid {
   position: relative;
   z-index: 1;
+  /* A flex item of .hero-frame: without this it shrinks to its content, which on screens wider than the
+     container leaves it narrower (and so further in from the edges) than the header logo above it. */
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--sp-6);
   align-items: center;
-  /* Kept close to one viewport tall on mobile — the stacked copy+visual
+  /* Kept close to one viewport tall on mobile - the stacked copy+visual
      column used to run well past 100svh, forcing a long scroll of blank
      canvas just to finish exiting the hero before the hook's pin could
      take over (see heroGutOpacity in home.ts for the other half of that
@@ -71,7 +74,7 @@
 
 @media (min-width: 900px) {
   .hero-grid {
-    /* Equal columns — symmetric visual weight left and right. */
+    /* Equal columns - symmetric visual weight left and right. */
     grid-template-columns: 1fr 1fr;
     gap: clamp(var(--sp-12), 6vw, var(--sp-20));
     padding-block: clamp(var(--sp-10), 7vh, var(--sp-16));
@@ -85,10 +88,13 @@
   flex-direction: column;
   justify-content: center;
   gap: var(--sp-6);
+  /* Extra room between the header logo and the title. */
+  padding-top: 32px;
 }
 
 @media (min-width: 900px) {
   .hero-copy {
+    padding-top: 40px;
     padding-right: clamp(var(--sp-4), 4vw, var(--sp-10));
   }
 }
@@ -106,7 +112,7 @@
 .hero-headline em {
   font-style: italic;
   font-weight: 400;
-  color: var(--oxblood);
+  color: #000;
 }
 
 .hero-headline-sub {
@@ -117,9 +123,9 @@
 
 .hero-headline .mark {
   font-style: normal;
-  /* Yellow highlighter swipe (honey) behind the key word. */
+  /* Blue highlighter swipe behind the key word. */
   font-weight: 600;
-  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  background: linear-gradient(transparent 52%, var(--highlight-blue) 52%);
   padding: 0 4px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -141,7 +147,7 @@
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 0.94rem;
-  color: var(--oxblood);
+  color: #000;
   text-decoration: none;
   border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
   padding-bottom: 2px;
@@ -178,7 +184,7 @@
   gap: var(--sp-5);
 }
 
-/* Mobile keeps just the "Find your root cause" link, as already approved — the
+/* Mobile keeps just the "Find your root cause" link, as already approved - the
    global floating chrome pill (always visible below 640px) is the mobile
    booking CTA. Desktop's chrome pill is scroll-gated instead (only fades in
    once the reader has scrolled past the hero), so without a CTA pill here
@@ -223,7 +229,7 @@
 /* ---------- the hook ---------- */
 .hook {
   background: transparent;
-  /* Zero top padding — the hero's own visual hands off directly into the
+  /* Zero top padding - the hero's own visual hands off directly into the
      hook's heading with no gap, reading as one continuous scroll rather
      than a new section starting. The bottom keeps the same fixed margin
      every other section boundary uses (.scene), so the hook-to-root-map
@@ -238,9 +244,9 @@
   padding-inline: var(--gutter-mobile);
   flex: 0 0 auto;
   /* Left-to-right typewriter-style reveal (headingRevealProgress in
-     home.ts) — same frame-smoothing transition as .hook-deck's opacity.
+     home.ts) - same frame-smoothing transition as .hook-deck's opacity.
      opacity/transform are the mobile heading's own scroll-tied reveal
-     (mobileHeadingRevealProgress) — harmless no-op on desktop, which never
+     (mobileHeadingRevealProgress) - harmless no-op on desktop, which never
      sets inline opacity/transform on this element. */
   transition:
     clip-path 60ms linear,
@@ -261,11 +267,11 @@
   line-height: 1.15;
   /* Plain --ink read as just another line of body copy once it's sitting
      pinned on screen for a while, surrounded by the cards' own (also --ink)
-     titles — nothing marked it as THE section heading. A muted burgundy
+     titles - nothing marked it as THE section heading. A muted burgundy
      tint (not the hero's full-strength --oxblood) ties it to the same
      accent already used for links/CTAs/emphasis elsewhere, while staying
      quiet enough not to compete with the cards. */
-  color: color-mix(in oklab, var(--oxblood) 58%, var(--ink));
+  color: #000;
 }
 
 /* ---------- the hook · story track ---------- */
@@ -273,11 +279,11 @@
    height IS the scroll budget: `position: sticky` on the viewport holds the
    section in place while the headline reveals once and stays, and the
    cards cycle underneath it. `position: sticky` releases itself once the
-   pin scrolls past — so normal scroll resumes after the last card, with no
+   pin scrolls past - so normal scroll resumes after the last card, with no
    extra bookkeeping.
    Mobile: cards crossfade in place, one per scroll segment.
    Desktop (>=900px, HOOK_HORIZONTAL_BREAKPOINT): a continuous translateX
-   drag across the track — each card a two-pane slide, image one side,
+   drag across the track - each card a two-pane slide, image one side,
    info the other, alternating for rhythm. */
 .hook-pin {
   position: relative;
@@ -286,7 +292,7 @@
 .hook-viewport {
   position: sticky;
   top: 0;
-  /* svh (stable viewport height) over plain vh — on mobile, vh tracks the
+  /* svh (stable viewport height) over plain vh - on mobile, vh tracks the
      browser chrome showing/hiding, which drifted out of sync with the
      `document.documentElement.clientHeight` reading the pin's scroll math
      uses, releasing the sticky pin before the JS thought the last card's
@@ -303,7 +309,7 @@
 }
 
 /* Dissolves on desktop (default) so .hook-heading-row and .hook-deck stay
-   direct flex items of .hook-viewport exactly as before — same
+   direct flex items of .hook-viewport exactly as before - same
    display:contents trick app-root-map uses for its own wrapper. */
 .hook-stack {
   display: contents;
@@ -311,7 +317,7 @@
 
 /* ---------- the hook · mobile swipe carousel ----------
    Below HOOK_HORIZONTAL_BREAKPOINT (900px, home.ts) the pinned scroll-driven
-   track doesn't render at all — touch users reach for a swipe gesture on a
+   track doesn't render at all - touch users reach for a swipe gesture on a
    stacked card, not a scroll gesture, so this is plain normal-flow content:
    scrolling the page always just scrolls the page, and cards only change in
    response to a real horizontal swipe or a drag on the pill below them. */
@@ -321,7 +327,7 @@
   margin-inline: auto;
   padding-inline: var(--gutter-mobile);
   padding-top: calc(env(safe-area-inset-top, 0px) + 36px);
-  /* Fills the whole screen, like the hero before it — one section per
+  /* Fills the whole screen, like the hero before it - one section per
      screen, rather than the hook heading already being visible in the same
      first viewport as the hero on taller screens. */
   min-height: 100svh;
@@ -336,7 +342,7 @@
 }
 
 .hook-mobile .hook-heading-row {
-  /* .hook-mobile already supplies the horizontal gutter — the base rule's
+  /* .hook-mobile already supplies the horizontal gutter - the base rule's
      own padding-inline/max-width/margin-inline (sized for sitting directly
      inside the full-width .hook-viewport on desktop) would otherwise double
      up with it here. */
@@ -363,7 +369,7 @@
 
 .hook-carousel-viewport {
   width: 100%;
-  /* Clip sideways only — swiped-away cards slide out of view at the edges,
+  /* Clip sideways only - swiped-away cards slide out of view at the edges,
      while the card shadows and the stack's peek on the right stay visible. */
   overflow-x: clip;
   overflow-y: visible;
@@ -372,12 +378,12 @@
 
 /* Stacked deck: every card shares one grid cell, so the stage is as tall as
    the tallest card and all cards match. Each card's transform/opacity comes
-   from cardStackStyle() in home.ts — the front card at rest, the others
+   from cardStackStyle() in home.ts - the front card at rest, the others
    peeking out to the right, slightly smaller each step back. */
 .hook-carousel-track {
   display: grid;
   width: 100%;
-  /* pan-y (not none/auto) — the browser keeps handling vertical scroll
+  /* pan-y (not none/auto) - the browser keeps handling vertical scroll
      natively so scrolling the page still works everywhere on the card, but
      leaves horizontal gestures free for the carousel's own pointer
      handlers instead of trying to pan the page sideways too. */
@@ -411,13 +417,13 @@
 }
 
 .hook-carousel-track.dragging .hook-carousel-slide {
-  /* The reader's finger IS the animation during a drag — no transition to
+  /* The reader's finger IS the animation during a drag - no transition to
      fight against it mid-gesture, only once they let go and it snaps. */
   transition: none;
 }
 
 /* Specificity bump (not plain `.hook-card`/`.hook-image`) is
-   deliberate — the shared base rules further down this file are equal
+   deliberate - the shared base rules further down this file are equal
    specificity and later in source, so a plain selector here would have its
    width/height silently overridden right back to the base values. */
 .hook-carousel-slide .hook-card {
@@ -438,7 +444,7 @@
   flex: none;
 }
 
-/* Mobile type — larger than the shared base sizes, which are tuned for the
+/* Mobile type - larger than the shared base sizes, which are tuned for the
    desktop deck. */
 .hook-mobile .hook-heading {
   font-size: clamp(2.2rem, 1.705rem + 2.42vw, 2.97rem);
@@ -453,7 +459,7 @@
   font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.15rem);
 }
 
-/* One-time usage hint under the stack — fades out on first touch. */
+/* One-time usage hint under the stack - fades out on first touch. */
 .hook-hint {
   display: flex;
   flex-wrap: wrap;
@@ -474,7 +480,7 @@
 
 .hook-hint-arrow {
   display: inline-block;
-  color: var(--oxblood);
+  color: #000;
   animation: hook-hint-nudge 1.6s var(--ease-out-soft) infinite;
 }
 
@@ -494,7 +500,7 @@
   }
 }
 
-/* The single pill-shaped progress/scrub control — a loading-bar style fill
+/* The single pill-shaped progress/scrub control - a loading-bar style fill
    (empty at card 1, full at the last card), not dots. Small and quiet by
    design, but a real drag target: tap to jump proportionally, or drag for
    the fill to track the finger continuously while the carousel snaps
@@ -547,13 +553,13 @@
   }
 }
 
-/* Desktop card deck — every card stacked in the same spot (not laid out
+/* Desktop card deck - every card stacked in the same spot (not laid out
    side by side), each one's opacity/transform/blur a continuous function of
    its distance from the current scroll position (see cardVisibility et al.
    in home.ts). A card's fade-out and its neighbor's fade-in happen across
    the same window, so they cross-dissolve into each other instead of
    handing off with a cut. The 60ms linear transitions below are the same
-   "frame smoothing" trick used elsewhere in this file — they interpolate
+   "frame smoothing" trick used elsewhere in this file - they interpolate
    between discrete rAF-driven values, not a separate easing/dwell of their
    own, so the motion stays exactly proportional to scroll. */
 .hook-deck {
@@ -582,7 +588,7 @@
   align-items: center;
 }
 
-/* Blur lives on the image only — blurring the copy meant two overlapping
+/* Blur lives on the image only - blurring the copy meant two overlapping
    paragraphs of blurred text mid-crossfade, which read as noise rather than
    depth. The image tolerates it fine as a decorative cue. */
 .hook-pin.is-horizontal .hook-image {
@@ -603,7 +609,7 @@
   }
 }
 
-/* No card chrome — no border, no shadow, no background box. Content sits
+/* No card chrome - no border, no shadow, no background box. Content sits
    straight on the shared canvas like the hero does, so the story reads as
    one continuous scene rather than a stack of UI containers. */
 .hook-card {
@@ -622,20 +628,20 @@
   font-size: 0.76rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--terracotta);
+  color: #000;
 }
 
 /* The desktop deck has its own step rail (below, next to the heading) that
-   already carries the 01/02/03/04 — showing it again per-card would just be
+   already carries the 01/02/03/04 - showing it again per-card would just be
    noise. Mobile has no rail, so it keeps this inline index. */
 .hook-pin.is-horizontal .hook-index {
   display: none;
 }
 
 /* ---------- the hook · step rail (desktop) ----------
-   A persistent "01 — 02 — 03 — 04" progress stepper between the heading and
+   A persistent "01 - 02 - 03 - 04" progress stepper between the heading and
    the deck, each number filling in (scale + weight + color) as its card
-   becomes active via the same cardVisibility() driving the card crossfade —
+   becomes active via the same cardVisibility() driving the card crossfade -
    this is what actually reads as scrollytelling rather than a slideshow:
    always a sense of where you are and how much is left. */
 .hook-rail {
@@ -653,7 +659,7 @@
 }
 
 .hook-rail-num {
-  /* Reset button chrome — this is a small text control, not a UI button. */
+  /* Reset button chrome - this is a small text control, not a UI button. */
   appearance: none;
   background: none;
   border: none;
@@ -663,7 +669,7 @@
   font-family: var(--font-mono);
   font-size: 0.8rem;
   letter-spacing: var(--ls-eyebrow);
-  color: color-mix(in oklab, var(--oxblood) calc(var(--fill, 0) * 100%), var(--text-quiet-light));
+  color: #000;
   opacity: calc(0.45 + var(--fill, 0) * 0.55);
   transform: scale(calc(1 + var(--fill, 0) * 0.25));
   transition:
@@ -673,7 +679,7 @@
 }
 
 .hook-rail-num:hover {
-  color: var(--oxblood);
+  color: #000;
   opacity: 1;
 }
 
@@ -699,7 +705,7 @@
   }
 }
 
-/* "Scroll to explore" cue — pinned to the bottom of the viewport so it
+/* "Scroll to explore" cue - pinned to the bottom of the viewport so it
    doesn't participate in the heading/rail/deck's own vertical centering; it
    fades out (hookScrollHintOpacity, home.ts) the moment the reader starts
    actually progressing through the cards. */
@@ -766,7 +772,7 @@
 /* These two illustrations (the plant's root system, the clinician's profile)
    have their meaningful detail toward the top of the square source image.
    On the mobile carousel the image tile is cropped short/wide, and a dead
-   center crop there clips too much of that detail — nudge toward the top
+   center crop there clips too much of that detail - nudge toward the top
    without going all the way, so it's still a centered-feeling crop.
    Small screens only: the desktop pinned deck gives the image a tall
    4:3 tile with room to show the whole illustration, so it stays centered. */
@@ -803,8 +809,8 @@
   line-height: var(--lh-body);
 }
 
-/* Desktop horizontal slides: a wide two-column beat — image one side, type
-   the other — filling the slide the way an open magazine spread would.
+/* Desktop horizontal slides: a wide two-column beat - image one side, type
+   the other - filling the slide the way an open magazine spread would.
    Typography scales with viewport width via clamp() rather than snapping
    to one fixed size, so very wide screens keep proportion instead of
    plateauing early. */
@@ -818,7 +824,7 @@
     max-width: calc(var(--container-max) - 2 * var(--gutter-desktop));
   }
 
-  /* Every card keeps image-left/copy-right, deliberately not alternating —
+  /* Every card keeps image-left/copy-right, deliberately not alternating -
      the composition stays fixed as you scroll so the section reads as one
      continuous scene advancing, not a slideshow flipping sides each slide. */
 
@@ -876,13 +882,13 @@
   max-width: 28ch;
 }
 
-/* Each word fills in with a honey (yellow) highlight — identical to the
-   browser's ::selection colour — as it scrolls into view. --fill is a
+/* Each word fills in with the blue highlight - identical to the
+   browser's ::selection colour - as it scrolls into view. --fill is a
    continuous 0..1 value recomputed every scroll frame so the sweep is
    genuinely tied to the scroll gesture, not a fixed-duration timer. */
 .hook-close-word {
   --fill: 0;
-  background: color-mix(in oklab, var(--honey) calc(var(--fill) * 100%), transparent);
+  background: color-mix(in oklab, var(--highlight-blue) calc(var(--fill) * 100%), transparent);
   padding-block: 0.06em;
   transition: background var(--dur-micro) linear;
 }
@@ -921,7 +927,7 @@
 .treat-viewport {
   position: sticky;
   top: 0;
-  /* svh over plain vh for the same reason as .hook-viewport — vh drifts
+  /* svh over plain vh for the same reason as .hook-viewport - vh drifts
      with mobile browser chrome showing/hiding, which can release the
      sticky pin before updateTreatScroll's own math thinks the hold is
      over. */
@@ -931,7 +937,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* Clears the fixed chrome wordmark/CTA pill — on a device with a notch or
+  /* Clears the fixed chrome wordmark/CTA pill - on a device with a notch or
      dynamic island, env(safe-area-inset-top) pushes that chrome down past
      its baseline var(--sp-5) top offset (see .chrome-wordmark), so a flat
      var(--sp-16) here isn't always enough clearance and the deck's card can
@@ -981,7 +987,7 @@
 .treat-progress-dot.is-done {
   background: color-mix(in oklab, var(--oxblood) 20%, var(--surface-card-light));
   box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--oxblood) 40%, var(--rule-on-light));
-  color: var(--oxblood);
+  color: #000;
 }
 
 .treat-progress-line {
@@ -995,13 +1001,13 @@
   background: var(--oxblood);
 }
 
-/* A grid, not a flex row/column — every card shares the same cell
+/* A grid, not a flex row/column - every card shares the same cell
    (grid-area: 1 / 1 below), which is what lets this container's own height
    track the TALLEST step's actual content instead of being told to fill
    whatever's left of the pinned viewport (the old flex: 1 + each card
    position: absolute; inset: 0 approach, which forced every card's opaque
-   background to stretch to that full height even when its own content —
-   a short step with a small illustration — was much shorter, reading as a
+   background to stretch to that full height even when its own content -
+   a short step with a small illustration - was much shorter, reading as a
    big empty white card). */
 .treat-deck {
   display: grid;
@@ -1011,7 +1017,7 @@
 
 /* All four cards stack in the same grid cell and cross-fade between each
    other (treatCardOpacity/treatCardTransform) instead of sliding up as
-   opaque sheets that cover one another — that stack-of-sheets look read as
+   opaque sheets that cover one another - that stack-of-sheets look read as
    a swipeable card deck (like the expert carousel above it), which it
    wasn't: this section only ever advances by scrolling. .treat-progress is
    the step-count cue now instead of the stack's peeking strips. */
@@ -1025,7 +1031,7 @@
   border: 1px solid var(--rule-on-light);
   border-radius: var(--r-lg);
   box-shadow: var(--shadow-soft);
-  /* Opacity is binary now (treatCardOpacity), not a crossfade — no
+  /* Opacity is binary now (treatCardOpacity), not a crossfade - no
      transition on it, so the outgoing step disappears immediately instead
      of lingering through a fade. The slide (transform) is the transition. */
   transition: transform 260ms var(--ease-out-soft);
@@ -1050,7 +1056,7 @@
   font-size: 0.74rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--oxblood);
+  color: #000;
   pointer-events: none;
 }
 
@@ -1072,7 +1078,7 @@
 }
 
 /* The rail is what makes this read as "step 1 of a sequence" rather than a
-   continuation of the heading's prose — a numbered badge with a line
+   continuation of the heading's prose - a numbered badge with a line
    trailing off below it. The line now runs the full height of
    .treat-step-content (copy + illustration both), not just alongside the
    text, since .treat-step-rail is a row sibling of that whole column and
@@ -1121,7 +1127,7 @@
   margin-top: var(--sp-2);
   background: linear-gradient(to bottom, var(--oxblood), color-mix(in oklab, var(--oxblood) 40%, transparent));
   /* Grows downward from the badge (treatLineProgress, 0→1) as the reader
-     scrolls through this step's hold — scaleY instead of height so it's a
+     scrolls through this step's hold - scaleY instead of height so it's a
      cheap transform, not a layout-triggering resize every frame. */
   transform-origin: top;
   will-change: transform;
@@ -1149,7 +1155,7 @@
 }
 
 /* The booking CTA lives inline in step 1's own sentence (see
-   splitBodyAroundCta in home.ts) instead of a separate button — same
+   splitBodyAroundCta in home.ts) instead of a separate button - same
    underline treatment as .source-link, but as plain text flow there's
    nothing to wrap awkwardly. */
 .inline-cta {
@@ -1158,7 +1164,7 @@
   border: none;
   padding: 0;
   font: inherit;
-  color: var(--oxblood);
+  color: #000;
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, var(--oxblood) 45%, transparent);
   text-underline-offset: 2px;
@@ -1169,7 +1175,7 @@
   text-decoration-color: var(--oxblood);
 }
 
-/* ---- the phone illustration: a video call, not a chat thread — two tiles
+/* ---- the phone illustration: a video call, not a chat thread - two tiles
    (main + self) read as "on a call" at a glance, and the topic chips rise
    through the screen like things coming up naturally in conversation,
    rather than stacking like sent messages. ---- */
@@ -1182,12 +1188,12 @@
 .treat-phone {
   position: relative;
   /* Width-only clamps (60vw) don't help on a short viewport (a phone in
-     landscape, a small device, or just a browser with a lot of chrome) —
+     landscape, a small device, or just a browser with a lot of chrome) -
      the 9:19.5 aspect ratio can still blow past the available height, since
      the pinned stage has very little vertical slack to begin with (it's
      already a tight fit against the copy above it). calc(44vh * 0.4615) is
      that same ratio applied to a height budget instead, so whichever
-     constraint — width or height — is tighter actually wins, and the
+     constraint - width or height - is tighter actually wins, and the
      illustration keeps shrinking proportionally as the viewport gets
      shorter instead of hitting a floor and clipping anyway. */
   width: clamp(130px, min(46vw, calc(36vh * 0.4615)), 210px);
@@ -1238,7 +1244,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  /* Olive, not ember — a "live/connected" color reads correctly here the
+  /* Olive, not ember - a "live/connected" color reads correctly here the
      way a warm accent wouldn't (green is the universal on-call signal). */
   background: var(--olive);
   animation: treat-call-pulse 1.8s ease-in-out infinite;
@@ -1264,7 +1270,7 @@
   align-items: center;
   justify-content: center;
   /* Clips the portrait to the tile's rounded corners. Scoped to this tile
-     only — the self tile's cloud bubbles deliberately sit just outside its
+     only - the self tile's cloud bubbles deliberately sit just outside its
      own box (see .treat-cloud-stack) and would be clipped by this too. */
   overflow: hidden;
 }
@@ -1298,7 +1304,7 @@
   width: 52%;
 }
 
-/* Topic clouds — one at a time, auto-looping, anchored to the self-view
+/* Topic clouds - one at a time, auto-looping, anchored to the self-view
    tile so each visibly rises from "your" box rather than the doctor's.
    All five share one spot (the price-flip overlay trick used elsewhere in
    this codebase) and the same keyframe; a negative animation-delay per
@@ -1320,7 +1326,7 @@
   align-items: center;
   justify-content: center;
   padding: 4px var(--sp-2);
-  /* Borderless oval + a single pointed tail — a classic speech-bubble
+  /* Borderless oval + a single pointed tail - a classic speech-bubble
      silhouette, not a pill or a chat-message shape. A drop-shadow (not a
      border) defines the edge, and shadows the tail as part of the same
      shape rather than as a separate box. */
@@ -1396,7 +1402,7 @@
   }
 }
 
-/* Gmeet-style control bar — mic / camera / end call. Decorative, same as
+/* Gmeet-style control bar - mic / camera / end call. Decorative, same as
    the rest of the phone mockup, but it's what reads this as "a live call
    screen" rather than a generic app. */
 .treat-call-controls {
@@ -1414,7 +1420,7 @@
   justify-content: center;
   /* % of .treat-call-controls (itself 100% of the phone screen's width) so
      these scale down together with .treat-phone instead of staying a fixed
-     px size — the phone's own width now ranges from 150-230px (see
+     px size - the phone's own width now ranges from 150-230px (see
      .treat-phone) depending on viewport height, and a fixed px button sized
      for the old 220-260px phone looked oversized against the new one.
      aspect-ratio (not a fixed height) plus flex: 0 0 auto is what actually
@@ -1479,7 +1485,7 @@
   }
 
   /* Five clouds share one spot and only separate in time via the animation
-     — freezing it would stack all five on top of each other unreadably, so
+     - freezing it would stack all five on top of each other unreadably, so
      reduced motion drops the loop entirely rather than freezing it. */
   .treat-cloud-stack {
     display: none;
@@ -1496,7 +1502,7 @@
 
 /* ---------- how we treat · desktop timeline ----------
    All four steps laid out left to right instead of the mobile deck's
-   stacked crossfade — each reveals in place as its turn comes up and
+   stacked crossfade - each reveals in place as its turn comes up and
    nothing fades back out, so by the end all four sit on screen together
    as one finished 01→02→03→04 chain. */
 .treat-pin-desktop {
@@ -1516,14 +1522,14 @@
      absorbs all the leftover space itself, which is what actually pins
      the heading right under padding-top every time. .treat-timeline has
      no flex:1 sizing of its own, so with justify-content:center here the
-     heading+timeline centered as one block — meaning the heading's
+     heading+timeline centered as one block - meaning the heading's
      distance from the top moved with the row's content height instead of
      staying fixed like Hook's. Pinning the heading at flex-start and
      letting the timeline's own auto margins (below) absorb the leftover
      space instead reproduces Hook's actual mechanism. */
   justify-content: flex-start;
   /* A real gap between the heading and the node row, not just whatever's
-     left over — matches .hook-viewport's own rhythm instead of the
+     left over - matches .hook-viewport's own rhythm instead of the
      cramped "shrink everything to make it fit" pass this replaced, which
      only became necessary because the node row itself was carrying more
      text and bigger images than it needed to (see bodyShort and
@@ -1534,7 +1540,7 @@
 }
 
 /* The heading reuses .treat-heading-row/.treat-heading/.treat-subtext at
-   their normal (Hook-matching) size and spacing — here it's just a direct
+   their normal (Hook-matching) size and spacing - here it's just a direct
    child of the full-width sticky viewport instead of .treat-inner, so it
    needs its own horizontal centering. */
 .treat-viewport-desktop .treat-heading-row {
@@ -1542,7 +1548,7 @@
   max-width: var(--container-max);
   margin-inline: auto;
   padding-inline: var(--gutter-desktop);
-  /* Pins to its own content height — see the justify-content comment
+  /* Pins to its own content height - see the justify-content comment
      above. */
   flex: 0 0 auto;
 }
@@ -1553,7 +1559,7 @@
   gap: var(--sp-6);
   width: 100%;
   /* Matches .treat-heading-row/.scene-inner's own max-width + gutter
-     exactly (not a wider custom value) — this was previously 1480px for
+     exactly (not a wider custom value) - this was previously 1480px for
      "more breathing room," but at this viewport that's wider than the
      container itself, so margin-inline: auto had nothing left to center
      with and padding-inline alone decided the left edge, landing the
@@ -1564,7 +1570,7 @@
   margin-inline: auto;
   padding-inline: var(--gutter-desktop);
   /* Auto margins on the column's main (vertical) axis absorb whatever
-     space is left under the pinned heading, centering the row in it —
+     space is left under the pinned heading, centering the row in it -
      the same net look as the old justify-content: center, but without
      dragging the heading along with it. */
   margin-block: auto;
@@ -1577,7 +1583,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  /* Scroll-driven every frame — no transition (see .treat-deck-card). */
+  /* Scroll-driven every frame - no transition (see .treat-deck-card). */
   will-change: opacity, transform;
 }
 
@@ -1624,7 +1630,7 @@
   display: flex;
   flex-direction: column;
   /* Matches .treat-node's own gap, so title-to-body and body-to-image read
-     as the same rhythm — without this, title-to-body collapsed to 0 (no
+     as the same rhythm - without this, title-to-body collapsed to 0 (no
      margin of its own) while body-to-image got the flex gap from
      .treat-node, which is what read as "inconsistent." */
   gap: var(--sp-3);
@@ -1656,7 +1662,7 @@
   justify-content: center;
 }
 
-/* No hand-drawn laptop chrome — step 1's image already has its own window
+/* No hand-drawn laptop chrome - step 1's image already has its own window
    frame baked in (macOS traffic lights, call controls), and steps 2-4
    carry a thin border, so this is just a plain rounded, shadowed card. */
 .treat-node-image {
@@ -1669,7 +1675,7 @@
 }
 
 /* Step 1's laptop window already reads as its own object sitting on the
-   page (dark title bar, traffic lights) — stacking the card's drop
+   page (dark title bar, traffic lights) - stacking the card's drop
    shadow underneath it on top of that doubled up as two competing
    "lifted off the page" cues. Same width/height as every other node's
    image either way, just without the shadow. */
@@ -1680,7 +1686,7 @@
 .treat-node-img {
   /* cover, not contain: steps 2-4 are already full-bleed at the card's own
      16:9, so this is a no-op for them either way, but step 1's laptop
-     window sits on a transparent canvas slightly narrower than 16:9 —
+     window sits on a transparent canvas slightly narrower than 16:9 -
      contain let the gap show through as the card's ivory background (two
      vertical white bars beside the laptop). cover scales it up just
      enough to fill the card completely, cropping that empty margin away
@@ -1696,16 +1702,16 @@
 }
 
 /* ---------- root map · diseases & categories ---------- */
-/* Same ivory canvas as every other section (--canvas-descent-*) — no dark
+/* Same ivory canvas as every other section (--canvas-descent-*) - no dark
    panel inversion. Oxblood/ink carry the tone here instead. */
-/* No override — uses .scene's fixed padding-block, same as every other
+/* No override - uses .scene's fixed padding-block, same as every other
    section, so the hook-to-root-map gap matches every other section gap. */
 
 /* The heading now lives inside app-root-map itself, as a sticky "lead" card
-   in the steps column — see root-map.ts. */
+   in the steps column - see root-map.ts. */
 
 /* ---------- programme · what step 1 covers ---------- */
-/* No override here either, for the same reason — one consistent margin
+/* No override here either, for the same reason - one consistent margin
    between every section on the page (see .scene). */
 
 .programme .t-display {
@@ -1739,7 +1745,7 @@ app-expert-carousel {
 /* ---------- programme · founders billboard ----------
    The billboard stands upright and gently wiggles left-right on its own
    (an idle ambient animation), and also tilts live toward wherever the
-   cursor/touch is over it — both read off the same `--cursor-tilt` custom
+   cursor/touch is over it - both read off the same `--cursor-tilt` custom
    property (set from pointer position in home.ts, defaulting to 0 and
    recentering on pointer-leave), so the idle wiggle and the pointer tilt
    compose into one motion instead of fighting each other. */
@@ -1749,7 +1755,7 @@ app-expert-carousel {
   margin-top: var(--sp-16);
   /* .programme-banner::before (the Ambilight glow) bleeds ~14% past the
      banner's own edges on purpose, to look like light spilling onto the
-     page around the card — but isolation: isolate only creates a stacking
+     page around the card - but isolation: isolate only creates a stacking
      context, it does NOT clip, so that bleed was reaching all the way out
      to (and past) the real viewport edge on narrow screens, inflating the
      page's scrollWidth and risking paint artifacts near the edge on some
@@ -1761,7 +1767,7 @@ app-expert-carousel {
 }
 
 /* Registered so the browser can actually interpolate changes to it (a plain
-   custom property jumps instantly otherwise) — this is what makes the
+   custom property jumps instantly otherwise) - this is what makes the
    pointer-follow tilt glide instead of stepping on every mousemove tick,
    and what smooths the snap back to 0 on pointer-leave. */
 @property --cursor-tilt {
@@ -1797,7 +1803,7 @@ app-expert-carousel {
   isolation: isolate;
   width: 100%;
   /* .programme-billboard is a flex column with align-items: center, so this
-     (a flex item) doesn't stretch to fill it by default — it sizes to fit
+     (a flex item) doesn't stretch to fill it by default - it sizes to fit
      its content instead, and a flex item's content-based min size ignores
      `width: 100%` on its own replaced descendant (the banner <img>, which
      carries width/height attributes for its intrinsic aspect ratio),
@@ -1814,7 +1820,7 @@ app-expert-carousel {
 /* "Ambilight" treatment (as in modern TVs that bias-light the wall behind
    the screen to match what's on it): the same photo, scaled up and heavily
    blurred, sitting behind the card and bleeding its own actual colours out
-   past every edge — rather than an arbitrary gradient or a glow animated
+   past every edge - rather than an arbitrary gradient or a glow animated
    independently of the image. */
 .programme-banner::before {
   content: '';
@@ -1857,7 +1863,7 @@ app-expert-carousel {
   height: auto;
   border-radius: var(--r-lg);
   /* The pointer tracking for the tilt effect means readers are dragging
-     their cursor/finger across this image constantly — without this it
+     their cursor/finger across this image constantly - without this it
      gets selected (and highlighted honey/yellow, per the global
      ::selection style) on every drag instead of just tilting the sign. */
   user-select: none;
@@ -1903,7 +1909,7 @@ app-expert-carousel {
 }
 
 /* The highway car-pass (road + car + the lean-in/snap reveal synced to it)
-   is commented out — see the matching comment in home.html. Left in place
+   is commented out - see the matching comment in home.html. Left in place
    in case it's worth revisiting with a different trigger.
 .programme-road {
   position: relative;
@@ -1998,7 +2004,7 @@ app-expert-carousel {
 /* The billboard's own idle wiggle, independent of the (commented-out) car:
    starts as soon as the section is in view, oscillating around whatever
    `--cursor-tilt` currently is (0 by default, or wherever the pointer last
-   set it) rather than a fixed 0deg — so the ambient wiggle and the
+   set it) rather than a fixed 0deg - so the ambient wiggle and the
    pointer-follow tilt are one continuous motion, not two competing ones. */
 @media (prefers-reduced-motion: no-preference) {
   .programme-highway.is-visible .programme-billboard {
@@ -2156,7 +2162,7 @@ app-expert-carousel {
   font-family: var(--font-body);
   font-weight: 500;
   font-size: 0.94rem;
-  color: var(--oxblood);
+  color: #000;
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -2211,7 +2217,7 @@ app-expert-carousel {
   display: block;
   -webkit-line-clamp: unset;
   line-clamp: unset;
-  /* No scrolling — whatever does not fit is trimmed to the last full stop (fitMoreText in home.ts). */
+  /* No scrolling - whatever does not fit is trimmed to the last full stop (fitMoreText in home.ts). */
   max-height: 9.5lh;
   overflow: hidden;
 }
@@ -2220,4 +2226,45 @@ app-expert-carousel {
   .hook-carousel-slide .hook-image {
     transition: none;
   }
+}
+
+/* ---------- the E.A.S.E. community ---------- */
+.community-intro {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-4);
+  max-width: 62ch;
+  margin-bottom: var(--sp-12);
+}
+
+.community-intro .lede {
+  max-width: 62ch;
+}
+
+/* "Join the community": a centred call to action under the comparison. */
+.community-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-12);
+}
+
+/* The same plain hyperlink as the rest of the page (.source-link: one underline, an arrow), with WhatsApp's icon in its own green. */
+.community-link .wa-icon {
+  width: 22px;
+  height: 22px;
+  fill: #25d366;
+  stroke: none;
+}
+
+.community-link:hover .wa-icon {
+  transform: none;
+}
+
+.community-link .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

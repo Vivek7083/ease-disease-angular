@@ -3,7 +3,7 @@ import { Component, DestroyRef, effect, inject, input, output, signal, untracked
 import { CtaPill } from '../cta-pill/cta-pill';
 
 export interface TeamMember {
-  /** Stable id for this member — used to route to/anchor their section on the founders page. */
+  /** Stable id for this member - used to route to/anchor their section on the founders page. */
   readonly slug?: string;
   readonly name: string;
   readonly role: string;
@@ -12,12 +12,12 @@ export interface TeamMember {
   readonly initials: string;
   readonly ctaLabel: string;
   /** 'pill' (default) is the full button; 'link' renders as a plain
-   *  text-plus-arrow hyperlink instead — used where the card's job is just
+   *  text-plus-arrow hyperlink instead - used where the card's job is just
    *  to tease ("know more about X") rather than to be the primary action. */
   readonly ctaStyle?: 'pill' | 'link';
-  /** Left unset until a real photo is supplied — the portrait falls back to the initials badge. */
+  /** Left unset until a real photo is supplied - the portrait falls back to the initials badge. */
   readonly photo?: string;
-  /** object-position for the portrait crop — most photos are centered on the
+  /** object-position for the portrait crop - most photos are centered on the
    *  face already, but a source shot framed off-center (e.g. a wide 16:9
    *  photo with the subject on one side) needs this to land the circular
    *  crop on the face instead of empty background. */
@@ -45,13 +45,13 @@ export interface TeamMember {
       <div class="content" [style.opacity]="contentOpacity()">
         <div class="portrait">
           <!-- The desktop spotlight keeps ONE persistent app-team-card and just
-               changes its [member] input (see expert-carousel.ts) — so unlike
+               changes its [member] input (see expert-carousel.ts) - so unlike
                the mobile carousel's per-member instances, this <img> node can
                stay mounted across a photo change. NgOptimizedImage doesn't
                support mutating ngSrc on an already-initialized image (it
                throws NG0953), so @for/track on the photo URL forces Angular
                to tear down and recreate the node on each change instead of
-               reusing it — ngSrc is then only ever set once per node. -->
+               reusing it - ngSrc is then only ever set once per node. -->
           @for (photo of member().photo ? [member().photo] : []; track photo) {
             <img [ngSrc]="photo!" fill alt="" [style.object-position]="member().photoPosition ?? 'center'" />
           } @empty {
@@ -69,29 +69,24 @@ export interface TeamMember {
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
             </button>
           } @else {
-            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
+            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostLight" (pressed)="connectRequested.emit()" />
           }
         </div>
       </div>
     </article>
   `,
   styles: `
-    /* Hospitality look: a warm champagne-to-parchment card with a honey-gold
-       hairline and a fine inner frame, like a welcome card at a good hotel
-       or spa — warm and inviting rather than clinical. Solid (no blur), so
-       the colour never shifts with whatever scrolls behind it. */
+    /* Solid deep navy with white text, matching the footer and the result
+       panels, with a fine inner frame. Solid (no blur), so the colour never
+       shifts with whatever scrolls behind it. */
     .team-card {
       position: relative;
       overflow: hidden;
-      background: linear-gradient(
-        158deg,
-        color-mix(in oklab, var(--honey) 18%, var(--ivory)) 0%,
-        color-mix(in oklab, var(--honey) 8%, var(--parchment)) 100%
-      );
-      color: var(--ink);
+      background: var(--oxblood);
+      color: #fff;
       border-radius: var(--r-lg);
       padding: var(--sp-8) var(--sp-6) var(--sp-6);
-      border: 1px solid color-mix(in oklab, var(--honey) 60%, var(--parchment));
+      border: 1px solid var(--oxblood);
       outline: 1px solid color-mix(in oklab, var(--honey) 45%, transparent);
       outline-offset: -9px;
       box-shadow:
@@ -99,7 +94,7 @@ export interface TeamMember {
         inset 0 1px 0 color-mix(in oklab, white 75%, transparent);
     }
 
-    /* Content fades independently of the card shell above — the shell
+    /* Content fades independently of the card shell above - the shell
        (background, border, foliage, energy dot) never remounts or
        re-renders when the active expert changes, so its color never has a
        "before" and "after" state to snap between. Only this inner layer
@@ -107,7 +102,7 @@ export interface TeamMember {
        (see contentOpacity) rather than a CSS class+transition: a transition
        toggled via class on an element inside a backdrop-filter ancestor
        measurably stalls for ~200ms before it starts animating in this
-       browser, then has to cram the rest into whatever time is left —
+       browser, then has to cram the rest into whatever time is left -
        reading as a stall-then-snap instead of a smooth fade. Driving the
        numeric value directly sidesteps that engage delay entirely. */
     .content {
@@ -118,7 +113,7 @@ export interface TeamMember {
       text-align: center;
     }
 
-    /* Sprouting branches in the corners — decorative only, well behind the
+    /* Sprouting branches in the corners - decorative only, well behind the
        text (negative z-index beats the card's own in-flow content, which
        otherwise stacks above a merely-absolute, non-negative descendant). */
     .foliage {
@@ -127,10 +122,10 @@ export interface TeamMember {
       width: 130px;
       height: 130px;
       fill: none;
-      stroke: var(--olive);
+      stroke: #d6e2ec; /* the old navy-on-navy stroke would vanish on the dark card */
       stroke-width: 2.5;
       stroke-linecap: round;
-      opacity: 0.4;
+      opacity: 0.18;
     }
     .foliage-a {
       bottom: -18px;
@@ -144,7 +139,7 @@ export interface TeamMember {
 
     /* The same travelling-energy idea as the page's own background flow
        line (flow-lines.ts), scaled down to hug this one card's border
-       instead of a page-length path — offset-path: border-box traces the
+       instead of a page-length path - offset-path: border-box traces the
        card's actual box (radius included) with no hand-built SVG path
        needed. Kept very subtle: small, low-opacity, soft glow only. */
     .card-energy {
@@ -156,7 +151,7 @@ export interface TeamMember {
       background: var(--terracotta);
       offset-path: border-box;
       offset-rotate: 0deg;
-      opacity: 0.4;
+      opacity: 0.35;
       filter: drop-shadow(0 0 3px color-mix(in oklab, var(--terracotta) 55%, transparent));
       animation: card-energy-travel 9s linear infinite;
     }
@@ -205,7 +200,7 @@ export interface TeamMember {
     h3 {
       margin-top: var(--sp-5);
       font-size: var(--fs-display-s);
-      color: var(--ink);
+      color: #fff;
     }
 
     .role {
@@ -214,18 +209,18 @@ export interface TeamMember {
       font-size: 0.72rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: var(--olive);
+      color: #fff;
     }
 
     .credential {
       margin-top: var(--sp-2);
       font-size: 0.82rem;
-      color: var(--text-quiet-light);
+      color: var(--text-quiet-dark);
     }
 
     .bio {
       margin-top: var(--sp-4);
-      color: var(--text-quiet-light);
+      color: var(--text-quiet-dark);
       font-size: 0.9rem;
       line-height: var(--lh-body);
       max-width: 32ch;
@@ -233,7 +228,7 @@ export interface TeamMember {
 
     /* Non-split only (the compact carousel/stacked card): bio copy varies a
        lot in length between experts, so it's clamped there to keep the
-       card's height — and therefore the CTA's position — predictable,
+       card's height - and therefore the CTA's position - predictable,
        instead of pushing the button off the bottom of a fixed-height
        carousel stage on mobile. The split layout (e.g. the founders page)
        has room to breathe and shows the bio in full. */
@@ -248,7 +243,7 @@ export interface TeamMember {
       margin-top: var(--sp-6);
     }
 
-    /* Matches .source-link in home.scss ("Find your root cause →") exactly —
+    /* Matches .source-link in home.scss ("Find your root cause →") exactly -
        the same hairline-underline link treatment used wherever the page
        teases toward more detail instead of taking the primary action. */
     .cta-link {
@@ -258,13 +253,13 @@ export interface TeamMember {
       margin-top: var(--sp-6);
       padding: 0 0 2px;
       border: none;
-      border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
       background: none;
       width: fit-content;
       font-family: var(--font-body);
       font-weight: 500;
       font-size: 0.94rem;
-      color: var(--oxblood);
+      color: #fff;
       cursor: pointer;
       transition:
         gap var(--dur-micro) var(--ease),
@@ -284,22 +279,22 @@ export interface TeamMember {
     .cta-link:hover,
     .cta-link:focus-visible {
       gap: var(--sp-3);
-      border-color: var(--oxblood);
+      border-color: #fff;
     }
     .cta-link:hover svg,
     .cta-link:focus-visible svg {
       transform: translateX(2px);
     }
     .cta-link:focus-visible {
-      outline: 2px solid var(--oxblood);
+      outline: 2px solid #fff;
       outline-offset: 3px;
     }
 
-    /* Split layout: photo and info sit side by side instead of stacked — the
+    /* Split layout: photo and info sit side by side instead of stacked - the
        large-screen expert-carousel spotlight only ever renders this at
        ≥900px anyway (its wrapper is display:none below that), but the
        founders page reuses split at every width, so the row layout itself
-       is gated behind the same breakpoint — below it, is-split just falls
+       is gated behind the same breakpoint - below it, is-split just falls
        back to the normal stacked layout instead of squeezing a 220px
        portrait and text into a narrow row. */
     .team-card.is-split {
@@ -344,11 +339,11 @@ export interface TeamMember {
 export class TeamCard {
   readonly member = input.required<TeamMember>();
   readonly split = input(false);
-  /** Desktop spotlight only — fades the inner content out and back in while
+  /** Desktop spotlight only - fades the inner content out and back in while
    *  the glass shell itself stays mounted and unchanged. */
   readonly fading = input(false);
   readonly connectRequested = output<void>();
-  /** Fires once the fade-out tween actually reaches 0 — the caller swaps
+  /** Fires once the fade-out tween actually reaches 0 - the caller swaps
    *  member data on this, not on a guessed timer, so the swap never happens
    *  while the old content is still partway visible. */
   readonly contentHidden = output<void>();
@@ -367,7 +362,7 @@ export class TeamCard {
     effect(() => {
       const target = this.fading() ? 0 : 1;
       // animateOpacityTo reads/writes contentOpacity() internally (to find
-      // the tween's starting value and to step it every frame) — without
+      // the tween's starting value and to step it every frame) - without
       // untracked, those reads register as extra dependencies of THIS
       // effect, so every single .set() during the tween re-triggers the
       // whole effect and restarts the tween from wherever it just got to.

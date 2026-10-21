@@ -13,14 +13,16 @@ interface FooterLink {
   readonly route?: string;
   /** Opens the booking form instead of navigating. */
   readonly book?: boolean;
+  /** Opens in a new tab (used for the Privacy Policy). */
+  readonly newTab?: boolean;
 }
 
 /**
  * Oxblood-deep background (the site's one dark surface, same token the Team
- * cards and Descent panel already use) with olive as the secondary accent —
+ * cards and Descent panel already use) with olive as the secondary accent -
  * not the ember CTA gradient, that stays reserved for actual booking CTAs.
  * Socials and legal links are left as "#" placeholders until the founders
- * supply real ones — see need-review/footer-placeholders.md.
+ * supply real ones - see need-review/footer-placeholders.md.
  */
 @Component({
   selector: 'app-site-footer',
@@ -30,7 +32,7 @@ interface FooterLink {
       <div class="footer-top">
         <div class="footer-brand">
           <app-wordmark [onDark]="true" [collapse]="false" />
-          <p class="footer-tagline">Digestion-first, root-cause care — not a replacement for your doctor.</p>
+          <p class="footer-tagline">Digestion-first, root-cause care - not a replacement for your doctor.</p>
           <app-cta-pill label="Book now" variant="ghostLight" (pressed)="bookRequested.emit()" />
         </div>
 
@@ -85,13 +87,27 @@ interface FooterLink {
         <p class="footer-copyright">&copy; {{ year }} Ease Dis-<span class="ease-mark">ease</span>. All rights reserved.</p>
         <ul class="footer-legal">
           @for (link of legalLinks; track link.label) {
-            <li><a [href]="link.href">{{ link.label }}</a></li>
+            <li>
+              <a [href]="link.href" [attr.target]="link.newTab ? '_blank' : null" [attr.rel]="link.newTab ? 'noopener' : null">
+                {{ link.label }}@if (link.newTab) {<span class="sr-only"> (opens in a new tab)</span>}
+              </a>
+            </li>
           }
         </ul>
       </div>
     </footer>
   `,
   styles: `
+    /* Visually hidden, still read by screen readers. */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+
     .site-footer {
       background: var(--surface-deep);
       color: var(--text-quiet-dark);
@@ -137,7 +153,7 @@ interface FooterLink {
     }
 
     /* The socials/legal hrefs are still "#" placeholders, which resolve to
-       the current page itself — browsers count that as "visited" on first
+       the current page itself - browsers count that as "visited" on first
        paint, so without this the links would pick up the UA default visited
        color instead of the footer's own palette. */
     .footer-col a:visited {
@@ -239,7 +255,7 @@ export class SiteFooter {
   protected readonly exploreLinks: readonly FooterLink[] = [
     { label: 'Home', href: '#top', fragment: 'top' },
     { label: 'Why root-cause care', href: '#hook', fragment: 'hook' },
-    { label: 'Conditions we treat', href: '#root-map', fragment: 'root-map' },
+    { label: 'Conditions we support', href: '#root-map', fragment: 'root-map' },
     { label: 'Packages', href: '#programme', fragment: 'programme' },
     { label: 'Meet the experts', href: '#experts', fragment: 'experts' },
     { label: 'Events & retreats', href: '/events', route: '/events' },
@@ -259,7 +275,7 @@ export class SiteFooter {
   ];
 
   protected readonly legalLinks: readonly FooterLink[] = [
-    { label: 'Privacy Policy', href: '#' },
+    { label: 'Privacy Policy', href: '/privacy', newTab: true },
     { label: 'Terms of Service', href: '#' },
   ];
 }

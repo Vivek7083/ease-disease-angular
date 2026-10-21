@@ -3,14 +3,14 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
 
 /**
  * Both breakpoints auto-advance through the experts on a timer, and it never
- * stops — a manual arrow press (or swipe) just jumps the index immediately,
+ * stops - a manual arrow press (or swipe) just jumps the index immediately,
  * and the timer keeps ticking from wherever that lands. prefers-reduced-motion
  * skips autoplay entirely.
  *
- * Mobile: a 3D "coverflow" — the active card faces forward, the other two
+ * Mobile: a 3D "coverflow" - the active card faces forward, the other two
  * sit rotated and scaled down on either side like a cylinder.
  *
- * Desktop: a split spotlight — one expert at a time, photo on the left,
+ * Desktop: a split spotlight - one expert at a time, photo on the left,
  * everything else on the right, the whole panel re-entering with a slide/
  * fade each time the active expert changes.
  */
@@ -18,7 +18,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
   selector: 'app-expert-carousel',
   imports: [TeamCard],
   template: `
-    <!-- Desktop (≥900px). One persistent app-team-card — its [member] input
+    <!-- Desktop (≥900px). One persistent app-team-card - its [member] input
          just changes value, so the glass shell never destroys/remounts and
          never has a "before" and "after" look to snap between; only the
          inner content (TeamCard's own [fading] input) fades. -->
@@ -97,7 +97,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
       .carousel-stage {
         position: relative;
         height: clamp(500px, 68vh, 560px);
-        /* Bleeds past the section's own gutter to the true viewport edges —
+        /* Bleeds past the section's own gutter to the true viewport edges -
            the rotated side cards need that extra width to peek convincingly.
            Only the stage bleeds; the arrows row below stays within the gutter. */
         margin-inline: calc(var(--gutter-mobile) * -1);
@@ -106,7 +106,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
         perspective: 1200px;
         touch-action: pan-y;
         /* The rotated/translated side cards extend past this box by design
-           (that's the peek) — without clipping here, that overflow becomes
+           (that's the peek) - without clipping here, that overflow becomes
            real page-level horizontal scroll instead of a contained peek. */
         overflow: hidden;
       }
@@ -116,7 +116,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
         top: 0;
         left: 50%;
         width: min(76vw, 300px);
-        /* --ease-out-soft is an expo-out curve (cubic-bezier(.16,1,.3,1)) —
+        /* --ease-out-soft is an expo-out curve (cubic-bezier(.16,1,.3,1)) -
            great for a card's position settling into place, but on opacity it
            front-loads almost the entire fade into the first ~30% of the
            duration and then barely moves, which reads as a sudden dim/
@@ -154,7 +154,7 @@ import { TeamCard, type TeamMember } from '../team-card/team-card';
       border-radius: 50%;
       border: 1.5px solid var(--rule-on-light);
       background: var(--surface-card-light);
-      color: var(--oxblood);
+      color: #000;
       cursor: pointer;
       transition:
         background var(--dur-micro) var(--ease),
@@ -184,7 +184,7 @@ export class ExpertCarousel {
 
   protected readonly activeIndex = signal(0);
 
-  /** Desktop spotlight only: lags activeIndex by a short cross-fade window —
+  /** Desktop spotlight only: lags activeIndex by a short cross-fade window -
    *  spotlightFading tells the single persistent app-team-card to fade its
    *  content out; TeamCard reports back via (contentHidden) once that fade
    *  actually reaches 0 (not a guessed timer, which can race the real
@@ -227,7 +227,7 @@ export class ExpertCarousel {
       }
 
       this.spotlightFading.set(true); // fade the current content out in place; onSpotlightContentHidden takes it from here
-      // (contentHidden) is the normal path — this is just a backstop so a swap
+      // (contentHidden) is the normal path - this is just a backstop so a swap
       // can never get stuck mid-fade (content invisible forever) if that event
       // doesn't fire for some reason. Comfortably longer than TeamCard's own
       // 260ms fade-out, so it only ever fires after the real handshake already has.
@@ -257,7 +257,7 @@ export class ExpertCarousel {
   }
 
   /** Signed distance from the active card, wrapped the short way round the
-   *  cylinder (e.g. with 3 cards, index 0 is both "+1" and "-2" from index 2 —
+   *  cylinder (e.g. with 3 cards, index 0 is both "+1" and "-2" from index 2 -
    *  this picks -1, keeping the carousel feeling continuous either direction). */
   protected circularOffset(i: number): number {
     const n = this.members().length;

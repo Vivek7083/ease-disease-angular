@@ -3,21 +3,21 @@ import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
 import { ConditionNoteCard } from './condition-note';
 import { NOTES } from './conditions-data';
 
-/** How many notes show before the "more" button — the first half of the PRD list. */
+/** How many notes show before the "more" button - the first half of the PRD list. */
 const INITIAL_NOTES = 8;
 
 /**
  * Mobile "pinboard" under the root map: a single column of notes, the first
- * half to start with and the rest on request. Normal flow, no pin — a calm
+ * half to start with and the rest on request. Normal flow, no pin - a calm
  * beat after the map. (Large screens place the same notes around the
- * pinned map instead — see root-map.ts.)
+ * pinned map instead - see root-map.ts.)
  */
 @Component({
   selector: 'app-conditions-board',
   imports: [ScrollRevealDirective, ConditionNoteCard],
   template: `
     <p class="board-hint">Tap a note for the full list</p>
-    <ul class="board" id="board-notes" aria-label="Conditions we treat">
+    <ul class="board" id="board-notes" aria-label="Conditions we support">
       @for (note of visibleNotes(); track note.id; let i = $index) {
         <li class="slot reveal" [appScrollReveal]="0" [revealRepeat]="true" [class.is-odd]="i % 2 === 0">
           <app-condition-note [note]="note" [tilt]="i" [open]="openId() === note.id" (toggled)="toggle(note.id)" />
@@ -78,7 +78,7 @@ const INITIAL_NOTES = 8;
       border-radius: var(--r-pill);
       border: 1px solid color-mix(in oklab, var(--oxblood) 40%, transparent);
       background: transparent;
-      color: var(--oxblood-deep);
+      color: #000;
       font-family: var(--font-body);
       font-size: 0.95rem;
       cursor: pointer;
@@ -93,10 +93,10 @@ const INITIAL_NOTES = 8;
 export class ConditionsBoard {
   protected readonly hiddenCount = NOTES.length - INITIAL_NOTES;
 
-  /** One note open at a time — opening another closes the last, so the board never grows into a wall of text. */
+  /** One note open at a time - opening another closes the last, so the board never grows into a wall of text. */
   protected readonly openId = signal<string | null>(null);
 
-  /** Only the first half show until the reader asks for the rest — newly shown notes arrive through the usual scroll reveal. */
+  /** Only the first half show until the reader asks for the rest - newly shown notes arrive through the usual scroll reveal. */
   protected readonly showAll = signal(false);
   protected readonly visibleNotes = computed(() => (this.showAll() ? NOTES : NOTES.slice(0, INITIAL_NOTES)));
 
@@ -105,7 +105,7 @@ export class ConditionsBoard {
     const wasOpen = this.showAll();
     this.showAll.set(!wasOpen);
     if (wasOpen) {
-      // Collapsing shortens the page under the reader — keep the button, and the reader, in place.
+      // Collapsing shortens the page under the reader - keep the button, and the reader, in place.
       this.openId.set(null);
       requestAnimationFrame(() => button.scrollIntoView({ block: 'center', behavior: 'smooth' }));
     }

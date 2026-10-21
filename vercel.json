@@ -1,4 +1,5 @@
 {
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
       "source": "/(index.html|ngsw.json|ngsw-worker.js|safety-worker.js|worker-basic.min.js|manifest.webmanifest)",

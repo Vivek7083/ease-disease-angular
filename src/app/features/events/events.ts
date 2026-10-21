@@ -22,7 +22,7 @@ interface PastEvent {
 
 /**
  * Routed at /events. Upcoming events are empty for now (the brewing state
- * below); past events are a plain display — a gallery per event can replace
+ * below); past events are a plain display - a gallery per event can replace
  * these cards later. Event details come from deeparajani.com/events.
  */
 @Component({

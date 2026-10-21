@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgOptimizedImage } from '@angular/common';
 import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
@@ -6,7 +6,7 @@ import { EyebrowLabel } from '../../../shared/components/eyebrow-label/eyebrow-l
 import { CtaPill } from '../../../shared/components/cta-pill/cta-pill';
 import { SiteFooter } from '../../../shared/components/site-footer/site-footer';
 import { SocialLinks, type SocialLink } from '../../../shared/components/social-links/social-links';
-import { openBookingForm } from '../../../core/config/booking';
+import { BookingModalService } from '../../../core/services/booking-modal';
 
 interface Book {
   readonly title: string;
@@ -34,7 +34,7 @@ interface Testimonial {
 }
 
 /**
- * Routed at /founders/deepa — intentionally a different shape from Carol's
+ * Routed at /founders/deepa - intentionally a different shape from Carol's
  * page (carol-profile.ts, a LinkedIn-style resume). Deepa's public footprint
  * is book + programme + community led, so this page is built around those
  * instead of a timeline.
@@ -57,7 +57,7 @@ export class DeepaProfile {
   ];
 
   protected readonly about =
-    'Deepa works with people whose gut issues and inner states feed each other — she doesn’t just treat the symptom, she helps ' +
+    'Deepa works with people whose gut issues and inner states feed each other - she doesn’t just treat the symptom, she helps ' +
     'reprogram how someone thinks, feels, digests and heals. That whole-person lens comes from her own path: years of yoga ' +
     'and functional nutrition work later, she built Awaken Your Soul to put gut health and mindset coaching under one roof.';
 
@@ -65,7 +65,7 @@ export class DeepaProfile {
     title: 'The Magic In You',
     subtitle: 'Awaken Your Soul',
     description:
-      'A guide to connecting with a higher consciousness — understanding that the gift of intelligence is what lets us make ' +
+      'A guide to connecting with a higher consciousness - understanding that the gift of intelligence is what lets us make ' +
       'better choices and become creators of our own destiny.',
     status: 'Published',
     cover: 'images/books/the-magic-in-you.webp',
@@ -76,12 +76,12 @@ export class DeepaProfile {
     {
       name: 'E.A.S.E. Dis-ease',
       tagline: 'Celiac Management Programme',
-      description: '360° management of celiac disease and gut healing — gluten-free protocol, gut-lining repair and correcting nutritional deficiencies, built around the person, not just the diagnosis.',
+      description: '360° management of celiac disease and gut healing - gluten-free protocol, gut-lining repair and correcting nutritional deficiencies, built around the person, not just the diagnosis.',
     },
     {
       name: 'F.A.B. L.I.F.E.',
       tagline: '90-day transformation journey',
-      description: 'Becoming Creators of a F.A.B. L.I.F.E. — a 90-day journey pairing gut-health protocols with the mindset work needed to make them stick.',
+      description: 'Becoming Creators of a F.A.B. L.I.F.E. - a 90-day journey pairing gut-health protocols with the mindset work needed to make them stick.',
     },
   ];
 
@@ -92,12 +92,14 @@ export class DeepaProfile {
   ];
 
   protected readonly testimonials: readonly Testimonial[] = [
-    { quote: 'Wisdom in bite-size pieces — it speaks to any reader.', name: 'Ketan Bhatia' },
+    { quote: 'Wisdom in bite-size pieces - it speaks to any reader.', name: 'Ketan Bhatia' },
     { quote: 'Written from the heart. It sparked a renewed motivation to pursue my dreams.', name: 'Dipti' },
     { quote: 'Made me more positive and open to believing in miracles.', name: 'Laveena Wadhwa' },
   ];
 
+  private readonly bookingModal = inject(BookingModalService);
+
   protected bookConsultation(): void {
-    openBookingForm();
+    this.bookingModal.open();
   }
 }

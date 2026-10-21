@@ -15,16 +15,16 @@ const RESPONSES: Record<string, string> = {
   digestive:
     'Digestive discomfort is often the clearest signal that something is off at the root. A consultation is where we map bloating, irregularity and discomfort back to a cause.',
   fatigue:
-    'Fatigue that lingers is often connected to how your gut processes nutrients and regulates blood sugar — one of the most common threads we hear in a first consultation.',
+    'Fatigue that lingers is often connected to how your gut processes nutrients and regulates blood sugar - one of the most common threads we hear in a first consultation.',
   skin: 'Skin is one of the clearest windows into gut health. A consultation is where we map your specific pattern.',
   cycle:
     'Hormonal balance depends heavily on the gut. If your cycle feels irregular, it is worth exploring that connection with us.',
   brain:
-    'Brain fog and mood can trace back to the gut-brain axis — a real, physical connection we look at in almost every consultation.',
+    'Brain fog and mood can trace back to the gut-brain axis - a real, physical connection we look at in almost every consultation.',
   unsure:
     'That is exactly the right place to start. A first consultation is a 30-minute conversation where we find the common thread together.',
   default:
-    'A 30-minute consultation is the best way to get a precise answer for your situation — every pattern is a little different.',
+    'A 30-minute consultation is the best way to get a precise answer for your situation - every pattern is a little different.',
 };
 
 function keyFor(text: string): keyof typeof RESPONSES {
@@ -65,7 +65,7 @@ function keyFor(text: string): keyof typeof RESPONSES {
         </div>
         <div class="heading">
           <h3>Ease guide</h3>
-          <p>Software, not a doctor — here to point you in a direction</p>
+          <p>Software, not a doctor - here to point you in a direction</p>
         </div>
         <button type="button" class="close" aria-label="Close chat" (click)="open.set(false)">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
@@ -305,7 +305,7 @@ export class ChatWidget {
     {
       id: 0,
       from: 'bot',
-      text: "Hi — I'm the Ease guide. Tell me what you're feeling and I'll help you see if it connects to your gut.",
+      text: "Hi - I'm the Ease guide. Tell me what you're feeling and I'll help you see if it connects to your gut.",
     },
   ]);
 

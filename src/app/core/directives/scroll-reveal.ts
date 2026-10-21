@@ -48,7 +48,7 @@ export class ScrollRevealDirective implements AfterViewInit {
             // Only rewind once the element has left through the BOTTOM edge. The hidden
             // state sits 28px lower, so rewinding an element that just left through the
             // top nudges it back into view, which re-reveals it, which moves it out
-            // again — the notes visibly bounced at the top edge. Leaving the top, it
+            // again - the notes visibly bounced at the top edge. Leaving the top, it
             // simply stays revealed.
             const leftThroughTop = entry.boundingClientRect.top < (entry.rootBounds?.top ?? 0);
             if (!leftThroughTop) {

@@ -1,4 +1,4 @@
-/* Design tokens — Oxblood & Ember, ivory-first canvas. See design system readme. */
+/* Design tokens - Oxblood & Ember, ivory-first canvas. See design system readme. */
 @use 'styles/tokens/fonts.css';
 @use 'styles/tokens/colors.css';
 @use 'styles/tokens/canvas.css';
@@ -18,7 +18,7 @@ html {
   /* The scroll-progress rail (right-middle chrome) replaces the browser's
      own scrollbar as the scroll affordance. */
   scrollbar-width: none;
-  /* Horizontal-scroll guard lives on `body` only (below), not here — setting
+  /* Horizontal-scroll guard lives on `body` only (below), not here - setting
      overflow-x on BOTH html and body turns each into its own independent
      scroll container (the UA auto-pairs the unset overflow-y to `auto` on
      each), which breaks every `position: sticky` element on the page (the
@@ -46,7 +46,7 @@ body {
      oversized via negative inset + a drift animation so their blur edges
      never show. Some mobile browser engines still count an oversized fixed
      element toward the page's scrollable area, producing a horizontal
-     scrollbar nothing on this page is meant to have — block it here, where
+     scrollbar nothing on this page is meant to have - block it here, where
      it propagates to the viewport, rather than on `html` directly (see the
      comment there) or chasing it per element. */
   overflow-x: hidden;
@@ -76,7 +76,7 @@ a {
 }
 
 ::selection {
-  background: var(--honey);
+  background: var(--highlight-blue);
   color: var(--ink);
 }
 
@@ -92,7 +92,7 @@ a {
   }
 }
 
-/* Scroll-reveal utility — paired with ScrollRevealDirective, which toggles
+/* Scroll-reveal utility - paired with ScrollRevealDirective, which toggles
    .is-visible the first time an element crosses into the viewport. Keeps
    the scroll feeling continuous: content arrives, nothing pops in whole. */
 .reveal {
@@ -108,7 +108,7 @@ a {
   transform: none;
 }
 
-/* Elements that fade out and back in as they cross the viewport fade ONLY —
+/* Elements that fade out and back in as they cross the viewport fade ONLY -
    no rise. A hidden state that sits lower than the shown one moves the element
    itself, which at the screen's edge shifts it back across the very line that
    just hid it, so it flickered ("bounced"). With no movement there is nothing

@@ -5,7 +5,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
  * One pinned note: group name, a one-line preview, and (for the longer
  * lists) a tap to open the full set as chips. Open/closed state lives with
  * the parent, so only one note is open at a time across a whole board.
- * Used by the mobile column, the desktop pinboard and the desktop grid —
+ * Used by the mobile column, the desktop pinboard and the desktop grid -
  * the same note everywhere, only its placement changes.
  */
 @Component({
@@ -98,7 +98,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       margin-left: -7px;
       border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, var(--terracotta), var(--oxblood) 70%);
-      box-shadow: 0 2px 3px rgba(43, 10, 15, 0.35);
+      box-shadow: 0 2px 3px rgba(18, 41, 59, 0.35);
     }
 
     .note-family {
@@ -107,7 +107,7 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       font-size: 0.66rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: color-mix(in oklab, var(--olive) 70%, var(--text-quiet-light));
+      color: #000;
     }
 
     .note-head {
@@ -218,7 +218,30 @@ import { ConditionNote, PREVIEW_COUNT, SHOW_ALL_MAX } from './conditions-data';
       background: color-mix(in oklab, var(--oxblood) 5%, var(--ivory));
       font-size: 0.84rem;
       line-height: 1.35;
-      color: var(--oxblood-deep);
+      color: #000;
+    }
+
+    /* The notes pinned beside the large-screen map: every text element 2px smaller, so they fit their narrow columns. */
+    @media (min-width: 900px) {
+      .note.is-compact .note-family {
+        font-size: calc(0.66rem - 2px);
+      }
+      .note.is-compact .note-title {
+        font-size: calc(1.08rem - 2px);
+      }
+      .note.is-compact .note-preview {
+        font-size: calc(0.84rem - 2px);
+      }
+      .note.is-compact .note-items li {
+        font-size: calc(0.84rem - 2px);
+      }
+      .note.is-compact button.note-head {
+        padding-right: var(--sp-5);
+      }
+      .note.is-compact .note-chevron {
+        width: 18px;
+        height: 18px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -234,7 +257,7 @@ export class ConditionNoteCard {
   readonly note = input.required<ConditionNote>();
   readonly open = input(false);
   readonly compact = input(false);
-  /** Any number — only its parity matters, to alternate the tilt direction between neighbouring notes. */
+  /** Any number - only its parity matters, to alternate the tilt direction between neighbouring notes. */
   readonly tilt = input(0);
   readonly toggled = output<void>();
 

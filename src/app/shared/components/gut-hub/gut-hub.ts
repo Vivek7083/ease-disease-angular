@@ -7,9 +7,9 @@ interface HubNodeSpec {
   readonly y: number;
 }
 
-// Wide layout (two-column hero) — viewBox 400x448, source at 200,224.
+// Wide layout (two-column hero) - viewBox 400x448, source at 200,224.
 // Rotated 30° off the vertical/horizontal axes so no node sits directly
-// above or below the coil — otherwise the food particle reads as coming
+// above or below the coil - otherwise the food particle reads as coming
 // from whichever node happens to be at 12 o'clock.
 const TALL: readonly HubNodeSpec[] = [
   { key: 'skin', label: 'Skin', x: 272, y: 99 },
@@ -20,7 +20,7 @@ const TALL: readonly HubNodeSpec[] = [
   { key: 'immunity', label: 'Immunity', x: 131, y: 99 },
 ];
 
-// Stacked layout (mobile) — viewBox 400x352, source at 200,176. Same 30° rotation.
+// Stacked layout (mobile) - viewBox 400x352, source at 200,176. Same 30° rotation.
 const SHORT: readonly HubNodeSpec[] = [
   { key: 'skin', label: 'Skin', x: 260, y: 72 },
   { key: 'sleep', label: 'Sleep', x: 330, y: 184 },
@@ -75,7 +75,7 @@ const LABEL_GAP = 22;
           />
         }
 
-        <!-- A quiet easter egg — the gut itself (not the orbiting nodes) is
+        <!-- A quiet easter egg - the gut itself (not the orbiting nodes) is
              a shortcut straight to the root-cause map, for anyone curious
              enough to click the thing the whole illustration centres on. -->
         <g
@@ -125,9 +125,9 @@ const LABEL_GAP = 22;
           </text>
         }
 
-        <!-- A one-time simulated click on the top node — a small cursor that
+        <!-- A one-time simulated click on the top node - a small cursor that
              approaches, presses down (a ripple confirms the "click") and
-             fades — the only hint that the nodes are interactive at all.
+             fades - the only hint that the nodes are interactive at all.
              Dismisses itself once its animation finishes, or the instant the
              reader actually touches/hovers/clicks anything in the hub. -->
         @if (showClickHint() && !reducedMotion()) {
@@ -146,6 +146,7 @@ const LABEL_GAP = 22;
       aspect-ratio: 1 / 0.9;
     }
     .stage-glow {
+      display: none;
       position: absolute;
       inset: -12%;
       border-radius: 50%;
@@ -222,7 +223,7 @@ const LABEL_GAP = 22;
       opacity: 0.65;
     }
     .food-cell {
-      fill: var(--honey);
+      fill: #f2c14e; /* the moving dots stay honey yellow; --honey is now the vivid blue */
       offset-rotate: 0deg;
     }
     .food-cell--a {
@@ -290,7 +291,7 @@ const LABEL_GAP = 22;
       transition: opacity var(--dur-base) var(--ease);
     }
 
-    /* Progressive reveal (descentActiveIndex/revealCount) — a node not yet
+    /* Progressive reveal (descentActiveIndex/revealCount) - a node not yet
        "unlocked" sits invisible and slightly shrunk rather than being
        removed from the DOM outright, so it can grow into place with a
        transition once its turn comes instead of popping in instantly. */
@@ -319,7 +320,7 @@ const LABEL_GAP = 22;
       }
     }
 
-    /* One-shot simulated click on the top node — approaches from above,
+    /* One-shot simulated click on the top node - approaches from above,
        presses down, releases with a ripple, then fades for good. */
     .click-hint {
       pointer-events: none;
@@ -387,7 +388,7 @@ export class GutHub {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly activeIndex = input<number | null>(null);
-  /** How many nodes (in declaration order) are "unlocked" so far — null shows all of them, as in the hero. */
+  /** How many nodes (in declaration order) are "unlocked" so far - null shows all of them, as in the hero. */
   readonly revealCount = input<number | null>(null);
   /** The easter egg: clicking/activating the gut itself (not a node). */
   readonly gutClicked = output<void>();
@@ -414,7 +415,7 @@ export class GutHub {
 
   readonly coilTransform = computed(() => `translate(${this.cx()} ${this.cy()}) scale(${GUT_SCALE})`);
 
-  /** Whichever node sits highest (smallest y) — the target for the click-simulation hint. */
+  /** Whichever node sits highest (smallest y) - the target for the click-simulation hint. */
   protected readonly topNodeIndex = computed(() => {
     const list = this.nodes();
     let best = 0;
@@ -445,7 +446,7 @@ export class GutHub {
     this.destroyRef.onDestroy(() => motionQuery.removeEventListener('change', onMotionChange));
 
     // Fallback in case `animationend` never fires (element removed from the
-    // DOM mid-animation, browser quirks, etc.) — the hint is a one-time
+    // DOM mid-animation, browser quirks, etc.) - the hint is a one-time
     // nudge, not something that should linger indefinitely either way.
     const dismissTimer = window.setTimeout(() => this.dismissHint(), 2800);
     this.destroyRef.onDestroy(() => window.clearTimeout(dismissTimer));

@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common';
-import { Component, DestroyRef, inject, input, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 const MINIMIZE_THRESHOLD = 64;
@@ -8,12 +8,16 @@ const MINIMIZE_THRESHOLD = 64;
   selector: 'app-wordmark',
   imports: [NgOptimizedImage, RouterLink],
   template: `
-    <a class="wordmark" routerLink="/" fragment="top" aria-label="Ease Dis-ease — back to top" [class.on-dark]="onDark()" [class.minimized]="collapse() && minimized()">
-      <img class="wordmark-logo" [ngSrc]="onDark() ? 'images/logo/logo-white.png' : 'images/logo/logo-transparent.png'" width="36" height="36" priority alt="" />
+    <a class="wordmark" routerLink="/" fragment="top" aria-label="Ease Dis-ease - back to top" [class.on-dark]="onDark()" [class.minimized]="collapse() && minimized()">
+      <img class="wordmark-logo" [ngSrc]="onDark() ? 'images/logo/logo-white.png' : 'images/logo/logo-transparent.png'" width="43" height="43" priority alt="" />
       <span class="wordmark-text-group">
         <span class="wordmark-text">Ease Dis-<span class="ease-mark">ease</span></span>
         @if (tagline(); as t) {
-          <span class="wordmark-tagline">{{ t }}</span>
+          <span class="wordmark-tagline" [attr.aria-label]="t">
+            @for (c of taglineChars(); track $index) {
+              <span aria-hidden="true" [class.gap]="c === ' '">{{ c }}</span>
+            }
+          </span>
         }
         <span class="wordmark-rule" aria-hidden="true">
           <span class="line"></span>
@@ -28,13 +32,25 @@ const MINIMIZE_THRESHOLD = 64;
        beside the name. On the dark footer the logo's dark reds would sink into
        the background, so it is set as a round ivory badge instead (its own
        white background, clipped to a circle) with the name in ivory beside it. */
+    /* Every size below is in em off this one value, so the logo, name, subtext
+       and gaps scale together. It tracks viewport width (clamped) so the
+       wordmark keeps the same proportion on a 1280px Windows window at 150%
+       display scaling and on a wide Mac window. */
     .wordmark {
+      font-size: clamp(1.05rem, 0.25rem + 1.1vw, 1.5rem);
       display: inline-flex;
       align-items: center;
       gap: var(--sp-2);
       color: var(--ink);
       text-decoration: none;
       transition: gap var(--dur-base) var(--ease);
+    }
+    /* Desktop Mac (class set in main.ts): the logo-to-text gap at 110%, as at
+       110% browser zoom. The font size needs no Mac override: measured in
+       Chromium, 110% zoom at 1440px gives 4px*1.1 + 1.1vw, which the base
+       clamp() above already matches to within 0.4px. */
+    :host-context(html.is-mac) .wordmark {
+      gap: calc(var(--sp-2) * 1.1);
     }
     .wordmark.on-dark {
       color: var(--ivory);
@@ -49,8 +65,8 @@ const MINIMIZE_THRESHOLD = 64;
     }
     .wordmark-logo {
       flex: none;
-      width: 36px;
-      height: 36px;
+      width: 2.25em;
+      height: 2.25em;
       display: block;
       transition: transform var(--dur-base) var(--ease);
     }
@@ -64,8 +80,8 @@ const MINIMIZE_THRESHOLD = 64;
     .wordmark-text-group {
       display: flex;
       flex-direction: column;
-      gap: 2px;
-      max-width: 200px;
+      gap: 0.4em;
+      max-width: 14em;
       opacity: 1;
       overflow: hidden;
       white-space: nowrap;
@@ -79,19 +95,26 @@ const MINIMIZE_THRESHOLD = 64;
       opacity: 0;
     }
     .wordmark-text {
-      font-family: var(--font-display);
-      font-weight: var(--wt-display-bold);
-      font-size: 1rem;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1em;
       letter-spacing: var(--ls-display);
       line-height: 1;
+      text-transform: uppercase;
     }
     .wordmark-tagline {
       font-family: var(--font-mono);
-      font-size: 0.58rem;
-      letter-spacing: 0.08em;
+      font-size: 0.48em;
       line-height: 1;
       text-transform: uppercase;
       color: var(--text-quiet-light);
+      /* One flex item per letter, spread edge to edge: the subtext always spans
+         the name's width, whatever the browser's font metrics. */
+      display: flex;
+      justify-content: space-between;
+    }
+    .wordmark-tagline .gap {
+      width: 0.5em;
     }
     .on-dark .wordmark-tagline {
       color: var(--text-quiet-dark);
@@ -99,10 +122,10 @@ const MINIMIZE_THRESHOLD = 64;
     .wordmark-rule {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 0.3em;
     }
     .wordmark-rule .line {
-      width: 16px;
+      width: 0.85em;
       height: 1px;
       background: color-mix(in oklab, currentColor 25%, transparent);
       display: block;
@@ -129,9 +152,11 @@ export class Wordmark {
   private readonly destroyRef = inject(DestroyRef);
 
   readonly onDark = input(false);
-  /** Shrinks to just the logo once the page scrolls — off for the footer, which is only ever seen scrolled. */
+  /** Shrinks to just the logo once the page scrolls - off for the footer, which is only ever seen scrolled. */
   readonly collapse = input(true);
   readonly tagline = input<string | undefined>('Functional Medicine');
+
+  readonly taglineChars = computed(() => [...(this.tagline() ?? '')]);
 
   readonly minimized = signal(false);
 

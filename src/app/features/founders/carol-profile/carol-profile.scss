@@ -31,7 +31,7 @@
   --hero-pt: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
   padding-top: var(--hero-pt);
   padding-bottom: clamp(var(--sp-8), 4vw, var(--sp-12));
-  background: linear-gradient(180deg, color-mix(in oklab, var(--honey) 10%, var(--ivory)), var(--ivory));
+  background: var(--ivory);
 }
 
 .carol-hero-grid {
@@ -61,7 +61,7 @@
   font-size: 0.78rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--olive);
+  color: #000;
 }
 
 .founders-tabs {
@@ -110,7 +110,7 @@
 }
 
 a.founders-tab:hover {
-  color: var(--oxblood);
+  color: #000;
 }
 
 .founders-tab.active {
@@ -142,26 +142,6 @@ a.founders-tab:hover {
   object-position: center 70%;
 }
 
-.carol-hero-visual .illustration-hero {
-  position: absolute;
-  right: -4%;
-  bottom: -12%;
-  width: 54%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-  transform: rotate(-4deg);
-  pointer-events: none;
-}
-
-@media (min-width: 900px) {
-  .carol-hero-visual .illustration-hero {
-    right: -22%;
-    bottom: -10%;
-    width: 58%;
-  }
-}
-
 /* ---------- about ---------- */
 .carol-about-copy {
   max-width: 68ch;
@@ -175,7 +155,7 @@ a.founders-tab:hover {
 .mark {
   font-style: normal;
   font-weight: 600;
-  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  background: linear-gradient(transparent 52%, var(--highlight-blue) 52%);
   padding: 0 4px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -235,7 +215,7 @@ a.founders-tab:hover {
   font-size: 0.7rem;
   letter-spacing: var(--ls-eyebrow);
   text-transform: uppercase;
-  color: var(--oxblood);
+  color: #000;
 }
 
 .featured-copy h3 {
@@ -306,7 +286,7 @@ a.founders-tab:hover {
 .timeline-org {
   margin-top: var(--sp-1);
   font-weight: 500;
-  color: var(--oxblood);
+  color: #000;
 }
 
 .timeline-meta {
@@ -337,7 +317,7 @@ a.founders-tab:hover {
   padding: 4px var(--sp-3);
   border-radius: var(--r-pill);
   background: color-mix(in oklab, var(--olive) 12%, var(--parchment));
-  color: var(--olive);
+  color: #000;
   font-size: 0.78rem;
   font-family: var(--font-mono);
 }
@@ -389,7 +369,7 @@ a.founders-tab:hover {
   margin-top: var(--sp-1);
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--olive);
+  color: #000;
 }
 
 .cert-card-more {

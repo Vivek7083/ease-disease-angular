@@ -27,7 +27,7 @@
   /* Clears the fixed wordmark/CTA chrome, same as the founders pages. */
   padding-top: max(calc(var(--sp-20) + env(safe-area-inset-top, 0px)), calc(var(--sp-10) + 8vw));
   padding-bottom: clamp(var(--sp-6), 3vw, var(--sp-10));
-  background: linear-gradient(180deg, color-mix(in oklab, var(--honey) 10%, var(--ivory)), var(--ivory));
+  background: var(--ivory);
 }
 
 .events-hero h1 {
@@ -44,7 +44,7 @@
 
 .mark {
   font-style: normal;
-  background: linear-gradient(transparent 52%, color-mix(in oklab, var(--honey) 85%, transparent) 52%);
+  background: linear-gradient(transparent 52%, var(--highlight-blue) 52%);
   padding: 0 4px;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
@@ -247,7 +247,7 @@
   font-family: var(--font-display);
   font-size: 2.4rem;
   line-height: 1;
-  color: var(--oxblood);
+  color: #000;
 }
 
 .stub-day-range {
@@ -268,7 +268,7 @@
 }
 
 .stub-year {
-  color: var(--olive);
+  color: #000;
 }
 
 .event-details {
@@ -285,7 +285,7 @@
   padding: 2px var(--sp-3);
   border-radius: var(--r-pill);
   background: color-mix(in oklab, var(--olive) 12%, var(--parchment));
-  color: var(--olive);
+  color: #000;
   font-family: var(--font-mono);
   font-size: 0.68rem;
   letter-spacing: var(--ls-eyebrow);

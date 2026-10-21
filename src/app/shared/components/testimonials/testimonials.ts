@@ -14,7 +14,7 @@ interface ChatThread {
   readonly id: string;
   /** Short theme shown under the phone and read out to screen readers. */
   readonly label: string;
-  /** Letter and colour of the chat avatar — clients' names are withheld. */
+  /** Letter and colour of the chat avatar - clients' names are withheld. */
   readonly initial: string;
   readonly tone: string;
   /** Header sub-line. */
@@ -114,7 +114,7 @@ export class Testimonials {
   protected readonly active = signal(0);
   protected readonly current = computed(() => THREADS[this.active()]);
 
-  /** Accessible, non-visual transcript of every exchange for screen readers — the chat chrome itself is aria-hidden. */
+  /** Accessible, non-visual transcript of every exchange for screen readers - the chat chrome itself is aria-hidden. */
   protected readonly transcript = THREADS.map(
     (thread, i) =>
       `Message ${i + 1} of ${THREADS.length}, ${thread.label}: ` +
