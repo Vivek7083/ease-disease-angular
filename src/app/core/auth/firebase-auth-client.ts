@@ -1,6 +1,7 @@
 import { Service } from '@angular/core';
 import type { Auth } from 'firebase/auth';
 import { environment } from '../../../environments/environment';
+import { firebaseApp } from './firebase-app';
 
 /** What the rest of the app needs to know about the Firebase user. The SDK's own User type never leaves this file. */
 export interface FirebaseUserInfo {
@@ -61,8 +62,8 @@ export class FirebaseAuthClient {
 
   private load() {
     this.sdk ??= (async () => {
-      const [{ initializeApp }, mod] = await Promise.all([import('firebase/app'), import('firebase/auth')]);
-      const auth = mod.getAuth(initializeApp(environment.firebase));
+      const [app, mod] = await Promise.all([firebaseApp(), import('firebase/auth')]);
+      const auth = mod.getAuth(app);
       if (environment.useAuthEmulator) {
         mod.connectAuthEmulator(auth, EMULATOR_URL, { disableWarnings: true });
       }

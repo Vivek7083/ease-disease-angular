@@ -1,4 +1,4 @@
-import { Service, computed, inject, isDevMode, signal } from '@angular/core';
+import { Service, computed, inject, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ApiClient } from '../api/api-client';
 import { ApiError } from '../api/api-error';
@@ -59,10 +59,6 @@ const storage = {
  * Failure rules (integration guide FE-2): a login the API will never accept
  * signs the person out; "Google or the network is unreachable" keeps the
  * Firebase session and offers a retry. Tokens are never stored or logged here.
- *
- * Dev-only preview: open any page with `?as=user` to see the signed-in navbar
- * without a Firebase login; it never touches the API and is compiled out of
- * production builds by isDevMode().
  */
 @Service()
 export class AuthService {
@@ -91,7 +87,6 @@ export class AuthService {
   private started = false;
   private signingIn = false;
   private firebaseUser: FirebaseUserInfo | null = null;
-  private devPreview = false;
 
   /** Starts watching the Firebase session. Call once at app start-up. */
   start(): void {
@@ -99,7 +94,6 @@ export class AuthService {
       return;
     }
     this.started = true;
-    this.applyDevPreview();
     this.firebase
       .watch((user) => void this.onFirebaseUser(user))
       .catch(() => this.ready.set(true));
@@ -196,9 +190,7 @@ export class AuthService {
   private async onFirebaseUser(user: FirebaseUserInfo | null): Promise<void> {
     this.firebaseUser = user;
     if (!user) {
-      if (!this.devPreview) {
-        this.profile.set(null);
-      }
+      this.profile.set(null);
       this.ready.set(true);
       return;
     }
@@ -262,21 +254,6 @@ export class AuthService {
     } else if (error instanceof ApiError) {
       // Google, the network or the rate limiter said not now: keep the Firebase session and let the person retry.
       this.needsRetry.set(this.hasSession());
-    }
-  }
-
-  private applyDevPreview(): void {
-    if (isDevMode() && typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('as') === 'user') {
-      this.devPreview = true;
-      this.profile.set({
-        id: 'dev-preview',
-        email: 'priya@example.com',
-        name: 'Priya Sharma',
-        phone: null,
-        dob: null,
-        authProvider: 'google.com',
-        lastAuthProvider: 'google.com',
-      });
     }
   }
 }

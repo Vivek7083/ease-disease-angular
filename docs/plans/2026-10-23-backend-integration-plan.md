@@ -1,6 +1,6 @@
 # Backend integration plan: login, booking, payment (Angular side)
 
-- **Status:** rev 3, 2026-10-23. Slices are built one at a time; after each: build/test green, tick it here, commit. Progress: navbar UI done (FE-2b, see below); FE-0 done; FE-1 on standby (live check passed, awaiting your confirmation); FE-0 to FE-7 done (FE-0 to FE-6 verified by the owner); next FE-8 (App Check), then the guide's local test script.
+- **Status:** rev 3, 2026-10-23. Slices are built one at a time; after each: build/test green, tick it here, commit. Progress: navbar UI done (FE-2b, see below); FE-0 done; FE-1 on standby (live check passed, awaiting your confirmation); All slices FE-0 to FE-8 built (FE-0 to FE-6 verified by the owner; FE-7 and FE-8 are code, tests and axe, with App Check switched off until a key exists); what remains is the owner's walk through the guide's local test script (table under FE-8), the Privacy wording review, and a design refinement pass.
 - **Source:** `../ease-disease-backend/docs/frontend-tasks/2026-10-22-frontend-integration-guide.md` (how-to), `../ease-disease-backend/api-flow.md` (locked contract), Swagger at `localhost:3000/docs` (wins on any disagreement).
 - **Created:** 2026-10-23
 
@@ -18,7 +18,7 @@ Decisions made while reviewing it in the browser; where they differ from 3.2 bel
 - Below 900px: brand, Book now, and a two-line menu button. The menu is a white sheet dropping from the top edge (Esc, X, or a tap outside closes it).
 - Links hide the page you are on and put Home first elsewhere (Events page: Home, Experts; Privacy: Home, Events, Experts; Home: Events, Experts). Experts always stays. My bookings appears only when signed in (its route arrives in FE-6).
 - The CTA is the short **Book now**. The scroll-revealed price pill and its cycling label are gone from the chrome (the `BookingCtaService` is no longer read by the shell and can be cleaned up later).
-- **Placeholder:** `core/services/auth.ts` holds `ready` / `user` and a dev-only `?as=user` preview; Log in / Sign up does nothing until FE-2/FE-3a.
+- Log in / Sign up opens the sign-in dialog; the account state is real (`AuthService`, FE-2). The dev-only `?as=user` preview that existed earlier has been removed.
 
 ---
 
@@ -222,8 +222,29 @@ Each slice: build (`npx ng build` or `npx tsc --noEmit -p tsconfig.app.json`) + 
   - *Accessibility (axe-core 4.10.2, WCAG 2 A/AA, 2.1, 2.2 AA and best-practice, run in a real browser over 24 pages and states):* every screen and dialog from this integration passes: Events, Privacy, the sign-in dialog (including the "check your inbox" state and at phone width), the booking details form (empty and with all errors, laptop and phone), the pay step, the phone menu sheet (signed out and in), the account menu, the booking status page (signed out, confirmed, confirming), My Bookings (signed out, with rows, phone), `/auth/finish` (both states) and the session notice. One real failure was found and fixed on Home: the gut diagram's container was marked `role="img"` while holding focusable nodes; it is now a labelled `role="group"`. **Two older findings remain, left for the design refinement:** Home on a phone, the second expert carousel card's text fails colour contrast (the faded, not-yet-active card); and the Founders page jumps from the page title to an `h3` (heading order, a best-practice rule).
   - *Tests:* 158 pass and nothing fails: the long-broken `app.spec.ts` now passes too (it needed a `matchMedia` stub, a service-worker stub and a fake Firebase). New in this slice: 12 for the notice and the auth notice rules, 5 for the countdown, 2 for rate-limited Pay buttons.
   - *Not done, on purpose:* skeleton placeholders (every call already has a spinner or a text state; the visual refinement comes with the design pass); `BookingCtaService` is still in the code because Home writes to it, though nothing reads it any more (safe to remove with the design pass).
-- [ ] **FE-8 App Check (before staging).** `initializeAppCheck` with reCAPTCHA Enterprise, interceptor adds `X-Firebase-AppCheck` to the three protected POSTs, debug token locally. Needs the site key.
-- [ ] **Then:** the guide's section 9 local test script (12 scenarios); record references for scenarios 3, 4, 6.
+- [x] **FE-8 App Check (before staging). BUILT 2026-10-24 and switched OFF by default; turning it on needs a reCAPTCHA Enterprise key from the Firebase console (see below).** `initializeAppCheck` with reCAPTCHA Enterprise, interceptor adds `X-Firebase-AppCheck` to the three protected POSTs, debug token locally. Needs the site key.
+  - *Built:* `core/auth/firebase-app.ts` (the one Firebase app, shared); `core/auth/app-check-client.ts` (`AppCheckClient`: lazy `firebase/app-check`, `initializeAppCheck` with `ReCaptchaEnterpriseProvider` and auto-refresh, optional debug token for localhost; on only when `environment.appCheck.siteKey` is set; a missing token never throws, the request just goes without the header and the API answers `APP_CHECK_FAILED`, which the app already words as "reload the page"); `core/auth/app-check.interceptor.ts` (adds `X-Firebase-AppCheck` to exactly three calls: `POST /v1/auth/sync`, `POST /v1/bookings`, `POST /v1/bookings/{ref}/checkout`; nothing else gets it). `environment.appCheck = { siteKey: null, debug }` in all three environments (`debug: true` locally only). With no key, nothing App Check related is loaded (checked: no request to App Check or reCAPTCHA hosts) and no header is sent, which matches the backend's `APP_CHECK_MODE=off`.
+  - *Checked:* 8 new tests (which calls need it, header added to all three and only those, reads and public routes untouched without even asking for a token, nothing while off, still sends when no token could be had, client off without a key); 166 tests in total all pass; development, staging and production builds pass; production initial bundle 374.9 kB.
+  - *To switch it on (needs you, in the Firebase console):* (1) App Check: register this web app with the reCAPTCHA Enterprise provider and create the site key; (2) put the key in `appCheck.siteKey` for the environment; (3) locally, keep `debug: true`, load the page once, copy the debug token the browser console prints, and register it under App Check, "Manage debug tokens"; (4) set the backend's `APP_CHECK_MODE` to `enforce` to prove it: sign-in sync, booking creation and checkout should still work, and the same calls without the header should be refused with `403 APP_CHECK_FAILED`. **Deployment task:** staging and production must have a key before the backend runs them in enforce mode, or sign-in sync, booking and payment will all be refused.
+  - *Cleanup done with it:* the dev-only `?as=user` signed-in preview is removed from `AuthService` (real sign-in is verified).
+- [~] **Then:** the guide's section 9 local test script (12 scenarios); record references for scenarios 3, 4, 6. Status, 2026-10-24:
+
+  | # | Scenario | Status |
+  |---|---|---|
+  | 1 | Sign in with Google | Done by the owner: avatar shows, `users` row created, a second sign-in updated `last_login_at` on the same row. |
+  | 2 | Sign in with an emailed link | NOT yet tried by a person (also settles the guide's "does an email-link login pass `/auth/sync`" question). Firebase accepts the request from the app. |
+  | 3 | Book and pay by card | Done by the owner: card and UPI, two bookings, both `CONFIRMED` with `paid_at`. |
+  | 4 | Cancel at PayU, expect the failed screen | NOT yet tried. The failed screen is covered by tests. |
+  | 5 | Book for someone else (PayU form carries that person's details, `users` row unchanged) | NOT yet tried. |
+  | 6 | Foreign number | Booking creation done by the owner (a 15-digit `+998...` number was accepted). Paying with the business fallback phone NOT yet tried. |
+  | 7 | Double-click Submit then Pay | NOT tried by hand. Covered by tests: the button disables while sending, and an identical retry keeps its `Idempotency-Key`. |
+  | 8 | Validation | Done by the owner for an invalid number; every other rule is covered by tests and was seen in the browser. |
+  | 9 | Caps (5 unpaid, 5 confirmed today) | NOT yet tried; the message and the My bookings link are covered by tests. |
+  | 10 | Tab closed during payment | NOT yet tried (needs the backend's settle step or its dev tick). |
+  | 11 | Rate limit | NOT yet tried; the countdown and the disabled buttons are covered by tests. |
+  | 12 | Open another account's booking | NOT yet tried; the "We cannot find this booking" screen is covered by tests. |
+
+  Record the booking references and outcomes of scenarios 3, 4 and 6 (the evidence for the remaining PayU unknowns): scenario 3 references so far are `ED-8CT0AV` (card or UPI) and `ED-TA19JS` (the other).
 
 ## 5. Risks to keep in view
 
