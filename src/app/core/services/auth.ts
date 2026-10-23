@@ -5,6 +5,7 @@ import { ApiError } from '../api/api-error';
 import type { ProfileResponse, UserProfile } from '../api/api-types';
 import { describeError } from '../api/error-messages';
 import { FirebaseAuthClient, type FirebaseUserInfo } from '../auth/firebase-auth-client';
+import { BookingModalService } from './booking-modal';
 
 export interface SignedInUser {
   readonly email: string;
@@ -67,6 +68,7 @@ const storage = {
 export class AuthService {
   private readonly firebase = inject(FirebaseAuthClient);
   private readonly api = inject(ApiClient);
+  private readonly modal = inject(BookingModalService);
 
   /** The API's profile of the signed-in person, or null. */
   readonly profile = signal<UserProfile | null>(null);
@@ -111,8 +113,10 @@ export class AuthService {
     return this.firebase.getIdToken(forceRefresh);
   }
 
-  /** FE-3a: opens the sign-in dialog. Does nothing yet. */
-  openSignIn(): void {}
+  /** Opens the dialog on its sign-in step (the navbar's Log in / Sign up). */
+  openSignIn(): void {
+    this.modal.open('sign-in');
+  }
 
   /** Google pop-up. Call straight from a click handler. Resolves true when signed in and the profile is loaded. */
   signInWithGoogle(): Promise<boolean> {

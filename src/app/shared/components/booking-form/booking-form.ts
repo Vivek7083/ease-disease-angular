@@ -1,8 +1,10 @@
-import { Component, ElementRef, Injector, afterNextRender, effect, inject, signal, untracked, viewChild } from '@angular/core';
+import { Component, ElementRef, Injector, afterNextRender, computed, effect, inject, signal, untracked, viewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../../core/services/auth';
 import { BookingModalService } from '../../../core/services/booking-modal';
 import { PackagesService } from '../../../core/services/packages';
+import { SignInStep } from './sign-in-step';
 
 const GENDERS = ['Female', 'Male', 'Other', 'Prefer not to say'] as const;
 
@@ -43,7 +45,7 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
  */
 @Component({
   selector: 'app-booking-form',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, SignInStep],
   template: `
     <dialog
       #dlg
@@ -56,10 +58,18 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
         <button type="button" class="bk-close" aria-label="Close booking form" (click)="modal.close()">&times;</button>
 
         <div class="bk-head">
-          <div class="bk-eyebrow">The E.A.S.E. Root Cause Assessment · {{ plan().duration }}</div>
-          <h2 class="bk-title" id="bk-title">{{ submitted() ? "You're almost booked" : 'Tell us a little about you' }}</h2>
+          <div class="bk-eyebrow">{{ eyebrow() }}</div>
+          <h2 class="bk-title" id="bk-title">{{ title() }}</h2>
         </div>
 
+        @switch (view()) {
+          @case ('sign-in') {
+            <app-sign-in-step [mode]="modal.mode()" />
+          }
+          @case ('checking') {
+            <p class="bk-checking" role="status">Checking your sign-in&hellip;</p>
+          }
+          @default {
         <form class="bk-form" [formGroup]="form" novalidate (ngSubmit)="onSubmit()">
           <div class="bk-body">
             @if (!submitted()) {
@@ -126,6 +136,8 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
             <button type="submit" class="bk-btn bk-btn-primary">{{ submitted() ? 'Continue to payment' : 'Submit' }}</button>
           </div>
         </form>
+          }
+        }
       </div>
     </dialog>
   `,
@@ -400,6 +412,12 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
       outline-offset: 3px;
     }
 
+    .bk-checking {
+      margin: 0;
+      padding: 28px;
+      color: #4a5a66;
+    }
+
     .bk-done {
       text-align: center;
       padding: 18px 6px 6px;
@@ -488,6 +506,7 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
 })
 export class BookingForm {
   protected readonly modal = inject(BookingModalService);
+  private readonly auth = inject(AuthService);
   protected readonly plan = inject(PackagesService).plan;
   private readonly injector = inject(Injector);
 
@@ -501,7 +520,52 @@ export class BookingForm {
   protected readonly firstName = signal('');
   protected readonly demoNote = signal('');
 
+  /**
+   * What the dialog shows. Booking needs a signed-in person: signed out, it opens on the sign-in step and moves on to
+   * the details form by itself once sign-in finishes. The navbar's Log in / Sign up shows only the sign-in step.
+   */
+  protected readonly view = computed<'checking' | 'sign-in' | 'details'>(() => {
+    if (!this.auth.ready()) {
+      return 'checking';
+    }
+    return this.auth.user() ? 'details' : 'sign-in';
+  });
+
+  protected readonly eyebrow = computed(() =>
+    this.view() === 'sign-in' && this.modal.mode() === 'sign-in'
+      ? 'Your Ease Dis-ease account'
+      : `The E.A.S.E. Root Cause Assessment · ${this.plan().duration}`,
+  );
+
+  protected readonly title = computed(() => {
+    switch (this.view()) {
+      case 'details':
+        return this.submitted() ? "You're almost booked" : 'Tell us a little about you';
+      case 'sign-in':
+        return this.modal.mode() === 'sign-in' ? 'Log in or sign up' : 'Sign in to book';
+      default:
+        return 'One moment';
+    }
+  });
+
   constructor() {
+    // Signed in from the navbar's Log in / Sign up: the job is done, so close the dialog.
+    effect(() => {
+      if (this.modal.isOpen() && this.modal.mode() === 'sign-in' && this.auth.user()) {
+        untracked(() => this.modal.close());
+      }
+    });
+
+    // The view changed under an open dialog (sign-in finished, or the session check ended): put focus in the new view.
+    effect(() => {
+      this.view();
+      untracked(() => {
+        if (this.modal.isOpen()) {
+          this.focusFirstField();
+        }
+      });
+    });
+
     effect(() => {
       const wantOpen = this.modal.isOpen();
       untracked(() => {
@@ -573,7 +637,10 @@ export class BookingForm {
   }
 
   private focusFirstField(): void {
-    afterNextRender(() => this.dlg()?.nativeElement.querySelector<HTMLElement>('.bk-body input')?.focus({ preventScroll: true }), { injector: this.injector });
+    afterNextRender(
+      () => this.dlg()?.nativeElement.querySelector<HTMLElement>('[data-autofocus], .bk-body input')?.focus({ preventScroll: true }),
+      { injector: this.injector },
+    );
   }
 
   private reset(): void {

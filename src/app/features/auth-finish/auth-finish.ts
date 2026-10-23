@@ -2,6 +2,7 @@ import { Component, inject, input, signal } from '@angular/core';
 import { FormField, email, form, required, submit } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService, safeNext } from '../../core/services/auth';
+import { BookingModalService } from '../../core/services/booking-modal';
 
 type Stage = 'working' | 'needs-email' | 'failed' | 'not-a-link';
 
@@ -149,6 +150,7 @@ type Stage = 'working' | 'needs-email' | 'failed' | 'not-a-link';
 export class AuthFinish {
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly bookingModal = inject(BookingModalService);
 
   /** From the link's `?next=` (component input binding). Only an internal path is ever followed. */
   readonly next = input<string | undefined>(undefined);
@@ -192,6 +194,10 @@ export class AuthFinish {
     const result = await this.auth.finishEmailLink(window.location.href, typedEmail);
     if (result === 'done') {
       await this.router.navigateByUrl(safeNext(this.next()), { replaceUrl: true });
+      // They left the booking dialog for their inbox: bring it back on the details step.
+      if (this.bookingModal.consumeBookIntent()) {
+        this.bookingModal.open('book');
+      }
     } else {
       this.stage.set(result);
     }
