@@ -2,21 +2,7 @@
 <div class="ambient-field" aria-hidden="true"></div>
 <app-flow-lines aria-hidden="true" />
 
-<app-wordmark class="chrome chrome-wordmark" />
-
-<app-cta-pill
-  class="chrome chrome-cta"
-  [class.visible]="bookingCta.visible()"
-  [style.opacity]="bookingCta.opacity()"
-  [label]="bookingCta.label()"
-  [durationLabel]="bookingCta.plan.duration"
-  [price]="bookingCta.plan.price"
-  [originalPrice]="bookingCta.plan.originalPrice"
-  revealKey="chrome"
-  variant="primary"
-  [compact]="true"
-  (pressed)="bookingCta.trigger()"
-/>
+<app-site-nav />
 
 <app-scroll-progress class="chrome chrome-progress" />
 

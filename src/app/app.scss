@@ -58,66 +58,6 @@
   z-index: 40;
 }
 
-.chrome-wordmark {
-  top: max(env(safe-area-inset-top, 0px), var(--sp-5));
-  left: var(--sp-6);
-}
-
-/* Desktop Mac: top offset at 110% to match the 110% wordmark. */
-:host-context(html.is-mac) .chrome-wordmark {
-  top: calc(var(--sp-5) * 1.1);
-}
-
-/* The booking CTA and the scroll rail now live in different corners
-   entirely (top-right vs. right-middle) - they can't overlap or fight for
-   space, so neither needs to guess the other's geometry. Same `top` as
-   .chrome-wordmark (not --sp-6) - the pill's own compact min-height now
-   matches the wordmark glyph's 36px, so an equal top is what actually lines
-   the two up instead of the pill sitting a few px lower. */
-.chrome-cta {
-  top: max(env(safe-area-inset-top, 0px), var(--sp-5));
-  right: var(--sp-6);
-  display: block;
-  max-width: 200px;
-  overflow: hidden;
-  pointer-events: none;
-  /* Opacity itself is already a continuous, scroll-bound value (see
-     BookingCtaService.opacity in home.ts) - it's updated every scroll frame,
-     so transitioning it here would make it perpetually chase a moving
-     target instead of tracking the scroll directly. Only the discrete
-     visible/hidden toggle (max-width) needs an eased transition, and a
-     longer, softer one reads as a graceful unfurl rather than a snap. */
-  transition: max-width var(--dur-scene) var(--ease-out-soft);
-}
-
-.chrome-cta.visible {
-  /* Roomier than the collapsed-state cap - the price/duration meta is
-     always shown now, not revealed on hover, so the pill needs its full
-     width reserved from the start. */
-  max-width: 340px;
-  pointer-events: auto;
-}
-
-/* Above the point where .scene-inner's 1200px max-width container stops
-   touching the viewport edges and starts centering with its own side
-   margins, a fixed `left`/`right` offset no longer lines up with where the
-   page content actually starts - the wordmark/CTA would sit further in
-   from the edge than the hero's headline/visual. This matches .scene-inner
-   exactly: the same centering gap, plus the same --gutter-desktop padding. */
-@media (min-width: 900px) {
-  .chrome-wordmark {
-    left: calc(var(--gutter-desktop) + max(0px, (100vw - var(--container-max)) / 2));
-  }
-
-  .chrome-cta {
-    right: calc(var(--gutter-desktop) + max(0px, (100vw - var(--container-max)) / 2));
-  }
-}
-
-.chrome-cta:not(.visible) {
-  max-width: 0;
-}
-
 /* The scroll rail replaces the browser's own scrollbar (hidden globally -
    see styles.scss) and sits centered on the right edge instead, out of the
    way of both the wordmark and the booking CTA up top. */
@@ -125,33 +65,6 @@
   top: 50%;
   right: var(--sp-4);
   transform: translateY(-50%);
-}
-
-@media (max-width: 640px) {
-  .chrome-wordmark {
-    left: var(--sp-4);
-  }
-
-  .chrome-cta {
-    right: var(--sp-4);
-  }
-
-  /* Smaller screens: the CTA is always available, not scroll-gated - there
-     is less room to "arrive" gracefully, so it just stays put; only its
-     label changes as the reader moves through the story. It also sits
-     directly over body copy at this width, so keep it translucent -
-     glassy rather than a solid block - so it doesn't look odd overlapping
-     text while scrolling. "none" only released the pill's own reveal cap -
-     it still needs a real ceiling here, or a long cycling label (or the
-     price/duration reveal) can grow the pill wider than the viewport and
-     get clipped by the right edge instead of wrapping. */
-  .chrome-cta {
-    opacity: 0.88 !important;
-    max-width: calc(100vw - 2 * var(--sp-4)) !important;
-    pointer-events: auto !important;
-    backdrop-filter: blur(6px);
-    border-radius: var(--r-pill);
-  }
 }
 
 /* Small screens: the scroll rail would sit on top of the conditions tree, so it steps aside while the tree is on screen. */

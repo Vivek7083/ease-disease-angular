@@ -1,18 +1,16 @@
 import { Component, DestroyRef, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CanvasStoryService } from './core/services/canvas-story';
-import { BookingCtaService } from './core/services/booking-cta';
 import { AppUpdateService } from './core/services/app-update';
 import { FragmentScrollService } from './core/services/fragment-scroll';
-import { Wordmark } from './shared/components/wordmark/wordmark';
+import { SiteNav } from './shared/components/site-nav/site-nav';
 import { ScrollProgress } from './shared/components/scroll-progress/scroll-progress';
-import { CtaPill } from './shared/components/cta-pill/cta-pill';
 import { FlowLines } from './shared/components/flow-lines/flow-lines';
 import { BookingForm } from './shared/components/booking-form/booking-form';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Wordmark, ScrollProgress, CtaPill, FlowLines, BookingForm],
+  imports: [RouterOutlet, SiteNav, ScrollProgress, FlowLines, BookingForm],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -21,7 +19,6 @@ export class App {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly canvasColor = this.canvasStory.canvasColor;
-  protected readonly bookingCta = inject(BookingCtaService);
 
   constructor() {
     this.canvasStory.start(this.destroyRef);
