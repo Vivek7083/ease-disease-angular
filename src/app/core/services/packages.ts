@@ -40,6 +40,12 @@ export class PackagesService {
 
   private started = false;
 
+  /** Asks again, e.g. after the API said the package is not on sale. */
+  reload(): void {
+    this.started = false;
+    this.load();
+  }
+
   /** Fetches the package list once. A failure keeps the fallback copy; it is not shown to the visitor. */
   load(): void {
     if (this.started) {
