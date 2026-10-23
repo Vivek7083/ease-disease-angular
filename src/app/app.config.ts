@@ -7,11 +7,14 @@ import {
   withViewTransitions,
 } from '@angular/router';
 import { routes } from './app.routes';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
+import { apiErrorInterceptor } from './core/api/api-error.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor])),
     provideRouter(
       routes,
       withComponentInputBinding(),
