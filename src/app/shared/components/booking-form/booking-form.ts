@@ -2,6 +2,7 @@ import { Component, ElementRef, Injector, afterNextRender, effect, inject, signa
 import { AbstractControl, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { BookingModalService } from '../../../core/services/booking-modal';
+import { PackagesService } from '../../../core/services/packages';
 
 const GENDERS = ['Female', 'Male', 'Other', 'Prefer not to say'] as const;
 
@@ -55,7 +56,7 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
         <button type="button" class="bk-close" aria-label="Close booking form" (click)="modal.close()">&times;</button>
 
         <div class="bk-head">
-          <div class="bk-eyebrow">The E.A.S.E. Root Cause Assessment · 30 min</div>
+          <div class="bk-eyebrow">The E.A.S.E. Root Cause Assessment · {{ plan().duration }}</div>
           <h2 class="bk-title" id="bk-title">{{ submitted() ? "You're almost booked" : 'Tell us a little about you' }}</h2>
         </div>
 
@@ -115,7 +116,7 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
                 <div class="bk-done-icon" aria-hidden="true">&#10003;</div>
                 <h3>Thank you, {{ firstName() }}</h3>
                 <p>We've received your details. One last step: confirm your E.A.S.E. Root Cause Assessment (30 minutes).</p>
-                <p class="bk-price"><s>₹5,000</s> ₹2,499</p>
+                <p class="bk-price"><s>{{ plan().originalPrice }}</s> {{ plan().price }}</p>
                 @if (demoNote()) { <p class="bk-demo" role="status">{{ demoNote() }}</p> }
               </div>
             }
@@ -487,6 +488,7 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
 })
 export class BookingForm {
   protected readonly modal = inject(BookingModalService);
+  protected readonly plan = inject(PackagesService).plan;
   private readonly injector = inject(Injector);
 
   private readonly dlg = viewChild<ElementRef<HTMLDialogElement>>('dlg');

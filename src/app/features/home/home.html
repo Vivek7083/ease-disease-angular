@@ -12,10 +12,10 @@
           <p class="lede">Understand the signals. Explore the root causes. Take a more informed approach to your well-being.</p>
           <div class="hero-cta-row">
             <app-cta-pill
-              [label]="plan.label"
-              [durationLabel]="plan.duration"
-              [price]="plan.price"
-              [originalPrice]="plan.originalPrice"
+              [label]="plan().label"
+              [durationLabel]="plan().duration"
+              [price]="plan().price"
+              [originalPrice]="plan().originalPrice"
               revealKey="hero"
               variant="primary"
               (pressed)="bookConsultation()"
@@ -132,7 +132,7 @@
       <p class="t-body lede">
         Every transformation begins with a conversation. Let's understand what your body is telling you, explore your concerns, and discover the right next steps for you.
       </p>
-      <app-level-selector [levels]="levels" (booked)="bookConsultation()" />
+      <app-level-selector [levels]="levels()" (booked)="bookConsultation()" />
       <p class="levels-fallback">
         <span>Not sure where to start?</span>
         <a class="source-link" href="#root-map">
@@ -263,7 +263,7 @@
         In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
       </p>
       <div class="cta-row">
-        <app-cta-pill [label]="plan.label" [durationLabel]="plan.duration" [price]="plan.price" [originalPrice]="plan.originalPrice" revealKey="close" variant="primary" (pressed)="bookConsultation()" />
+        <app-cta-pill [label]="plan().label" [durationLabel]="plan().duration" [price]="plan().price" [originalPrice]="plan().originalPrice" revealKey="close" variant="primary" (pressed)="bookConsultation()" />
         <app-cta-pill label="Ask the Ease guide first" variant="ghostDark" />
       </div>
       <p class="fine">This page describes common patterns, not a diagnosis. Please speak with a qualified practitioner about your own health.</p>

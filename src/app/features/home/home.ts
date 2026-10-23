@@ -3,7 +3,7 @@ import { NgOptimizedImage } from '@angular/common';
 import { Router } from '@angular/router';
 import { CanvasStopDirective } from '../../core/directives/canvas-stop';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
-import { MAIN_PLAN } from '../../core/config/booking';
+import { PackagesService } from '../../core/services/packages';
 import { BookingModalService } from '../../core/services/booking-modal';
 import { BookingCtaService } from '../../core/services/booking-cta';
 import { Wordmark } from '../../shared/components/wordmark/wordmark';
@@ -86,8 +86,10 @@ export class Home implements AfterViewInit {
   /** Descent, turn, team and close are on hold while Packages is reworked into the Programme section above. */
   protected readonly showRemainingSections = false;
 
-  /** The main offer every primary CTA shows - Level 1. */
-  protected readonly plan = MAIN_PLAN;
+  private readonly packages = inject(PackagesService);
+
+  /** The main offer every primary CTA shows - Level 1 (price and duration come from the API once loaded). */
+  protected readonly plan = this.packages.plan;
 
   constructor() {
     this.bookingCta.registerHandler(() => this.bookConsultation());
@@ -1307,13 +1309,13 @@ export class Home implements AfterViewInit {
   /** The "Join the community" WhatsApp invite (core/config/community.ts); # until it is set. */
   protected readonly communityWhatsapp = COMMUNITY_WHATSAPP_URL || '#';
 
-  protected readonly levels: readonly Level[] = [
+  protected readonly levels = computed<readonly Level[]>(() => [
     {
       tag: 'Start here',
       name: 'The E.A.S.E. Root Cause Assessment',
-      price: MAIN_PLAN.price,
-      originalPrice: MAIN_PLAN.originalPrice,
-      priceNote: '30 minutes · Includes a 3-week plan',
+      price: this.plan().price,
+      originalPrice: this.plan().originalPrice,
+      priceNote: `${this.packages.durationWords()} · Includes a 3-week plan`,
       ctaLabel: 'BOOK YOUR CONSULTATION',
       recommended: true,
       description: 'A personalized, one-time consultation to explore your health concerns, understand your symptoms in context, and identify the next steps that make sense for you.',
@@ -1327,7 +1329,7 @@ export class Home implements AfterViewInit {
       locked: true,
       lockedNote: 'Complete your first consultation to unlock.',
     },
-  ];
+  ]);
 
   protected readonly team: readonly TeamMember[] = [
     {
