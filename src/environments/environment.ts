@@ -6,8 +6,8 @@ export const environment: Environment = {
   firebase: {
     apiKey: 'PLACEHOLDER-firebase-web-api-key',
     authDomain: 'PLACEHOLDER.firebaseapp.com',
-    // Must equal the API's FIREBASE_PROJECT_ID. A "demo-" id works with the Auth emulator without a real project.
-    projectId: 'demo-ease-disease',
+    // Must equal the API's FIREBASE_PROJECT_ID (its .env). Without the emulator, the other three values must come from this project's Web app config too.
+    projectId: 'ease-disease-vivek',
     appId: 'PLACEHOLDER-firebase-web-app-id',
   },
   useAuthEmulator: true,

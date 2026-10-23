@@ -10,11 +10,12 @@ import { routes } from './app.routes';
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
 import { provideServiceWorker } from '@angular/service-worker';
 import { apiErrorInterceptor } from './core/api/api-error.interceptor';
+import { authInterceptor } from './core/auth/auth.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideHttpClient(withFetch(), withInterceptors([apiErrorInterceptor])),
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor, apiErrorInterceptor])),
     provideRouter(
       routes,
       withComponentInputBinding(),

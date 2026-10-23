@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { CanvasStoryService } from './core/services/canvas-story';
 import { AppUpdateService } from './core/services/app-update';
 import { FragmentScrollService } from './core/services/fragment-scroll';
+import { AuthService } from './core/services/auth';
 import { PackagesService } from './core/services/packages';
 import { SiteNav } from './shared/components/site-nav/site-nav';
 import { ScrollProgress } from './shared/components/scroll-progress/scroll-progress';
@@ -26,5 +27,6 @@ export class App {
     inject(AppUpdateService).start(this.destroyRef);
     inject(FragmentScrollService).start(this.destroyRef);
     inject(PackagesService).load();
+    inject(AuthService).start();
   }
 }

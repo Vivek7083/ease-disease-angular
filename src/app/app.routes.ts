@@ -27,6 +27,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/founders/deepa-profile/deepa-profile').then((m) => m.DeepaProfile),
   },
   {
+    path: 'auth/finish',
+    loadComponent: () => import('./features/auth-finish/auth-finish').then((m) => m.AuthFinish),
+  },
+  {
     path: '**',
     redirectTo: '',
   },
