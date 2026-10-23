@@ -27,6 +27,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/founders/deepa-profile/deepa-profile').then((m) => m.DeepaProfile),
   },
   {
+    path: 'my-bookings',
+    loadComponent: () => import('./features/my-bookings/my-bookings').then((m) => m.MyBookings),
+  },
+  {
+    // The payment callback sends people here (with ?e=verify|busy|server) when it cannot tie a payment to a booking.
+    path: 'bookings',
+    redirectTo: 'my-bookings',
+    pathMatch: 'full',
+  },
+  {
     path: 'booking/:reference',
     loadComponent: () => import('./features/booking-status/booking-status').then((m) => m.BookingStatus),
   },

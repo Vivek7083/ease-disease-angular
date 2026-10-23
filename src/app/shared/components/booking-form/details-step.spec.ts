@@ -189,6 +189,24 @@ describe('DetailsStep', () => {
     expect(reloads).toBe(1);
   });
 
+  it('points to My bookings when the person already has too many unpaid bookings', async () => {
+    bookings.answers = [fail('TOO_MANY_PENDING_BOOKINGS', 409, { limit: 5 })];
+    const { fixture, root } = render();
+    fillValid(root);
+    await submitForm(fixture, root);
+    const banner = root.querySelector('[role="alert"]')!;
+    expect(banner.textContent).toContain('unpaid bookings');
+    expect(banner.querySelector('a')?.getAttribute('href')).toBe('/my-bookings');
+  });
+
+  it('shows no My bookings link for other problems', async () => {
+    bookings.answers = [fail('DAILY_BOOKING_LIMIT', 409)];
+    const { fixture, root } = render();
+    fillValid(root);
+    await submitForm(fixture, root);
+    expect(root.querySelector('[role="alert"] a')).toBeNull();
+  });
+
   it('shows the daily limit message', async () => {
     bookings.answers = [fail('DAILY_BOOKING_LIMIT', 409)];
     const { fixture, root } = render();

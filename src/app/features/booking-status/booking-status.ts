@@ -53,7 +53,7 @@ const POLL_WINDOW_MS = 60_000;
               <h1 id="status-title">Still confirming with the bank</h1>
               <p role="status">
                 We are still waiting for the bank. There is nothing more for you to do: we will message you once the payment is
-                confirmed. You can come back to this page any time.
+                confirmed. You can come back to this page any time, or look in <a routerLink="/my-bookings">My bookings</a>.
               </p>
               <button type="button" class="btn btn-quiet" (click)="checkAgain()">Check again</button>
             }

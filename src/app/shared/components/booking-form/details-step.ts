@@ -22,6 +22,7 @@ import {
   textProblem,
   type BookingFormValue,
 } from '../../../core/booking/booking-rules';
+import { BookingModalService } from '../../../core/services/booking-modal';
 import { BookingsService } from '../../../core/services/bookings';
 import { PackagesService } from '../../../core/services/packages';
 
@@ -162,7 +163,12 @@ type ServerError = ValidationError.WithOptionalFieldTree;
         </div>
 
         @if (formError(); as problem) {
-          <p class="bk-banner" role="alert">{{ problem }}</p>
+          <p class="bk-banner" role="alert">
+            {{ problem }}
+            @if (showMyBookings()) {
+              <a routerLink="/my-bookings" (click)="modal.close()">Open My bookings</a>
+            }
+          </p>
         }
       </div>
 
@@ -264,6 +270,13 @@ type ServerError = ValidationError.WithOptionalFieldTree;
       color: #b0301a;
       font-size: 13px;
       margin: 6px 0 0;
+    }
+    .bk-banner a {
+      margin-left: 6px;
+      color: var(--oxblood);
+      font-weight: 500;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
     .bk-banner {
       margin: 18px 0 0;
@@ -408,6 +421,7 @@ type ServerError = ValidationError.WithOptionalFieldTree;
 })
 export class DetailsStep {
   private readonly bookings = inject(BookingsService);
+  protected readonly modal = inject(BookingModalService);
   private readonly packages = inject(PackagesService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -423,6 +437,8 @@ export class DetailsStep {
   protected readonly formError = signal<string | null>(null);
   /** Seconds left of a rate-limit wait; Pay is disabled until it reaches 0. */
   protected readonly waitSeconds = signal(0);
+  /** True when the message is about unpaid bookings, where the way forward is My bookings. */
+  protected readonly showMyBookings = signal(false);
 
   private readonly attemptKey = new AttemptKey(() => crypto.randomUUID());
   private countdown: ReturnType<typeof setInterval> | undefined;
@@ -476,6 +492,7 @@ export class DetailsStep {
       return;
     }
     this.formError.set(null);
+    this.showMyBookings.set(false);
     await submit(this.f, {
       action: () => this.send(),
       onInvalid: () => this.focusFirstProblem(),
@@ -516,6 +533,7 @@ export class DetailsStep {
       if (error.code === 'PACKAGE_NOT_FOUND' || error.code === 'PACKAGE_NOT_ACTIVE') {
         this.packages.reload();
       }
+      this.showMyBookings.set(error.code === 'TOO_MANY_PENDING_BOOKINGS');
       if (error.code === 'RATE_LIMITED' && error.retryAfterSeconds) {
         this.startCountdown(error.retryAfterSeconds);
       }
