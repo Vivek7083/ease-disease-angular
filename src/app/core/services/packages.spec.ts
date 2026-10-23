@@ -46,14 +46,21 @@ describe('PackagesService', () => {
     expect(service.packageId()).toBe(environment.launchPackageId);
   });
 
-  it('shows the API price and duration once the package loads, keeping the marketing original price', () => {
+  it('shows the API price, duration and "was" price once the package loads', () => {
     service.load();
-    http.expectOne('/v1/packages').flush({ packages: [consult()] });
+    http.expectOne('/v1/packages').flush({ packages: [consult({ originalPricePaise: 500000 })] });
     expect(service.plan().price).toBe('₹2999');
     expect(service.plan().duration).toBe('45 min');
-    expect(service.plan().originalPrice).toBe(MAIN_PLAN.originalPrice);
+    expect(service.plan().originalPrice).toBe('₹5000');
     expect(service.durationWords()).toBe('45 minutes');
     expect(service.packageId()).toBe('11111111-1111-4111-8111-111111111111');
+  });
+
+  it('strikes nothing through when the loaded package has no "was" price', () => {
+    service.load();
+    http.expectOne('/v1/packages').flush({ packages: [consult({ originalPricePaise: null })] });
+    expect(service.plan().originalPrice).toBe('');
+    expect(service.plan().price).toBe('₹2999');
   });
 
   it('keeps the fallback when the endpoint is missing or fails', () => {

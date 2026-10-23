@@ -15,8 +15,8 @@ export interface Plan {
 /**
  * The main offer every primary CTA points at - Level 1. This is the copy shown
  * until PackagesService has the real package from the API (and when the API
- * cannot be reached), so the page never renders without a price. The struck-
- * through original price is a marketing figure that is not in the API.
+ * cannot be reached), so the page never renders without a price. Once the package
+ * loads, its price, "was" price (`originalPricePaise`) and duration come from the API.
  */
 export const MAIN_PLAN: Plan = {
   label: 'Book a consultation',

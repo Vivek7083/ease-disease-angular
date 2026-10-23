@@ -24,11 +24,19 @@ export class PackagesService {
   /** The id to book: the API's package, else the launch package id from the environment. */
   readonly packageId = computed(() => this.mainPackage()?.id ?? environment.launchPackageId);
 
-  /** What the CTAs show: the API's price and duration, else the fallback copy. */
+  /**
+   * What the CTAs show: the API's price, "was" price and duration, else the fallback copy. Once the package has loaded,
+   * the API decides whether there is a "was" price: with none, nothing is struck through.
+   */
   readonly plan = computed<Plan>(() => {
     const pkg = this.mainPackage();
     return pkg
-      ? { ...MAIN_PLAN, duration: `${pkg.durationMinutes} min`, price: formatRupees(pkg.pricePaise) }
+      ? {
+          ...MAIN_PLAN,
+          duration: `${pkg.durationMinutes} min`,
+          price: formatRupees(pkg.pricePaise),
+          originalPrice: pkg.originalPricePaise ? formatRupees(pkg.originalPricePaise) : '',
+        }
       : MAIN_PLAN;
   });
 

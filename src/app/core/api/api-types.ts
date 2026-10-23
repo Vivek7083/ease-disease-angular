@@ -28,6 +28,8 @@ export interface PackageItem {
   title: string;
   description: string[];
   pricePaise: number;
+  /** The struck-through "was" price, when the package has one; absent or null otherwise. */
+  originalPricePaise?: number | null;
   currency: 'INR';
   durationMinutes: number;
 }
