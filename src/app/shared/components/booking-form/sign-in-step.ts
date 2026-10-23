@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, ElementRef, Injector, afterNextRender, inject, input, signal } from '@angular/core';
 import { FormField, email, form, required, submit } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
@@ -268,6 +268,15 @@ export class SignInStep {
 
   /** The address a sign-in link was just sent to, while the "check your inbox" message shows. */
   protected readonly sentTo = signal<string | null>(null);
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  constructor() {
+    // The step arrives after the dialog opens (it loads on demand), so it puts focus on its own first button.
+    afterNextRender(() => this.host.nativeElement.querySelector<HTMLElement>('[data-autofocus]')?.focus({ preventScroll: true }), {
+      injector: inject(Injector),
+    });
+  }
 
   private readonly model = signal({ email: '' });
   protected readonly emailForm = form(this.model, (path) => {

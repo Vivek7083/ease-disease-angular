@@ -64,7 +64,12 @@ type FieldName = keyof ReturnType<typeof makeForm>['controls'];
 
         @switch (view()) {
           @case ('sign-in') {
-            <app-sign-in-step [mode]="modal.mode()" />
+            <!-- Deferred: the step brings Signal Forms with it, which the Home page should not download up front. -->
+            @defer {
+              <app-sign-in-step [mode]="modal.mode()" />
+            } @placeholder {
+              <p class="bk-checking" role="status">Loading&hellip;</p>
+            }
           }
           @case ('checking') {
             <p class="bk-checking" role="status">Checking your sign-in&hellip;</p>
