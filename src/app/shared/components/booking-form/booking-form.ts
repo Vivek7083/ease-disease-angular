@@ -2,19 +2,20 @@ import { Component, ElementRef, Injector, afterNextRender, computed, effect, inj
 import type { BookingCreated } from '../../../core/api/api-types';
 import { AuthService } from '../../../core/services/auth';
 import { BookingModalService } from '../../../core/services/booking-modal';
-import { PackagesService, formatRupees } from '../../../core/services/packages';
+import { PackagesService } from '../../../core/services/packages';
 import { DetailsStep } from './details-step';
+import { PayStep } from './pay-step';
 import { SignInStep } from './sign-in-step';
 
 /**
  * The on-site booking dialog: a pop-up on desktop and a full-screen sheet on phones. It is only the frame (header,
  * close, focus, backdrop) around one of four views: checking the sign-in, the sign-in step, the details step, and the
- * "booking created" screen. The two steps load on demand, so the Home page does not download the forms up front.
+ * pay step (the booking exists; hand over to PayU). The two steps load on demand, so the Home page does not download the forms up front.
  * The earlier three-step version is kept in docs/reference/booking-form-three-step.ts.txt.
  */
 @Component({
   selector: 'app-booking-form',
-  imports: [SignInStep, DetailsStep],
+  imports: [SignInStep, DetailsStep, PayStep],
   template: `
     <dialog
       #dlg
@@ -48,19 +49,10 @@ import { SignInStep } from './sign-in-step';
                 <p class="bk-checking" role="status">Loading&hellip;</p>
               }
             }
-            @case ('created') {
-              <div class="bk-body">
-                <div class="bk-done" #done tabindex="-1">
-                  <div class="bk-done-icon" aria-hidden="true">&#10003;</div>
-                  <h3>Booking created</h3>
-                  @if (created(); as booking) {
-                    <p class="bk-ref">{{ booking.reference }}</p>
-                    <p>{{ booking.packageTitle }} for {{ booking.name }}</p>
-                    <p class="bk-price">{{ money(booking.amountPaise) }}</p>
-                  }
-                  <p class="bk-next">Your booking is saved and waiting for payment. The payment step comes next.</p>
-                </div>
-              </div>
+            @case ('pay') {
+              @if (created(); as booking) {
+                <app-pay-step [booking]="booking" />
+              }
             }
             @default {
               <p class="bk-checking" role="status">Checking your sign-in&hellip;</p>
@@ -168,50 +160,6 @@ import { SignInStep } from './sign-in-step';
       color: #4a5a66;
     }
 
-    .bk-done {
-      text-align: center;
-      padding: 18px 6px 6px;
-      outline: none;
-    }
-    .bk-done-icon {
-      width: 64px;
-      height: 64px;
-      margin: 0 auto 14px;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background: #e6f7fd;
-      color: var(--oxblood);
-      font-size: 30px;
-    }
-    .bk-done h3 {
-      font-family: var(--font-display);
-      font-weight: 400;
-      font-size: 26px;
-      margin: 0 0 10px;
-    }
-    .bk-done p {
-      margin: 0 auto 8px;
-      max-width: 42ch;
-      line-height: 1.55;
-    }
-    .bk-done .bk-price {
-      font-family: var(--font-display);
-      font-size: 22px;
-      margin: 16px 0 4px;
-    }
-    .bk-done .bk-ref {
-      font-family: var(--font-mono);
-      font-size: 18px;
-      letter-spacing: 0.08em;
-      margin: 6px 0 4px;
-    }
-    .bk-done .bk-next {
-      margin-top: 14px;
-      font-size: 14px;
-      color: #4a5a66;
-    }
-
     /* Phones: full-screen sheet */
     @media (max-width: 640px) {
       .bk-dialog[open] {
@@ -230,9 +178,6 @@ import { SignInStep } from './sign-in-step';
       .bk-title {
         font-size: 24px;
         padding-right: 44px;
-      }
-      .bk-body {
-        padding: 18px;
       }
     }
     @media (prefers-reduced-motion: reduce) {
@@ -257,9 +202,9 @@ export class BookingForm {
    * What the dialog shows. Booking needs a signed-in person: signed out, it opens on the sign-in step and moves on to
    * the details step by itself once sign-in finishes. The navbar's Log in / Sign up shows only the sign-in step.
    */
-  protected readonly view = computed<'checking' | 'sign-in' | 'details' | 'created'>(() => {
+  protected readonly view = computed<'checking' | 'sign-in' | 'details' | 'pay'>(() => {
     if (this.created()) {
-      return 'created';
+      return 'pay';
     }
     if (!this.auth.ready()) {
       return 'checking';
@@ -277,7 +222,7 @@ export class BookingForm {
     switch (this.view()) {
       case 'details':
         return 'Tell us a little about you';
-      case 'created':
+      case 'pay':
         return "You're almost booked";
       case 'sign-in':
         return this.modal.mode() === 'sign-in' ? 'Log in or sign up' : 'Sign in to book';
@@ -323,10 +268,6 @@ export class BookingForm {
     });
   }
 
-  protected money(paise: number): string {
-    return formatRupees(paise);
-  }
-
   protected onCreated(booking: BookingCreated): void {
     this.created.set(booking);
   }
@@ -346,7 +287,7 @@ export class BookingForm {
 
   private focusFirstField(): void {
     afterNextRender(
-      () => this.dlg()?.nativeElement.querySelector<HTMLElement>('[data-autofocus], .bk-body input, .bk-done')?.focus({ preventScroll: true }),
+      () => this.dlg()?.nativeElement.querySelector<HTMLElement>('[data-autofocus], .bk-body input, .done')?.focus({ preventScroll: true }),
       { injector: this.injector },
     );
   }
