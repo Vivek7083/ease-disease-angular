@@ -90,6 +90,7 @@ export class Home implements AfterViewInit {
 
   /** The main offer every primary CTA shows - Level 1 (price and duration come from the API once loaded). */
   protected readonly plan = this.packages.plan;
+  protected readonly durationWords = this.packages.durationWords;
 
   constructor() {
     this.bookingCta.registerHandler(() => this.bookConsultation());

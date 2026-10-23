@@ -260,7 +260,7 @@
       <app-wordmark class="close-wordmark" />
       <h2 id="close-heading" class="t-display">Since you're here, start now.</h2>
       <p class="t-body lede">
-        In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
+        In {{ durationWords() }} you tell us your whole story, and you leave knowing where to start. The first call is {{ plan().price }}.
       </p>
       <div class="cta-row">
         <app-cta-pill [label]="plan().label" [durationLabel]="plan().duration" [price]="plan().price" [originalPrice]="plan().originalPrice" revealKey="close" variant="primary" (pressed)="bookConsultation()" />
