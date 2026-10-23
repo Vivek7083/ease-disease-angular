@@ -10,6 +10,7 @@ import { BookingModalService } from '../../core/services/booking-modal';
 import { BookingsService } from '../../core/services/bookings';
 import { formatRupees } from '../../core/services/packages';
 import { PaymentService } from '../../core/services/payment';
+import { Countdown } from '../../core/util/countdown';
 
 /** Asks the API every 2 seconds, for at most 60 seconds (integration guide, FE-5). */
 const POLL_EVERY_MS = 2_000;
@@ -81,8 +82,14 @@ const POLL_WINDOW_MS = 60_000;
               <h1 id="status-title">Waiting for payment</h1>
               <p role="status">This booking is saved but not paid yet.</p>
               @if (b.canPay) {
-                <button type="button" class="btn" [disabled]="paying()" (click)="pay()">
-                  {{ paying() ? 'Taking you to payment…' : 'Pay ' + money(b.amountPaise) }}
+                <button type="button" class="btn" [disabled]="paying() || waitSeconds() > 0" (click)="pay()">
+                  @if (paying()) {
+                    Taking you to payment&hellip;
+                  } @else if (waitSeconds() > 0) {
+                    Please wait {{ waitSeconds() }}s
+                  } @else {
+                    Pay {{ money(b.amountPaise) }}
+                  }
                 </button>
               }
             }
@@ -300,6 +307,8 @@ export class BookingStatus {
   protected readonly timedOut = signal(false);
   protected readonly problem = signal<string | null>(null);
   protected readonly paying = signal(false);
+  private readonly wait = new Countdown();
+  protected readonly waitSeconds = this.wait.seconds;
 
   protected view(): StatusView {
     const booking = this.booking();
@@ -351,6 +360,9 @@ export class BookingStatus {
     } catch (error) {
       this.problem.set(describeError(error));
       this.paying.set(false);
+      if (error instanceof ApiError && error.code === 'RATE_LIMITED' && error.retryAfterSeconds) {
+        this.wait.start(error.retryAfterSeconds);
+      }
     }
   }
 

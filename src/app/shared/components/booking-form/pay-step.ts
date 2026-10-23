@@ -1,9 +1,10 @@
-import { Component, DestroyRef, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { ApiError } from '../../../core/api/api-error';
 import type { BookingCreated } from '../../../core/api/api-types';
 import { describeError } from '../../../core/api/error-messages';
 import { formatRupees } from '../../../core/services/packages';
 import { PaymentService } from '../../../core/services/payment';
+import { Countdown } from '../../../core/util/countdown';
 
 /** Answers where trying again cannot help (the booking is not payable, or this number cannot be paid for online yet). */
 const FINAL_CODES = new Set(['BOOKING_NOT_PAYABLE', 'BOOKING_NOT_FOUND', 'PAYMENT_PHONE_UNSUPPORTED']);
@@ -163,19 +164,16 @@ const FINAL_CODES = new Set(['BOOKING_NOT_PAYABLE', 'BOOKING_NOT_FOUND', 'PAYMEN
 })
 export class PayStep {
   private readonly payment = inject(PaymentService);
-  private readonly destroyRef = inject(DestroyRef);
 
   readonly booking = input.required<BookingCreated>();
 
   protected readonly state = signal<'starting' | 'failed' | 'back'>('starting');
   protected readonly problem = signal('');
   protected readonly canRetry = signal(true);
-  protected readonly waitSeconds = signal(0);
-
-  private countdown: ReturnType<typeof setInterval> | undefined;
+  private readonly wait = new Countdown();
+  protected readonly waitSeconds = this.wait.seconds;
 
   constructor() {
-    this.destroyRef.onDestroy(() => clearInterval(this.countdown));
     // The booking was just created: go straight to payment.
     queueMicrotask(() => void this.start());
   }
@@ -194,7 +192,7 @@ export class PayStep {
       this.problem.set(describeError(error) ?? 'Something went wrong. Please try again.');
       this.canRetry.set(!(error instanceof ApiError && FINAL_CODES.has(error.code)));
       if (error instanceof ApiError && error.code === 'RATE_LIMITED' && error.retryAfterSeconds) {
-        this.startCountdown(error.retryAfterSeconds);
+        this.wait.start(error.retryAfterSeconds);
       }
     }
   }
@@ -205,16 +203,5 @@ export class PayStep {
       this.state.set('back');
       this.canRetry.set(true);
     }
-  }
-
-  private startCountdown(seconds: number): void {
-    clearInterval(this.countdown);
-    this.waitSeconds.set(seconds);
-    this.countdown = setInterval(() => {
-      this.waitSeconds.update((left) => Math.max(0, left - 1));
-      if (this.waitSeconds() === 0) {
-        clearInterval(this.countdown);
-      }
-    }, 1000);
   }
 }

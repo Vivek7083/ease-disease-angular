@@ -57,7 +57,7 @@ const LABEL_GAP = 22;
   template: `
     <div
       class="stage"
-      role="img"
+      role="group"
       aria-label="Illustration of the gut at the centre, connected by flowing lines to Skin, Sleep, Energy, Mood, Hormones and Immunity, with food moving through digestion"
       (pointerdown)="dismissHint()"
     >

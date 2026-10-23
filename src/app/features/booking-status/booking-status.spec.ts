@@ -56,6 +56,7 @@ describe('BookingStatus page', () => {
   let bookings: FakeBookings;
   let auth: FakeAuth;
   let paid: string[];
+  let payFailure: ApiError | null;
   let modal: BookingModalService;
 
   const render = async (e?: string) => {
@@ -78,12 +79,21 @@ describe('BookingStatus page', () => {
     bookings = new FakeBookings();
     auth = new FakeAuth();
     paid = [];
+    payFailure = null;
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
         { provide: BookingsService, useValue: bookings },
         { provide: AuthService, useValue: auth },
-        { provide: PaymentService, useValue: { startPayment: async (ref: string) => void paid.push(ref) } },
+        {
+          provide: PaymentService,
+          useValue: {
+            startPayment: async (ref: string) => {
+              if (payFailure) throw payFailure;
+              paid.push(ref);
+            },
+          },
+        },
       ],
     });
     modal = TestBed.inject(BookingModalService);
@@ -214,6 +224,19 @@ describe('BookingStatus page', () => {
     root.querySelector<HTMLButtonElement>('.btn')!.click();
     await advance(0);
     expect(paid).toEqual(['ED-7K3QXM']);
+  });
+
+  it('after a rate limit on Pay, disables the button until the wait is over', async () => {
+    bookings.answers = [detail('PENDING_PAYMENT', null, { canPay: true })];
+    payFailure = fail('RATE_LIMITED', 429, 20);
+    const { root, advance } = await render();
+    root.querySelector<HTMLButtonElement>('.btn')!.click();
+    await advance(0);
+    const button = root.querySelector<HTMLButtonElement>('.btn')!;
+    expect(button.disabled).toBe(true);
+    expect(button.textContent).toContain('Please wait 20s');
+    await advance(20_000);
+    expect(root.querySelector<HTMLButtonElement>('.btn')!.disabled).toBe(false);
   });
 
   it('stops asking when the page is left', async () => {

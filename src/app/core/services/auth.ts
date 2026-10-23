@@ -85,6 +85,8 @@ export class AuthService {
   readonly error = signal<string | null>(null);
   /** True when Firebase has a session but the API could not confirm it (so a retry makes sense). */
   readonly needsRetry = signal(false);
+  /** A gentle sentence shown site-wide after the person was signed out by an error, not by choice. Null otherwise. */
+  readonly sessionNotice = signal<string | null>(null);
 
   private started = false;
   private signingIn = false;
@@ -164,6 +166,10 @@ export class AuthService {
     return ok ? 'done' : 'failed';
   }
 
+  dismissNotice(): void {
+    this.sessionNotice.set(null);
+  }
+
   /** Re-asks the API who this Firebase session is (after "Google or the network was unreachable"). */
   async retry(): Promise<void> {
     this.error.set(null);
@@ -183,7 +189,7 @@ export class AuthService {
 
   /** The token was refused even after a refresh: say so and sign out. Called by the auth interceptor. */
   sessionExpired(): void {
-    this.error.set(describeError(new ApiError('UNAUTHENTICATED', '', 401, null)));
+    this.sessionNotice.set(describeError(new ApiError('UNAUTHENTICATED', '', 401, null)));
     void this.signOut();
   }
 
@@ -208,6 +214,7 @@ export class AuthService {
       const response = await firstValueFrom(this.api.get<ProfileResponse>('/v1/me'));
       this.profile.set(response.user);
       this.needsRetry.set(false);
+      this.sessionNotice.set(null);
     } catch (error) {
       await this.handleApiFailure(error);
     } finally {
@@ -220,6 +227,7 @@ export class AuthService {
     const response = await firstValueFrom(this.api.post<ProfileResponse>('/v1/auth/sync'));
     this.profile.set(response.user);
     this.needsRetry.set(false);
+    this.sessionNotice.set(null);
   }
 
   private async runSignIn(step: () => Promise<void>): Promise<boolean> {
@@ -246,6 +254,10 @@ export class AuthService {
   private async handleApiFailure(error: unknown): Promise<void> {
     this.error.set(describeError(error));
     if (error instanceof ApiError && SIGN_OUT_CODES.has(error.code)) {
+      // Signed out by an error while restoring a session (not while the person was signing in): tell them, site-wide.
+      if (!this.signingIn) {
+        this.sessionNotice.set(describeError(error));
+      }
       await this.signOut();
     } else if (error instanceof ApiError) {
       // Google, the network or the rate limiter said not now: keep the Firebase session and let the person retry.

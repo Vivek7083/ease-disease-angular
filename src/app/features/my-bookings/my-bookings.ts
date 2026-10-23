@@ -10,6 +10,8 @@ import { BookingModalService } from '../../core/services/booking-modal';
 import { BookingsService } from '../../core/services/bookings';
 import { formatRupees } from '../../core/services/packages';
 import { PaymentService } from '../../core/services/payment';
+import { ApiError } from '../../core/api/api-error';
+import { Countdown } from '../../core/util/countdown';
 
 /** What one tab has loaded so far. */
 interface TabState {
@@ -85,8 +87,14 @@ const TABS: readonly { id: ListTab; label: string }[] = [
                       </span>
                     </a>
                     @if (item.canPay) {
-                      <button type="button" class="btn pay" [disabled]="payingRef() !== null" (click)="pay(item.reference)">
-                        {{ payingRef() === item.reference ? 'Taking you to payment…' : 'Pay now' }}
+                      <button type="button" class="btn pay" [disabled]="payingRef() !== null || waitSeconds() > 0" (click)="pay(item.reference)">
+                        @if (payingRef() === item.reference) {
+                          Taking you to payment&hellip;
+                        } @else if (waitSeconds() > 0) {
+                          Please wait {{ waitSeconds() }}s
+                        } @else {
+                          Pay now
+                        }
                       </button>
                     }
                     @if (payError(); as failure) {
@@ -338,6 +346,9 @@ export class MyBookings {
 
   protected readonly payingRef = signal<string | null>(null);
   protected readonly payError = signal<{ reference: string; message: string } | null>(null);
+  /** A rate-limit wait after a failed Pay now; every Pay now button waits it out. */
+  private readonly wait = new Countdown();
+  protected readonly waitSeconds = this.wait.seconds;
 
   constructor() {
     // Load the first page of the open tab once someone is signed in (and again if they sign back in).
@@ -410,6 +421,9 @@ export class MyBookings {
     } catch (error) {
       this.payError.set({ reference, message: describeError(error) ?? 'Something went wrong. Please try again.' });
       this.payingRef.set(null);
+      if (error instanceof ApiError && error.code === 'RATE_LIMITED' && error.retryAfterSeconds) {
+        this.wait.start(error.retryAfterSeconds);
+      }
     }
   }
 

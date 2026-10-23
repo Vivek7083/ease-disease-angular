@@ -42,7 +42,7 @@ class FakeAuth {
   openSignIn = () => this.signInOpened++;
 }
 
-const fail = (code: string, status: number) => new ApiError(code, 'm', status, 'req-1');
+const fail = (code: string, status: number, retryAfter: number | null = null) => new ApiError(code, 'm', status, 'req-1', {}, retryAfter);
 
 describe('MyBookings page', () => {
   let bookings: FakeBookings;
@@ -146,6 +146,18 @@ describe('MyBookings page', () => {
     await refresh();
     expect(root.querySelector('.row-error')?.textContent).toContain('temporarily unavailable');
     expect(root.querySelector<HTMLButtonElement>('.pay')!.disabled).toBe(false);
+  });
+
+  it('after a rate limit, every Pay now waits out the time the API asked for', async () => {
+    bookings.pages.active = [{ items: [item('ED-A', 'PENDING_PAYMENT', true), item('ED-B', 'PENDING_PAYMENT', true)], nextCursor: null }];
+    payFailure = fail('RATE_LIMITED', 429, 45);
+    const { root, refresh } = await render();
+    root.querySelector<HTMLButtonElement>('.pay')!.click();
+    await refresh();
+    const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('.pay'));
+    expect(buttons.every((b) => b.disabled)).toBe(true);
+    expect(buttons[0].textContent).toContain('Please wait 45s');
+    expect(root.querySelector('.row-error')?.textContent).toContain('45 seconds');
   });
 
   it('shows an empty state with Book now when there are no active bookings', async () => {

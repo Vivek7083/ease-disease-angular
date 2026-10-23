@@ -5,6 +5,7 @@ import { AppUpdateService } from './core/services/app-update';
 import { FragmentScrollService } from './core/services/fragment-scroll';
 import { AuthService } from './core/services/auth';
 import { PackagesService } from './core/services/packages';
+import { SessionNotice } from './shared/components/session-notice/session-notice';
 import { SiteNav } from './shared/components/site-nav/site-nav';
 import { ScrollProgress } from './shared/components/scroll-progress/scroll-progress';
 import { FlowLines } from './shared/components/flow-lines/flow-lines';
@@ -12,7 +13,7 @@ import { BookingForm } from './shared/components/booking-form/booking-form';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, SiteNav, ScrollProgress, FlowLines, BookingForm],
+  imports: [RouterOutlet, SiteNav, SessionNotice, ScrollProgress, FlowLines, BookingForm],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

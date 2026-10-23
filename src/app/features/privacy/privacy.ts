@@ -20,7 +20,7 @@ import { SiteFooter } from '../../shared/components/site-footer/site-footer';
         <div class="pp-inner">
           <app-eyebrow-label text="Your information" />
           <h1>Our <span class="mark">Privacy</span> Policy</h1>
-          <p class="pp-updated">Last updated 18 October 2026</p>
+          <p class="pp-updated">Last updated 24 October 2026</p>
           <p class="pp-lede">
             Ease Dis-ease ("we", "us") helps people find the root cause of their health concerns. This page explains, in plain words, what we
             collect when you use this website or book a consultation, why we collect it, and the choices you have.
@@ -31,12 +31,30 @@ import { SiteFooter } from '../../shared/components/site-footer/site-footer';
       <div class="pp-inner pp-body">
         <section>
           <h2>What we collect</h2>
+          <p>When you sign in, we receive:</p>
+          <ul>
+            <li>your email address and, if you sign in with Google, your name;</li>
+            <li>how you signed in (with Google, or with a link we email you) and when.</li>
+          </ul>
+          <p>
+            Sign-in is provided by Google (Firebase Authentication). We never see your Google password, and signing in with an emailed link
+            needs no password at all. To keep you signed in, your browser stores a small sign-in record on your device.
+          </p>
           <p>When you use the booking form, you give us:</p>
           <ul>
             <li>your name, WhatsApp number and email address;</li>
             <li>your age and your city;</li>
             <li>your gender, if you choose to tell us.</li>
           </ul>
+          <p>
+            When you book and pay, we also keep a record of the booking, its amount and its payment status, the time you gave your consent,
+            and the internet address (IP address) and browser details the booking and the payment came from. We use these to prevent fraud
+            and to settle any question about a booking or a payment.
+          </p>
+          <p>
+            Payments are taken by PayU. You enter your card or UPI details on PayU's page, and we never see or store them. For the payment we
+            send PayU your first name, your email address and a phone number, and PayU tells us whether the payment worked and how it was made.
+          </p>
           <p>
             Before or during your consultation we may also ask about your health, such as your symptoms, diet, sleep, stress and any
             medicines. This is sensitive information, and we only ask for it with your consent.
@@ -51,6 +69,7 @@ import { SiteFooter } from '../../shared/components/site-footer/site-footer';
         <section>
           <h2>Why we use it</h2>
           <ul>
+            <li>to let you sign in and see your bookings;</li>
             <li>to prepare for your consultation and to run it well;</li>
             <li>to contact you, usually on WhatsApp or email, about your booking and your consultation;</li>
             <li>to confirm and take payment for your booking.</li>
@@ -69,9 +88,9 @@ import { SiteFooter } from '../../shared/components/site-footer/site-footer';
         <section>
           <h2>Who sees it</h2>
           <p>
-            Your information is seen by our team. We also use a few services that help us run the booking, such as a service that delivers
-            booking forms to us by email, a payment provider when you pay, and WhatsApp or email to talk with you. They handle your
-            information only to provide that service. We do not share it with anyone else, unless the law requires us to.
+            Your information is seen by our team. We also use a few services that help us run the booking: Google, to sign you in; PayU, to
+            take your payment; our hosting provider; and WhatsApp or email to talk with you. They handle your information only to provide
+            that service. We do not share it with anyone else, unless the law requires us to.
           </p>
         </section>
 

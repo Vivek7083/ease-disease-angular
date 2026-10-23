@@ -153,6 +153,45 @@ describe('AuthService', () => {
     expect(fake.signOutCalls).toBe(1);
     expect(auth.error()).toContain('verify your email');
     expect(auth.user()).toBeNull();
+    // The person was in the middle of signing in, so the sign-in step shows it: no site-wide notice.
+    expect(auth.sessionNotice()).toBeNull();
+  });
+
+  it('tells the person site-wide when a restored session turns out to be refused', async () => {
+    fake.user = { email: 'priya@example.com', displayName: null };
+    auth.start();
+    await settle();
+    const { body, opts } = apiError('UNAUTHENTICATED', 401);
+    // The interceptor refreshes the token once and retries; the API refuses both times.
+    http.expectOne('/v1/me').flush(body, opts);
+    await settle();
+    http.expectOne('/v1/me').flush(body, opts);
+    await settle();
+    expect(fake.signOutCalls).toBeGreaterThanOrEqual(1);
+    expect(auth.user()).toBeNull();
+    expect(auth.sessionNotice()).toContain('session ended');
+  });
+
+  it('shows the session notice when the interceptor ends the session, and clears it on the next sign-in', async () => {
+    auth.start();
+    await settle();
+    auth.sessionExpired();
+    await settle();
+    expect(auth.sessionNotice()).toContain('session ended');
+
+    const done = auth.signInWithGoogle();
+    await settle();
+    http.expectOne('/v1/auth/sync').flush({ user: PROFILE, profileComplete: false });
+    await done;
+    expect(auth.sessionNotice()).toBeNull();
+  });
+
+  it('can dismiss the notice', async () => {
+    auth.start();
+    await settle();
+    auth.sessionExpired();
+    auth.dismissNotice();
+    expect(auth.sessionNotice()).toBeNull();
   });
 
   it('keeps the Firebase session and offers a retry when sign-in is temporarily unavailable', async () => {

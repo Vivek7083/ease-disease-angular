@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, Injector, afterNextRender, inject, output, signal } from '@angular/core';
+import { Component, ElementRef, Injector, afterNextRender, inject, output, signal } from '@angular/core';
 import { FormField, form, submit, validate, type ValidationError } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -25,6 +25,7 @@ import {
 import { BookingModalService } from '../../../core/services/booking-modal';
 import { BookingsService } from '../../../core/services/bookings';
 import { PackagesService } from '../../../core/services/packages';
+import { Countdown } from '../../../core/util/countdown';
 
 const GENDERS = ['Female', 'Male', 'Other', 'Prefer not to say'] as const;
 
@@ -425,7 +426,6 @@ export class DetailsStep {
   private readonly packages = inject(PackagesService);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
-  private readonly destroyRef = inject(DestroyRef);
 
   /** The booking was created (status PENDING_PAYMENT). */
   readonly created = output<BookingCreated>();
@@ -435,13 +435,13 @@ export class DetailsStep {
   protected readonly sending = signal(false);
   /** A problem that does not belong to one field (network, rate limit, package off sale, ...). */
   protected readonly formError = signal<string | null>(null);
-  /** Seconds left of a rate-limit wait; Pay is disabled until it reaches 0. */
-  protected readonly waitSeconds = signal(0);
+  /** A rate-limit wait; Pay is disabled until it reaches 0. */
+  private readonly wait = new Countdown();
+  protected readonly waitSeconds = this.wait.seconds;
   /** True when the message is about unpaid bookings, where the way forward is My bookings. */
   protected readonly showMyBookings = signal(false);
 
   private readonly attemptKey = new AttemptKey(() => crypto.randomUUID());
-  private countdown: ReturnType<typeof setInterval> | undefined;
 
   private readonly model = signal<BookingFormValue>({
     name: '',
@@ -471,10 +471,6 @@ export class DetailsStep {
     validate(path.gender, ({ value }) => problem('gender', length(value()) > GENDER_MAX ? `Gender can be at most ${GENDER_MAX} characters.` : null));
     validate(path.consent, ({ value }) => problem('consent', value() ? null : 'Please tick to continue.'));
   });
-
-  constructor() {
-    this.destroyRef.onDestroy(() => clearInterval(this.countdown));
-  }
 
   /** True when this field's complaint should show: it is invalid and was touched (submitting touches everything). */
   protected shown(name: FieldName): boolean {
@@ -535,7 +531,7 @@ export class DetailsStep {
       }
       this.showMyBookings.set(error.code === 'TOO_MANY_PENDING_BOOKINGS');
       if (error.code === 'RATE_LIMITED' && error.retryAfterSeconds) {
-        this.startCountdown(error.retryAfterSeconds);
+        this.wait.start(error.retryAfterSeconds);
       }
       const fields = error.fieldErrors;
       if (fields) {
@@ -564,17 +560,6 @@ export class DetailsStep {
     }
     this.formError.set(describeError(error));
     return undefined;
-  }
-
-  private startCountdown(seconds: number): void {
-    clearInterval(this.countdown);
-    this.waitSeconds.set(seconds);
-    this.countdown = setInterval(() => {
-      this.waitSeconds.update((left) => Math.max(0, left - 1));
-      if (this.waitSeconds() === 0) {
-        clearInterval(this.countdown);
-      }
-    }, 1000);
   }
 
   private focusFirstProblem(): void {
