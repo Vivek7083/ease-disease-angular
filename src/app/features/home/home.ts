@@ -1342,7 +1342,7 @@ export class Home implements AfterViewInit {
       bio: 'Helps people find the root cause of chronic conditions with a focus on type 2 diabetes, autoimmunity, thyroid health and menopause.',
       ctaLabel: 'Know more about Carol',
       ctaStyle: 'link',
-      photo: 'images/team/carol.jpg',
+      photo: 'images/team/carol-card.jpg',
     },
     {
       slug: 'deepa',

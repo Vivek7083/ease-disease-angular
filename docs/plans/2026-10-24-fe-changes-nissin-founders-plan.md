@@ -195,8 +195,8 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 |---|---|---|
 | S1 palette tokens | 5, 10 | Done, committed `c261846` |
 | S2 root map colours | 5, 6 | Done, committed `79d3495` |
-| S3 footer | 13 | Checked 2026-10-24, no code change needed (S1 did it), awaiting your look |
-| S4 experts | 1, 14, 16 | Waiting for answers |
+| S3 footer | 13 | Done, committed `3b6db75` |
+| S4 experts | 1, 14, 16 | BUILT 2026-10-24, awaiting your manual check |
 | S5 section order | 12, 11 | Waiting for answers |
 | S6 dividers and rhythm | 4, 8, 11 | Waiting for answers |
 | S7 MacBook spacing | 3, 18 | Needs screen details |
@@ -219,3 +219,9 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S2 revised after your first look:** lit and selected symptom chips (the leaves) olive; lit condition chips (between) burgundy; lit root chips a blend, `color-mix(in oklab, burgundy 55%, olive)`; the traced path burgundy. All chips ivory text. Selected chip is now olive like the other symptom chips (it was burgundy).
 
 **S3 as checked:** `site-footer.ts` has no colour of its own; it uses `--surface-deep`, `--text-quiet-dark`, `--rule-on-dark`, `--olive` and `--sage-soft`, all restored by S1. Headless screenshot of the Privacy page footer (1280 wide): deep burgundy `#2B0A0F` background, soft ivory text, burgundy hairlines. No code changed. Note for S13: the footer links (Home, Why root-cause care, Conditions we support, Packages, Meet the experts, Events & retreats, Book now) have no Community link.
+
+**S4 as built (answers: old champagne card, Carol only, big heading + subtitle):** (1) Home experts section: eyebrow removed; h2 "Meet the Experts" in capitals with "Experts" burgundy; "Understanding Your Health, Together" is an italic subtitle; the paragraph is unchanged (`home.html`, `home.scss`). (2) `team-card.ts`: the pre-navy champagne/parchment card is restored by reverse-applying the changes of `eb68ce6` (gold hairline and inner frame, dark text, olive foliage, `ghostDark` pill). (3) Carol photo: new optional `photoZoom` on `TeamMember`; Carol has `0.75`. The photo shrinks to 75% in its circle, a blurred copy of itself fills behind it and the edge is feathered with a mask. Deepa untouched. Note the source photo is a tight 640x640 crop, so "zoomed out" is simulated; a wider original photo would look better. 167 tests pass, build passes. Screenshots at 1280 and 390 wide checked.
+
+**S4 revised after your first look:** the photo zoom and blur effect are removed (`photoZoom` is gone from `TeamMember` and from Carol). The expert portrait is now a short portrait card (4:5, rounded corners `--r-md`, no effects): 112x140 in the carousel card, 220x275 in the split layout. This applies to both experts so the two cards match.
+
+**S4 revised again:** Carol's card photo is now `public/images/team/carol-card.jpg`, made from `founders/carol_image.JPG` (EXIF-rotated, full width kept, cropped only at the bottom to 4:5, resized 800x1000). `carol.jpg` is untouched because Carol's own page still uses it. Card sizes: portrait 160x200 on phones, 300x375 on large screens (the carousel spotlight); on large screens the name, role, credential and bio are larger and the bio can run to 64ch, so the text fills the card. Deepa uses the same sizes.

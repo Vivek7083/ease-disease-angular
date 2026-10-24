@@ -1725,6 +1725,30 @@
   color: var(--text-quiet-light);
 }
 
+/* Experts heading: "Meet the Experts" in capitals with the last word burgundy, the
+   old eyebrow line is now the subtitle under it. */
+.team-heading {
+  margin-top: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.team-heading .accent {
+  color: var(--oxblood);
+}
+
+.team-subtitle {
+  margin: var(--sp-3) 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+  color: var(--ink);
+}
+
+.team .lede {
+  margin-top: var(--sp-4);
+}
+
 app-expert-carousel {
   display: block;
   margin-top: var(--sp-8);
