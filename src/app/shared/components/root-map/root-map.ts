@@ -477,15 +477,25 @@ const NOTES_STEP = 0.14;
        with directly. */
     /* Terracotta deepened a touch toward oxblood: plain terracotta under
        ivory text is only ~3.7:1, below the 4.5:1 AA minimum. */
-    /* Palette step: every highlighted chip (and the links between them) is the
-       vivid blue, with black text for contrast (about 8.6:1). */
+    /* Lit chips, top to bottom: the symptoms (the leaves) olive, the conditions
+       between burgundy, the roots a blend of burgundy and olive. The traced
+       path is burgundy. */
     .root-map-node.lit,
-    .root-map-node--static.lit,
-    .root-map-node--root.lit,
     .root-map-node.selected {
-      background: var(--highlight-blue);
-      border-color: var(--highlight-blue);
-      color: #000;
+      background: var(--olive);
+      border-color: var(--olive);
+      color: var(--ivory);
+    }
+
+    .root-map-node--static.lit {
+      background: var(--oxblood);
+      border-color: var(--oxblood);
+    }
+
+    .root-map-node--root.lit {
+      --root-blend: color-mix(in oklab, var(--oxblood) 55%, var(--olive));
+      background: var(--root-blend);
+      border-color: var(--root-blend);
     }
 
     /* Mobile: compact pills so the whole tree fits a narrow screen. */
@@ -796,7 +806,7 @@ const NOTES_STEP = 0.14;
     }
     /* The traced path: hidden until a condition is clicked, then drawn stage by stage (--d is each stage's start delay). */
     .blue {
-      stroke: var(--highlight-blue);
+      stroke: var(--oxblood);
       stroke-width: 2.5;
       stroke-dasharray: 1;
       stroke-dashoffset: 1;

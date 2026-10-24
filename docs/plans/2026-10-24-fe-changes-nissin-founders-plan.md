@@ -193,8 +193,8 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 
 | Slice | Items | State |
 |---|---|---|
-| S1 palette tokens | 5, 10 | BUILT 2026-10-24, awaiting your visual check, then commit (see S1 notes) |
-| S2 root map colours | 5, 6 | Waiting for answers |
+| S1 palette tokens | 5, 10 | Done, committed `c261846` |
+| S2 root map colours | 5, 6 | BUILT 2026-10-24, awaiting your manual check |
 | S3 footer | 13 | Waiting (after S1) |
 | S4 experts | 1, 14, 16 | Waiting for answers |
 | S5 section order | 12, 11 | Waiting for answers |
@@ -213,3 +213,7 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 - Blue fills reverted: booking dialog focus ring and selected chips are burgundy with ivory text; conventional vs functional ticks and the "Functional" tag are honey with a burgundy check, the arrow is olive.
 - Left blue on purpose: text highlights (hero "Listen.", hook phrase band, "Optimum Health.", Events/Founders/Privacy underlines, display-block) and text selection. Root-map chips and links are still blue until S2. Expert cards are burgundy until S4 restores the glass look; the team-card foliage stroke is still the pale `#d6e2ec` (S4).
 - Checks: `tsc` clean, `ng build` passes, 167 tests pass. Visual check: hero only (headless). Other surfaces need an eye on them.
+
+**S2 as built (answers: old three-layer trace; item 6 covered by S1):** correction to section 0: `conditions-board` IS mounted (inside `root-map`: pinboard on mobile, notes around the map on desktop). Its colours already follow the tokens, so S1 restored them and S2 changes nothing there. In `root-map.ts`: lit symptom chip = terracotta mixed 72% with burgundy, lit condition chip = olive, lit root chip = burgundy, selected chip = burgundy, all with ivory text; the traced tree path (`.blue` class, name kept) is olive. No blue left in the map. 167 tests pass, tsc clean.
+
+**S2 revised after your first look:** lit and selected symptom chips (the leaves) olive; lit condition chips (between) burgundy; lit root chips a blend, `color-mix(in oklab, burgundy 55%, olive)`; the traced path burgundy. All chips ivory text. Selected chip is now olive like the other symptom chips (it was burgundy).
