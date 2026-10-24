@@ -142,14 +142,14 @@ export interface PhilosophyPoint {
       display: inline-block;
       margin: 0 0.18em;
       font-weight: 500;
-      background: linear-gradient(135deg, #bf3820, #e06f27);
+      background: var(--gradient-ember);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
     }
     .pf-goal {
       font-style: italic;
-      background-image: linear-gradient(transparent 56%, #00aeef 56%);
+      background-image: linear-gradient(transparent 56%, var(--highlight-blue) 56%);
       padding: 0 0.08em;
     }
     @media (max-width: 760px) {

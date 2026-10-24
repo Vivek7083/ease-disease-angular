@@ -223,7 +223,7 @@ const LABEL_GAP = 22;
       opacity: 0.65;
     }
     .food-cell {
-      fill: #f2c14e; /* the moving dots stay honey yellow; --honey is now the vivid blue */
+      fill: var(--honey);
       offset-rotate: 0deg;
     }
     .food-cell--a {

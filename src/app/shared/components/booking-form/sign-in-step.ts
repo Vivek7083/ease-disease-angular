@@ -185,8 +185,8 @@ import { BookingModalService, type BookingMode } from '../../../core/services/bo
     }
     input:focus {
       outline: none;
-      border-color: var(--highlight-blue);
-      box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.2);
+      border-color: var(--oxblood);
+      box-shadow: 0 0 0 3px rgba(90, 18, 32, 0.2);
     }
     input[aria-invalid='true'] {
       border-color: var(--ember-a);

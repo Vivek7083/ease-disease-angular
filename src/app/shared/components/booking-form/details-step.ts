@@ -256,8 +256,8 @@ type ServerError = ValidationError.WithOptionalFieldTree;
     }
     input:focus {
       outline: none;
-      border-color: var(--highlight-blue);
-      box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.2);
+      border-color: var(--oxblood);
+      box-shadow: 0 0 0 3px rgba(90, 18, 32, 0.2);
     }
     [aria-invalid='true'] {
       border-color: var(--ember-a);
@@ -317,12 +317,12 @@ type ServerError = ValidationError.WithOptionalFieldTree;
       user-select: none;
     }
     .bk-chips input:checked + span {
-      background: var(--highlight-blue);
-      border-color: var(--highlight-blue);
-      color: #000;
+      background: var(--oxblood);
+      border-color: var(--oxblood);
+      color: var(--ivory);
     }
     .bk-chips input:focus-visible + span {
-      box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.3);
+      box-shadow: 0 0 0 3px rgba(90, 18, 32, 0.3);
     }
 
     .bk-field label.bk-consent {
