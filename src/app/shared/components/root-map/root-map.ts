@@ -478,7 +478,7 @@ const NOTES_STEP = 0.14;
     /* Terracotta deepened a touch toward oxblood: plain terracotta under
        ivory text is only ~3.7:1, below the 4.5:1 AA minimum. */
     /* Lit chips, top to bottom: the symptoms (the leaves) olive, the conditions
-       between burgundy, the roots a blend of burgundy and olive. The traced
+       between a blend of burgundy and olive, the roots burgundy. The traced
        path is burgundy. */
     .root-map-node.lit,
     .root-map-node.selected {
@@ -488,14 +488,14 @@ const NOTES_STEP = 0.14;
     }
 
     .root-map-node--static.lit {
-      background: var(--oxblood);
-      border-color: var(--oxblood);
+      --mid-blend: color-mix(in oklab, var(--oxblood) 55%, var(--olive));
+      background: var(--mid-blend);
+      border-color: var(--mid-blend);
     }
 
     .root-map-node--root.lit {
-      --root-blend: color-mix(in oklab, var(--oxblood) 55%, var(--olive));
-      background: var(--root-blend);
-      border-color: var(--root-blend);
+      background: var(--oxblood);
+      border-color: var(--oxblood);
     }
 
     /* Mobile: compact pills so the whole tree fits a narrow screen. */
