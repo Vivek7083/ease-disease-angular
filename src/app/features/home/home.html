@@ -43,6 +43,8 @@
     </p>
   </div>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ THE ROOT MAP - diseases & categories, as an interactive
        symptom → condition → root-cause trace. Sits right after the hero and
        the inter-quote, above "Our philosophy". Stays on the same ivory
@@ -114,6 +116,8 @@
     <app-transform-timeline [steps]="treatTimelineSteps" />
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ RESULTS - how you feel once the work is done, plus the large
        client quote (PRD §4 + §5). Plain stacked flow with a light
        appScrollReveal, deliberately NOT pinned: it follows two pinned
@@ -123,6 +127,8 @@
       <app-results />
     </div>
   </section>
+
+  <app-section-transition variant="vine" />
 
   <!-- ============ PROGRAMME - packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
@@ -144,6 +150,8 @@
     </div>
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ CONVENTIONAL VS FUNCTIONAL MEDICINE - the two approaches side by side ============ -->
   <section class="scene compare" id="compare" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="compare-heading">
     <div class="scene-inner">
@@ -154,6 +162,8 @@
       <app-approach-compare />
     </div>
   </section>
+
+  <app-section-transition variant="vine" />
 
   <!-- ============ TESTIMONIALS - a real client message shown as it was
        received, a WhatsApp thread, rather than a styled pull-quote. Same
@@ -190,6 +200,8 @@
     </div>
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ TEAM - meet the experts ============ -->
   <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
     <div class="scene-inner">
@@ -201,6 +213,8 @@
       <app-expert-carousel [members]="team" (connectRequested)="onExpertConnect($event)" />
     </div>
   </section>
+
+  <app-section-transition variant="vine" />
 
   <!-- ============ EVENTS & RETREATS - invite to the events page ============ -->
   <section class="scene events-invite" id="events" appCanvasStop from="var(--canvas-team-to)" to="var(--canvas-team-to)" aria-labelledby="events-invite-heading">
