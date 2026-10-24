@@ -194,8 +194,8 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 | Slice | Items | State |
 |---|---|---|
 | S1 palette tokens | 5, 10 | Done, committed `c261846` |
-| S2 root map colours | 5, 6 | BUILT 2026-10-24, awaiting your manual check |
-| S3 footer | 13 | Waiting (after S1) |
+| S2 root map colours | 5, 6 | Done, committed `79d3495` |
+| S3 footer | 13 | Checked 2026-10-24, no code change needed (S1 did it), awaiting your look |
 | S4 experts | 1, 14, 16 | Waiting for answers |
 | S5 section order | 12, 11 | Waiting for answers |
 | S6 dividers and rhythm | 4, 8, 11 | Waiting for answers |
@@ -217,3 +217,5 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S2 as built (answers: old three-layer trace; item 6 covered by S1):** correction to section 0: `conditions-board` IS mounted (inside `root-map`: pinboard on mobile, notes around the map on desktop). Its colours already follow the tokens, so S1 restored them and S2 changes nothing there. In `root-map.ts`: lit symptom chip = terracotta mixed 72% with burgundy, lit condition chip = olive, lit root chip = burgundy, selected chip = burgundy, all with ivory text; the traced tree path (`.blue` class, name kept) is olive. No blue left in the map. 167 tests pass, tsc clean.
 
 **S2 revised after your first look:** lit and selected symptom chips (the leaves) olive; lit condition chips (between) burgundy; lit root chips a blend, `color-mix(in oklab, burgundy 55%, olive)`; the traced path burgundy. All chips ivory text. Selected chip is now olive like the other symptom chips (it was burgundy).
+
+**S3 as checked:** `site-footer.ts` has no colour of its own; it uses `--surface-deep`, `--text-quiet-dark`, `--rule-on-dark`, `--olive` and `--sage-soft`, all restored by S1. Headless screenshot of the Privacy page footer (1280 wide): deep burgundy `#2B0A0F` background, soft ivory text, burgundy hairlines. No code changed. Note for S13: the footer links (Home, Why root-cause care, Conditions we support, Packages, Meet the experts, Events & retreats, Book now) have no Community link.
