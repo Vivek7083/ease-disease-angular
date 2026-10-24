@@ -144,6 +144,17 @@
     </div>
   </section>
 
+  <!-- ============ CONVENTIONAL VS FUNCTIONAL MEDICINE - the two approaches side by side ============ -->
+  <section class="scene compare" id="compare" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="compare-heading">
+    <div class="scene-inner">
+      <div class="compare-intro reveal" [appScrollReveal]="0">
+        <app-eyebrow-label text="Two ways of looking at health" />
+        <h2 id="compare-heading" class="t-display">Conventional vs <span class="accent">Functional Medicine</span></h2>
+      </div>
+      <app-approach-compare />
+    </div>
+  </section>
+
   <!-- ============ TESTIMONIALS - a real client message shown as it was
        received, a WhatsApp thread, rather than a styled pull-quote. Same
        canvas stop as the end of Results (flat, not chained). Sits right
@@ -156,7 +167,7 @@
 
   <app-section-transition variant="wave" />
 
-  <!-- ============ THE E.A.S.E. COMMUNITY - conventional vs functional medicine, side by side ============ -->
+  <!-- ============ THE E.A.S.E. COMMUNITY - events, expert-led sessions and the WhatsApp group ============ -->
   <section class="scene community" id="community" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="community-heading">
     <div class="scene-inner">
       <div class="community-intro reveal" [appScrollReveal]="0">
@@ -166,7 +177,6 @@
           Explore upcoming events, expert-led sessions, and wellness experiences designed to deepen your understanding of health, introduce new perspectives, and inspire more informed choices for your well-being.
         </p>
       </div>
-      <app-approach-compare />
       <div class="community-cta">
         <a class="source-link community-link" [href]="communityWhatsapp" target="_blank" rel="noopener">
           <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

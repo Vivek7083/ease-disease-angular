@@ -196,8 +196,8 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 | S1 palette tokens | 5, 10 | Done, committed `c261846` |
 | S2 root map colours | 5, 6 | Done, committed `79d3495` |
 | S3 footer | 13 | Done, committed `3b6db75` |
-| S4 experts | 1, 14, 16 | BUILT 2026-10-24, awaiting your manual check |
-| S5 section order | 12, 11 | Waiting for answers |
+| S4 experts | 1, 14, 16 | Done, committed `9c78613` |
+| S5 section order | 12, 11 | BUILT 2026-10-24, awaiting your manual check |
 | S6 dividers and rhythm | 4, 8, 11 | Waiting for answers |
 | S7 MacBook spacing | 3, 18 | Needs screen details |
 | S8 lock icon (mobile) | 7 | Waiting for answers |
@@ -225,3 +225,5 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S4 revised after your first look:** the photo zoom and blur effect are removed (`photoZoom` is gone from `TeamMember` and from Carol). The expert portrait is now a short portrait card (4:5, rounded corners `--r-md`, no effects): 112x140 in the carousel card, 220x275 in the split layout. This applies to both experts so the two cards match.
 
 **S4 revised again:** Carol's card photo is now `public/images/team/carol-card.jpg`, made from `founders/carol_image.JPG` (EXIF-rotated, full width kept, cropped only at the bottom to 4:5, resized 800x1000). `carol.jpg` is untouched because Carol's own page still uses it. Card sizes: portrait 160x200 on phones, 300x375 on large screens (the carousel spotlight); on large screens the name, role, credential and bio are larger and the bio can run to 64ch, so the text fills the card. Deepa uses the same sizes.
+
+**S5 as built (answers: suggested wording, community content unchanged, order as item 12):** new section `#compare` after Packages with eyebrow "Two ways of looking at health" and heading "Conventional vs **Functional Medicine**" (the burgundy part is the impactful phrase, not simply the last word; you said this rule applies to all headings, S12 uses it). `app-approach-compare` moved out of `#community` into it. Home order is now: hero, quote, root map, philosophy, transform, results, packages, compare, testimonials, community, experts, events. The community keeps its eyebrow, heading, intro and WhatsApp link; its link is left-aligned now that it no longer sits under the compare. The wave divider still sits between testimonials and community; dividers are redone in S6.

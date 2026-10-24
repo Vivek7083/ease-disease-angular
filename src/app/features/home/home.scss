@@ -2252,8 +2252,8 @@ app-expert-carousel {
   }
 }
 
-/* ---------- the E.A.S.E. community ---------- */
-.community-intro {
+/* ---------- conventional vs functional medicine ---------- */
+.compare-intro {
   display: grid;
   justify-items: start;
   gap: var(--sp-4);
@@ -2261,15 +2261,31 @@ app-expert-carousel {
   margin-bottom: var(--sp-12);
 }
 
+.compare-intro .t-display {
+  margin: 0;
+}
+
+.compare-intro .accent {
+  color: var(--oxblood);
+}
+
+/* ---------- the E.A.S.E. community ---------- */
+.community-intro {
+  display: grid;
+  justify-items: start;
+  gap: var(--sp-4);
+  max-width: 62ch;
+}
+
 .community-intro .lede {
   max-width: 62ch;
 }
 
-/* "Join the community": a centred call to action under the comparison. */
+/* "Join the community": the call to action under the intro, left-aligned with it. */
 .community-cta {
   display: flex;
-  justify-content: center;
-  margin-top: var(--sp-12);
+  justify-content: flex-start;
+  margin-top: var(--sp-8);
 }
 
 /* The same plain hyperlink as the rest of the page (.source-link: one underline, an arrow), with WhatsApp's icon in its own green. */
