@@ -9,7 +9,16 @@
    compact, consistent margin). */
 .scene {
   position: relative;
-  padding-block: clamp(var(--sp-6), 3vw, var(--sp-10));
+  /* One seam size for the whole page: with the 16px the divider adds, two of these make
+     110px between one section's content and the next on phones and 160px from 900px up. */
+  --seam-pad: 47px;
+  padding-block: var(--seam-pad);
+}
+
+@media (min-width: 900px) {
+  .scene {
+    --seam-pad: 72px;
+  }
 }
 
 .scene-inner {
@@ -234,7 +243,7 @@
      than a new section starting. The bottom keeps the same fixed margin
      every other section boundary uses (.scene), so the hook-to-root-map
      gap stays consistent with the rest of the page. */
-  padding-block: 0 clamp(var(--sp-6), 3vw, var(--sp-10));
+  padding-block: var(--seam-pad);
 }
 
 .hook-heading-row {

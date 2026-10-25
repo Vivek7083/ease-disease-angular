@@ -37,7 +37,8 @@ const MINIMIZE_THRESHOLD = 64;
        wordmark keeps the same proportion on a 1280px Windows window at 150%
        display scaling and on a wide Mac window. */
     .wordmark {
-      font-size: clamp(1.05rem, 0.25rem + 1.1vw, 1.5rem);
+      /* +1.8px on the font size makes the 2.25em logo 4px larger; the name, tagline and gaps scale with it. */
+      font-size: calc(clamp(1.05rem, 0.25rem + 1.1vw, 1.5rem) + 1.8px);
       display: inline-flex;
       align-items: center;
       gap: var(--sp-2);

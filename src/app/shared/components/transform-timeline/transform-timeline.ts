@@ -43,7 +43,7 @@ export interface TimelineStep {
     .tl {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 72px 20px 96px;
+      padding: 0 20px;
     }
     .tl-head {
       text-align: center;
@@ -235,13 +235,6 @@ export interface TimelineStep {
       }
     }
 
-    /* MacBook-width screens (about 1280 to 1728px): same as the philosophy section, the
-       section's own padding is enough, so the extra 72px and 96px are dropped. */
-    @media (min-width: 1280px) and (max-width: 1728px) {
-      .tl {
-        padding-block: 24px;
-      }
-    }
   `,
 })
 export class TransformTimeline {

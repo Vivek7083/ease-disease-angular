@@ -6,29 +6,37 @@ export interface PhilosophyPoint {
   readonly body: string;
 }
 
-/** "Our philosophy": a short intro, then every point as a numbered card in a plain vertical stack - no carousel, no pinned deck. */
+/**
+ * "Our philosophy", set as a page worth stopping on: the title on the left beside
+ * three ruled statements, the formula alone in a quiet band across the full width,
+ * then the four points as numbered cards. Everything shares the other sections'
+ * left and right edges.
+ */
 @Component({
   selector: 'app-philosophy',
   imports: [ScrollRevealDirective],
   template: `
     <div class="phil">
       <header class="phil-head">
-        <span class="phil-eyebrow">Root-cause, not symptoms</span>
-        <h2 class="phil-title" id="hook-heading">Our <span class="accent">Philosophy</span></h2>
-        <div class="phil-intro">
-          <ul class="phil-lines">
-            <li>Every thought you think sends a message to your body - to heal, to grow, or to remain stuck.</li>
-            <li>For every dis-ease, there is a cause. When you remove the cause, the effect cannot remain.</li>
-            <li>With the right knowledge and choices - nutrition, lifestyle, and mindset - you can support your body’s natural ability to heal.</li>
-          </ul>
-          <p class="phil-formula">
-            <!-- &ngsp; keeps the spaces: Angular drops whitespace-only text between elements. -->
-            <!-- The reveal sits on the inner span: .reveal sets a transform that would undo the centring on the <p>. -->
-            <span class="pf-inner reveal" [appScrollReveal]="0"><span class="pf-part">Right Knowledge</span>&ngsp;<span class="pf-part"><span class="pf-op">+</span>&ngsp;Right Action</span>&ngsp;<span class="pf-part"><span class="pf-op">=</span>&ngsp;<span class="pf-goal">Optimum Health.</span></span></span>
-          </p>
-          <p class="phil-faith">Healing begins the moment you choose FAITH over Fear.</p>
+        <div class="phil-title-block reveal" [appScrollReveal]="0">
+          <span class="phil-eyebrow">Root-cause, not symptoms</span>
+          <h2 class="phil-title" id="hook-heading">Our <span class="accent">Philosophy</span></h2>
+          <span class="phil-underline" aria-hidden="true"></span>
         </div>
+        <ul class="phil-lines">
+          <li class="reveal" [appScrollReveal]="0">Every thought you think sends a message to your body - to heal, to grow, or to remain stuck.</li>
+          <li class="reveal" [appScrollReveal]="120">For every dis-ease, there is a cause. When you remove the cause, the effect cannot remain.</li>
+          <li class="reveal" [appScrollReveal]="240">With the right knowledge and choices - nutrition, lifestyle, and mindset - you can support your body’s natural ability to heal.</li>
+        </ul>
       </header>
+
+      <div class="phil-band reveal" [appScrollReveal]="0">
+        <p class="phil-formula">
+          <!-- &ngsp; keeps the spaces: Angular drops whitespace-only text between elements. -->
+          <span class="pf-part">Right Knowledge</span>&ngsp;<span class="pf-part"><span class="pf-op">+</span>&ngsp;Right Action</span>&ngsp;<span class="pf-part"><span class="pf-op">=</span>&ngsp;<span class="pf-goal">Optimum Health.</span></span>
+        </p>
+        <p class="phil-faith">Healing begins the moment you choose FAITH over Fear.</p>
+      </div>
 
       <div class="phil-cards">
         @for (point of points(); track point.title; let i = $index) {
@@ -47,14 +55,32 @@ export interface PhilosophyPoint {
     :host {
       display: block;
     }
+    /* Same left and right edges as every other section; the section's own padding gives the space above and below. */
     .phil {
-      max-width: 1080px;
+      max-width: var(--container-max);
       margin: 0 auto;
-      padding: 72px 18px 96px;
+      padding-inline: var(--gutter-mobile);
     }
+    @media (min-width: 900px) {
+      .phil {
+        padding-inline: var(--gutter-desktop);
+      }
+    }
+    .accent {
+      color: var(--oxblood);
+    }
+
+    /* ---------- title beside the three statements ---------- */
     .phil-head {
-      text-align: center;
-      margin-bottom: 56px;
+      display: grid;
+      gap: 36px;
+    }
+    @media (min-width: 900px) {
+      .phil-head {
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+        gap: 72px;
+        align-items: start;
+      }
     }
     .phil-eyebrow {
       display: inline-flex;
@@ -76,72 +102,63 @@ export interface PhilosophyPoint {
       font-family: var(--font-display);
       font-weight: 400;
       font-size: var(--fs-heading);
-      line-height: 1.1;
+      line-height: 1.08;
       letter-spacing: -0.02em;
-      margin: 14px 0 0;
+      margin: 16px 0 0;
       color: #000;
     }
-    .accent {
-      color: var(--oxblood);
+    .phil-underline {
+      display: block;
+      width: 64px;
+      height: 3px;
+      margin-top: 26px;
+      border-radius: 2px;
+      background: var(--gradient-ember);
     }
 
-    /* Intro: three short lines, each set off by a small diamond marker. */
-    .phil-intro {
-      max-width: 640px;
-      margin: 28px auto 0;
-    }
+    /* Three statements, each between hairlines with a small burgundy diamond. */
     .phil-lines {
       list-style: none;
       margin: 0;
       padding: 0;
-      display: grid;
-      gap: 22px;
+      border-bottom: 1px solid var(--rule-on-light);
     }
     .phil-lines li {
+      position: relative;
+      padding: 24px 0 24px 32px;
+      border-top: 1px solid var(--rule-on-light);
       font-family: var(--font-body);
-      font-size: 18px;
-      line-height: 1.6;
+      font-size: clamp(18px, 1.1vw + 11px, 22px);
+      line-height: 1.55;
       color: #000;
     }
     .phil-lines li::before {
       content: '';
-      display: block;
-      width: 7px;
-      height: 7px;
-      margin: 0 auto 10px;
+      position: absolute;
+      left: 4px;
+      top: calc(24px + 0.78em);
+      width: 8px;
+      height: 8px;
       background: var(--oxblood);
-      transform: rotate(45deg);
+      transform: translateY(-50%) rotate(45deg);
     }
-    .phil-intro p {
-      font-family: var(--font-body);
-      font-size: 18px;
-      line-height: 1.6;
-      color: #000;
-      margin: 0 0 12px;
+
+    /* ---------- the formula, alone in a quiet band ---------- */
+    .phil-band {
+      margin-top: 56px;
+      padding: clamp(40px, 5vw, 72px) 24px;
+      border-radius: var(--r-lg);
+      border: 1px solid var(--rule-on-light);
+      background: color-mix(in oklab, var(--parchment) 45%, var(--ivory));
+      text-align: center;
     }
-    .phil-intro .phil-faith {
-      font-style: italic;
-      margin-bottom: 0;
-    }
-    /* Make the formula pop; one line where there is room, centred even where it is wider than the text column. */
-    .phil-intro .phil-formula {
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
-      width: max-content;
-      max-width: calc(100vw - 36px);
-      margin: 36px 0 18px;
-      padding: 18px 8px;
+    .phil-formula {
+      margin: 0;
       font-family: Fraunces, Georgia, serif;
-      font-size: clamp(28px, 3.2vw, 42px);
+      font-size: clamp(28px, 3.4vw, 48px);
       line-height: 1.25;
       letter-spacing: -0.02em;
       color: #000;
-      white-space: normal;
-      text-align: center;
-    }
-    .pf-inner {
-      display: block;
     }
     .pf-part {
       white-space: nowrap;
@@ -160,31 +177,31 @@ export interface PhilosophyPoint {
       background-image: linear-gradient(transparent 56%, var(--highlight-blue) 56%);
       padding: 0 0.08em;
     }
-    @media (min-width: 761px) {
-      .phil-intro .phil-formula {
-        white-space: nowrap;
-      }
+    .phil-faith {
+      margin: 22px 0 0;
+      font-family: var(--font-body);
+      font-size: clamp(17px, 0.6vw + 13px, 20px);
+      font-style: italic;
+      color: #000;
     }
     @media (max-width: 760px) {
-      .phil-intro .phil-formula {
-        line-height: 1.35;
-      }
       .pf-part {
         display: block;
       }
     }
 
-    /* The four points: wide numbered cards in one column. */
+    /* ---------- the four points: wide numbered cards in one column ---------- */
     .phil-cards {
       display: grid;
       gap: 20px;
+      margin-top: 56px;
     }
     .phil-card {
       display: grid;
-      grid-template-columns: 96px minmax(0, 1fr);
-      gap: 28px;
+      grid-template-columns: 112px minmax(0, 1fr);
+      gap: 0 32px;
       align-items: start;
-      padding: 36px 40px;
+      padding: 36px 44px 36px 36px;
       background: var(--surface-card-light);
       border: 1px solid var(--rule-on-light);
       border-radius: var(--r-lg);
@@ -206,6 +223,8 @@ export interface PhilosophyPoint {
       }
     }
     .phil-num {
+      padding-right: 28px;
+      border-right: 1px solid var(--rule-on-light);
       font-family: var(--font-display);
       font-size: clamp(44px, 5vw, 64px);
       line-height: 1;
@@ -224,24 +243,24 @@ export interface PhilosophyPoint {
     .phil-card p {
       font-family: var(--font-body);
       font-size: 18px;
-      line-height: 1.6;
+      line-height: 1.65;
       margin: 0;
       color: #000;
-      max-width: 62ch;
+      max-width: 90ch;
     }
 
     @media (max-width: 760px) {
-      .phil {
-        padding: 56px 18px 72px;
-      }
-      .phil-head {
-        margin-bottom: 32px;
-      }
-      .phil-intro {
-        margin-top: 20px;
-      }
       .phil-lines li {
-        font-size: 17px;
+        padding: 20px 0 20px 28px;
+      }
+      .phil-lines li::before {
+        top: calc(20px + 0.78em);
+      }
+      .phil-band {
+        margin-top: 40px;
+      }
+      .phil-cards {
+        margin-top: 40px;
       }
       .phil-card {
         grid-template-columns: 1fr;
@@ -249,19 +268,12 @@ export interface PhilosophyPoint {
         padding: 24px 22px;
       }
       .phil-num {
+        padding-right: 0;
+        border-right: 0;
         font-size: 40px;
       }
       .phil-card p {
         font-size: 17px;
-      }
-    }
-
-    /* MacBook-width screens (13/14/16 inch, about 1280 to 1728px): the section already
-       has its own padding above and below, so the extra 72px and 96px made the gap to the
-       next section far larger than every other seam on the page. */
-    @media (min-width: 1280px) and (max-width: 1728px) {
-      .phil {
-        padding-block: 32px 24px;
       }
     }
   `,
