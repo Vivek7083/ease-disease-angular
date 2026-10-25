@@ -3,14 +3,13 @@ import type { Environment } from './environment.model';
 export const environment: Environment = {
   apiBaseUrl: 'https://api-staging.easedisease.in',
   firebase: {
-    apiKey: 'PLACEHOLDER-firebase-web-api-key',
-    authDomain: 'PLACEHOLDER.firebaseapp.com',
-    projectId: 'PLACEHOLDER-staging-project-id',
-    appId: 'PLACEHOLDER-firebase-web-app-id',
+    apiKey: 'AIzaSyDdVO70vy9PuuwNjwcyfZTNEbercOL_T-8',
+    authDomain: 'ease-disease-staging.firebaseapp.com',
+    projectId: 'ease-disease-staging',
+    appId: '1:188618345109:web:8d1721844e7ca9ba62299c',
   },
-  // null = App Check off. Before staging or production (where the API enforces App Check), create a reCAPTCHA Enterprise key
-  // in the Firebase console, register this web app for App Check, and put the key here.
-  appCheck: { siteKey: null, debug: false },
+  // reCAPTCHA Enterprise (Fraud Defense) site key of the staging Firebase project; a public identifier, not a secret.
+  appCheck: { siteKey: '6LfAxf4tAAAAAOfXbqYGeIBRjVTlsPMrIWCXP2Se', debug: false },
   useAuthEmulator: false,
   launchPackageId: '00000000-0000-4000-8000-000000000001',
 };

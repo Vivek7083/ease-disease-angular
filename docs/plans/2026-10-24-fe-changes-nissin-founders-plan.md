@@ -198,9 +198,9 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 | S3 footer | 13 | Done, committed `3b6db75` |
 | S4 experts | 1, 14, 16 | Done, committed `9c78613` |
 | S5 section order | 12, 11 | Done, committed `d504a27` |
-| S6 dividers and rhythm | 4, 8, 11 | BUILT 2026-10-24 (dividers only), awaiting your manual check |
+| S6 dividers and rhythm | 4, 8, 11 | Dividers done, committed `ad2f9fd`; item 11 spacing not retuned |
 | S7 MacBook spacing | 3, 18 | Needs screen details |
-| S8 lock icon (mobile) | 7 | Waiting for answers |
+| S8 lock icon (mobile) | 7 | BUILT 2026-10-24, awaiting your manual check |
 | S9 philosophy cards | 9, 18 | Waiting for answers |
 | S10 compare on mobile | 17 | Needs a decision |
 | S11 Carol page | 15, 19 | Waiting for answers |
@@ -229,3 +229,5 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S5 as built (answers: suggested wording, community content unchanged, order as item 12):** new section `#compare` after Packages with eyebrow "Two ways of looking at health" and heading "Conventional vs **Functional Medicine**" (the burgundy part is the impactful phrase, not simply the last word; you said this rule applies to all headings, S12 uses it). `app-approach-compare` moved out of `#community` into it. Home order is now: hero, quote, root map, philosophy, transform, results, packages, compare, testimonials, community, experts, events. The community keeps its eyebrow, heading, intro and WhatsApp link; its link is left-aligned now that it no longer sits under the compare. The wave divider still sits between testimonials and community; dividers are redone in S6.
 
 **S6 as built (answers: vine plus the existing dividers, no vine before the footer, Home and Events, burgundy stem and olive leaves):** the vine (`<app-section-transition variant="vine">`) is back between Home sections wherever there was no divider: quote/root map, transform/results, results/packages, packages/compare, compare/testimonials, community/experts, experts/events. The existing curtain (root map/philosophy), dots (philosophy/transform) and wave (testimonials/community) stay. No vine between hero and quote, and none before the footer. Events page: vine between the intro and Upcoming, and between Upcoming and Past events. The vine's colours come from the restored tokens (burgundy stem, olive leaves). **Not done:** item 11's "same padding and margin between sections" is not retuned; sections still share `.scene` padding, but several have their own overrides. Tell me where gaps look uneven and I will fix those specifically.
+
+**S8 as built (answers: lock on the tick and the card, filled circle as the marker):** phones only (the `gauge-mobile` markup is hidden from 900px up; desktop untouched). In `level-selector.ts` the triangle (`.gauge-thumb`, its CSS and the unused `displayPercent`) is removed; dragging and tapping the track still work. A tick whose package has `locked: true` shows a lock icon instead of its number and its aria-label says "(locked)"; the card keeps its own "Locked" badge. Today only package 2, "Digest with Ease", is locked (the code has two packages, not three). The thin line above the ticks stays. 167 tests pass.
