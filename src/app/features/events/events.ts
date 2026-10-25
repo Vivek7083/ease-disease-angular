@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
 import { ScrollRevealDirective } from '../../core/directives/scroll-reveal';
 import { EyebrowLabel } from '../../shared/components/eyebrow-label/eyebrow-label';
+import { SectionTransition } from '../../shared/components/section-transition/section-transition';
 import { SiteFooter } from '../../shared/components/site-footer/site-footer';
 
 interface PastEvent {
@@ -27,7 +28,7 @@ interface PastEvent {
  */
 @Component({
   selector: 'app-events',
-  imports: [NgOptimizedImage, ScrollRevealDirective, EyebrowLabel, SiteFooter],
+  imports: [NgOptimizedImage, ScrollRevealDirective, EyebrowLabel, SectionTransition, SiteFooter],
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })

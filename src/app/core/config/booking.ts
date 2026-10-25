@@ -1,15 +1,26 @@
 /**
  * Every "Book now" style CTA opens the on-site booking form (see
- * BookingModalService and app-booking-form), which replaced the old Google Form.
- * The form is in demo mode for now: nothing is sent and the payment button only
- * shows a note, until email delivery (Web3Forms) and the payment link
- * (Razorpay) are set up.
+ * BookingModalService and app-booking-form). Payment goes through PayU via the
+ * Ease Disease API.
  */
 
-/** The one main offer every primary CTA points at - Level 1. */
-export const MAIN_PLAN = {
+/** What the CTAs show about the main offer. */
+export interface Plan {
+  readonly label: string;
+  readonly duration: string;
+  readonly price: string;
+  readonly originalPrice: string;
+}
+
+/**
+ * The main offer every primary CTA points at - Level 1. This is the copy shown
+ * until PackagesService has the real package from the API (and when the API
+ * cannot be reached), so the page never renders without a price. Once the package
+ * loads, its price, "was" price (`originalPricePaise`) and duration come from the API.
+ */
+export const MAIN_PLAN: Plan = {
   label: 'Book a consultation',
   duration: '30 min',
   price: '₹2499',
   originalPrice: '₹5000',
-} as const;
+};

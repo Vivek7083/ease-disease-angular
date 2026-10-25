@@ -12,10 +12,10 @@
           <p class="lede">Understand the signals. Explore the root causes. Take a more informed approach to your well-being.</p>
           <div class="hero-cta-row">
             <app-cta-pill
-              [label]="plan.label"
-              [durationLabel]="plan.duration"
-              [price]="plan.price"
-              [originalPrice]="plan.originalPrice"
+              [label]="plan().label"
+              [durationLabel]="plan().duration"
+              [price]="plan().price"
+              [originalPrice]="plan().originalPrice"
               revealKey="hero"
               variant="primary"
               (pressed)="bookConsultation()"
@@ -42,6 +42,8 @@
       }
     </p>
   </div>
+
+  <app-section-transition variant="vine" />
 
   <!-- ============ THE ROOT MAP - diseases & categories, as an interactive
        symptom → condition → root-cause trace. Sits right after the hero and
@@ -114,6 +116,8 @@
     <app-transform-timeline [steps]="treatTimelineSteps" />
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ RESULTS - how you feel once the work is done, plus the large
        client quote (PRD §4 + §5). Plain stacked flow with a light
        appScrollReveal, deliberately NOT pinned: it follows two pinned
@@ -124,6 +128,8 @@
     </div>
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ PROGRAMME - packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
@@ -132,7 +138,7 @@
       <p class="t-body lede">
         Every transformation begins with a conversation. Let's understand what your body is telling you, explore your concerns, and discover the right next steps for you.
       </p>
-      <app-level-selector [levels]="levels" (booked)="bookConsultation()" />
+      <app-level-selector [levels]="levels()" (booked)="bookConsultation()" />
       <p class="levels-fallback">
         <span>Not sure where to start?</span>
         <a class="source-link" href="#root-map">
@@ -143,6 +149,21 @@
 
     </div>
   </section>
+
+  <app-section-transition variant="vine" />
+
+  <!-- ============ CONVENTIONAL VS FUNCTIONAL MEDICINE - the two approaches side by side ============ -->
+  <section class="scene compare" id="compare" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="compare-heading">
+    <div class="scene-inner">
+      <div class="compare-intro reveal" [appScrollReveal]="0">
+        <app-eyebrow-label text="Two ways of looking at health" />
+        <h2 id="compare-heading" class="t-display">Conventional vs <span class="accent">Functional Medicine</span></h2>
+      </div>
+      <app-approach-compare />
+    </div>
+  </section>
+
+  <app-section-transition variant="vine" />
 
   <!-- ============ TESTIMONIALS - a real client message shown as it was
        received, a WhatsApp thread, rather than a styled pull-quote. Same
@@ -156,7 +177,7 @@
 
   <app-section-transition variant="wave" />
 
-  <!-- ============ THE E.A.S.E. COMMUNITY - conventional vs functional medicine, side by side ============ -->
+  <!-- ============ THE E.A.S.E. COMMUNITY - events, expert-led sessions and the WhatsApp group ============ -->
   <section class="scene community" id="community" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="community-heading">
     <div class="scene-inner">
       <div class="community-intro reveal" [appScrollReveal]="0">
@@ -166,7 +187,6 @@
           Explore upcoming events, expert-led sessions, and wellness experiences designed to deepen your understanding of health, introduce new perspectives, and inspire more informed choices for your well-being.
         </p>
       </div>
-      <app-approach-compare />
       <div class="community-cta">
         <a class="source-link community-link" [href]="communityWhatsapp" target="_blank" rel="noopener">
           <svg class="wa-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -180,17 +200,21 @@
     </div>
   </section>
 
+  <app-section-transition variant="vine" />
+
   <!-- ============ TEAM - meet the experts ============ -->
   <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">
     <div class="scene-inner">
-      <app-eyebrow-label text="Meet the experts" />
-      <h2 id="team-heading" class="t-display">Understanding Your Health, Together</h2>
+      <h2 id="team-heading" class="t-display team-heading">Meet the <span class="accent">Experts</span></h2>
+      <p class="team-subtitle">Understanding Your Health, Together</p>
       <p class="t-body lede">
         Our team looks beyond individual symptoms, connecting the dots between your lifestyle, health history, and everyday habits to understand your unique needs and guide you toward an informed and personalised health journey.
       </p>
       <app-expert-carousel [members]="team" (connectRequested)="onExpertConnect($event)" />
     </div>
   </section>
+
+  <app-section-transition variant="vine" />
 
   <!-- ============ EVENTS & RETREATS - invite to the events page ============ -->
   <section class="scene events-invite" id="events" appCanvasStop from="var(--canvas-team-to)" to="var(--canvas-team-to)" aria-labelledby="events-invite-heading">
@@ -260,10 +284,10 @@
       <app-wordmark class="close-wordmark" />
       <h2 id="close-heading" class="t-display">Since you're here, start now.</h2>
       <p class="t-body lede">
-        In thirty minutes you tell us your whole story, and you leave knowing where to start. The first call is ₹499.
+        In {{ durationWords() }} you tell us your whole story, and you leave knowing where to start. The first call is {{ plan().price }}.
       </p>
       <div class="cta-row">
-        <app-cta-pill [label]="plan.label" [durationLabel]="plan.duration" [price]="plan.price" [originalPrice]="plan.originalPrice" revealKey="close" variant="primary" (pressed)="bookConsultation()" />
+        <app-cta-pill [label]="plan().label" [durationLabel]="plan().duration" [price]="plan().price" [originalPrice]="plan().originalPrice" revealKey="close" variant="primary" (pressed)="bookConsultation()" />
         <app-cta-pill label="Ask the Ease guide first" variant="ghostDark" />
       </div>
       <p class="fine">This page describes common patterns, not a diagnosis. Please speak with a qualified practitioner about your own health.</p>

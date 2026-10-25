@@ -141,7 +141,7 @@ const FUNCTIONAL: readonly string[] = [
       border: 1.5px solid #c8c8c8;
     }
     .mark--tick {
-      background: var(--highlight-blue);
+      background: var(--honey);
     }
     .mark--tick path {
       fill: none;
@@ -230,7 +230,7 @@ const FUNCTIONAL: readonly string[] = [
       color: #fff;
     }
     .panel--functional .item .mark {
-      background: var(--highlight-blue);
+      background: var(--honey);
     }
     .panel--functional .item .mark path {
       fill: none;
@@ -332,8 +332,8 @@ const FUNCTIONAL: readonly string[] = [
       z-index: 1;
     }
     .num--tick {
-      background: var(--highlight-blue);
-      border-color: var(--highlight-blue);
+      background: var(--honey);
+      border-color: var(--honey);
     }
     .num--tick svg {
       width: 16px;
@@ -370,7 +370,7 @@ const FUNCTIONAL: readonly string[] = [
       color: #000;
     }
     .tag--func {
-      background: var(--highlight-blue);
+      background: var(--honey);
       color: var(--oxblood);
     }
 
@@ -396,7 +396,7 @@ const FUNCTIONAL: readonly string[] = [
     }
     .arrow path {
       fill: none;
-      stroke: var(--highlight-blue);
+      stroke: var(--olive);
       stroke-width: 2;
       stroke-linecap: round;
       stroke-linejoin: round;

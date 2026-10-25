@@ -8,7 +8,7 @@ const MINIMIZE_THRESHOLD = 64;
   selector: 'app-wordmark',
   imports: [NgOptimizedImage, RouterLink],
   template: `
-    <a class="wordmark" routerLink="/" fragment="top" aria-label="Ease Dis-ease - back to top" [class.on-dark]="onDark()" [class.minimized]="collapse() && minimized()">
+    <a class="wordmark" routerLink="/" fragment="top" aria-label="Ease Dis-ease - back to top" [class.on-dark]="onDark()" [class.minimized]="compact() || (collapse() && minimized())">
       <img class="wordmark-logo" [ngSrc]="onDark() ? 'images/logo/logo-white.png' : 'images/logo/logo-transparent.png'" width="43" height="43" priority alt="" />
       <span class="wordmark-text-group">
         <span class="wordmark-text">Ease Dis-<span class="ease-mark">ease</span></span>
@@ -154,6 +154,8 @@ export class Wordmark {
   readonly onDark = input(false);
   /** Shrinks to just the logo once the page scrolls - off for the footer, which is only ever seen scrolled. */
   readonly collapse = input(true);
+  /** Logo only, whatever the scroll position - for the navbar on phones, where the full name leaves no room. */
+  readonly compact = input(false);
   readonly tagline = input<string | undefined>('Functional Medicine');
 
   readonly taglineChars = computed(() => [...(this.tagline() ?? '')]);

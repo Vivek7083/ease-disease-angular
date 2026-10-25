@@ -69,24 +69,29 @@ export interface TeamMember {
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11M10 4l6 6-6 6" /></svg>
             </button>
           } @else {
-            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostLight" (pressed)="connectRequested.emit()" />
+            <app-cta-pill class="cta" [label]="member().ctaLabel" variant="ghostDark" (pressed)="connectRequested.emit()" />
           }
         </div>
       </div>
     </article>
   `,
   styles: `
-    /* Solid deep navy with white text, matching the footer and the result
-       panels, with a fine inner frame. Solid (no blur), so the colour never
-       shifts with whatever scrolls behind it. */
+    /* Hospitality look: a warm champagne-to-parchment card with a honey-gold
+       hairline and a fine inner frame, like a welcome card at a good hotel
+       or spa — warm and inviting rather than clinical. Solid (no blur), so
+       the colour never shifts with whatever scrolls behind it. */
     .team-card {
       position: relative;
       overflow: hidden;
-      background: var(--oxblood);
-      color: #fff;
+      background: linear-gradient(
+        158deg,
+        color-mix(in oklab, var(--honey) 18%, var(--ivory)) 0%,
+        color-mix(in oklab, var(--honey) 8%, var(--parchment)) 100%
+      );
+      color: var(--ink);
       border-radius: var(--r-lg);
       padding: var(--sp-8) var(--sp-6) var(--sp-6);
-      border: 1px solid var(--oxblood);
+      border: 1px solid color-mix(in oklab, var(--honey) 60%, var(--parchment));
       outline: 1px solid color-mix(in oklab, var(--honey) 45%, transparent);
       outline-offset: -9px;
       box-shadow:
@@ -122,10 +127,10 @@ export interface TeamMember {
       width: 130px;
       height: 130px;
       fill: none;
-      stroke: #d6e2ec; /* the old navy-on-navy stroke would vanish on the dark card */
+      stroke: var(--olive);
       stroke-width: 2.5;
       stroke-linecap: round;
-      opacity: 0.18;
+      opacity: 0.4;
     }
     .foliage-a {
       bottom: -18px;
@@ -151,7 +156,7 @@ export interface TeamMember {
       background: var(--terracotta);
       offset-path: border-box;
       offset-rotate: 0deg;
-      opacity: 0.35;
+      opacity: 0.4;
       filter: drop-shadow(0 0 3px color-mix(in oklab, var(--terracotta) 55%, transparent));
       animation: card-energy-travel 9s linear infinite;
     }
@@ -167,11 +172,12 @@ export interface TeamMember {
       }
     }
 
+    /* A short portrait card (4:5), not a circle; the photo is shown as it is. */
     .portrait {
       position: relative;
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
+      width: 160px;
+      height: 200px;
+      border-radius: var(--r-md);
       overflow: hidden;
       background: var(--gradient-ember);
     }
@@ -200,7 +206,7 @@ export interface TeamMember {
     h3 {
       margin-top: var(--sp-5);
       font-size: var(--fs-display-s);
-      color: #fff;
+      color: var(--ink);
     }
 
     .role {
@@ -209,18 +215,18 @@ export interface TeamMember {
       font-size: 0.72rem;
       letter-spacing: var(--ls-eyebrow);
       text-transform: uppercase;
-      color: #fff;
+      color: #000;
     }
 
     .credential {
       margin-top: var(--sp-2);
       font-size: 0.82rem;
-      color: var(--text-quiet-dark);
+      color: var(--text-quiet-light);
     }
 
     .bio {
       margin-top: var(--sp-4);
-      color: var(--text-quiet-dark);
+      color: var(--text-quiet-light);
       font-size: 0.9rem;
       line-height: var(--lh-body);
       max-width: 32ch;
@@ -253,13 +259,13 @@ export interface TeamMember {
       margin-top: var(--sp-6);
       padding: 0 0 2px;
       border: none;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+      border-bottom: 1px solid color-mix(in oklab, var(--oxblood) 45%, transparent);
       background: none;
       width: fit-content;
       font-family: var(--font-body);
       font-weight: 500;
       font-size: 0.94rem;
-      color: #fff;
+      color: #000;
       cursor: pointer;
       transition:
         gap var(--dur-micro) var(--ease),
@@ -279,14 +285,14 @@ export interface TeamMember {
     .cta-link:hover,
     .cta-link:focus-visible {
       gap: var(--sp-3);
-      border-color: #fff;
+      border-color: var(--oxblood);
     }
     .cta-link:hover svg,
     .cta-link:focus-visible svg {
       transform: translateX(2px);
     }
     .cta-link:focus-visible {
-      outline: 2px solid #fff;
+      outline: 2px solid var(--oxblood);
       outline-offset: 3px;
     }
 
@@ -316,19 +322,37 @@ export interface TeamMember {
     .team-card.is-split .portrait {
       flex: none;
       width: 220px;
-      height: 220px;
+      height: 275px;
     }
     .team-card.is-split .portrait-fallback {
       font-size: 3.2rem;
     }
     @media (min-width: 900px) {
+      /* Large screens: a bigger portrait and text that fills the rest of the card. */
+      .team-card.is-split .portrait {
+        width: 300px;
+        height: 375px;
+      }
       .team-card.is-split .info {
         align-items: flex-start;
         flex: 1;
       }
       .team-card.is-split h3 {
         margin-top: 0;
-        font-size: var(--fs-display-m);
+        font-size: var(--fs-display-l);
+      }
+      .team-card.is-split .role {
+        font-size: 0.85rem;
+      }
+      .team-card.is-split .credential {
+        font-size: 1rem;
+      }
+      .team-card.is-split .bio {
+        max-width: 64ch;
+        font-size: 1.1rem;
+      }
+      .team-card.is-split .cta-link {
+        font-size: 1.02rem;
       }
     }
     .team-card.is-split .bio {

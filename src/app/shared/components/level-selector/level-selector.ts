@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal, viewChildren } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, input, output, signal, viewChildren } from '@angular/core';
 import { LevelCard, type Level } from '../level-card/level-card';
 
 /**
@@ -34,7 +34,6 @@ import { LevelCard, type Level } from '../level-card/level-card';
           (keydown)="onKeydown($event)"
         >
           <div class="gauge-groove"></div>
-          <div class="gauge-thumb" [class.is-dragging]="dragging()" [style.left.%]="displayPercent()"></div>
         </div>
 
         <!-- Ticks sit in the same 0–100% coordinate space as the thumb (absolute,
@@ -49,11 +48,18 @@ import { LevelCard, type Level } from '../level-card/level-card';
               class="gauge-tick"
               [class.is-active]="i === activeIndex()"
               [style.left.%]="stepPercent(i)"
-              [attr.aria-label]="'Show ' + level.name"
+              [attr.aria-label]="'Show ' + level.name + (level.locked ? ' (locked)' : '')"
               [attr.aria-pressed]="i === activeIndex()"
               (click)="selectIndex(i)"
             >
-              {{ i + 1 }}
+              @if (level.locked) {
+                <svg class="tick-lock" viewBox="0 0 20 20" aria-hidden="true">
+                  <rect x="4.5" y="9" width="11" height="8" rx="1.8" />
+                  <path d="M7 9V6.5a3 3 0 0 1 6 0V9" />
+                </svg>
+              } @else {
+                {{ i + 1 }}
+              }
             </button>
           }
         </div>
@@ -151,34 +157,14 @@ import { LevelCard, type Level } from '../level-card/level-card';
       box-shadow: 0 0 0 3px color-mix(in oklab, var(--oxblood) 35%, transparent);
     }
 
-    /* A simple, fully-filled oxblood line - not a progress bar, the triangle
-       alone marks the current position. Not the ember CTA gradient; that
+    /* A simple, fully-filled oxblood line - not a progress bar; the filled
+       numbered circle below marks the current package. Not the ember CTA gradient; that
        stays reserved for actual CTAs. */
     .gauge-groove {
       width: 100%;
       height: 1px;
       background: var(--oxblood);
       transition: box-shadow var(--dur-micro) var(--ease);
-    }
-
-    /* A triangular marker instead of a round handle - points down into the
-       groove like a level/depth flag. Olive against the oxblood line for the
-       same two-accent pairing used elsewhere. Purely visual: the track
-       element underneath handles all pointer input across its full width. */
-    .gauge-thumb {
-      position: absolute;
-      top: 6px;
-      width: 20px;
-      height: 16px;
-      transform: translateX(-50%);
-      clip-path: polygon(50% 100%, 0 0, 100% 0);
-      background: var(--olive);
-      filter: drop-shadow(0 6px 10px color-mix(in oklab, var(--oxblood) 35%, transparent));
-      pointer-events: none;
-      transition: left 320ms var(--ease-out-soft);
-    }
-    .gauge-thumb.is-dragging {
-      transition: none;
     }
 
     .gauge-ticks {
@@ -210,6 +196,15 @@ import { LevelCard, type Level } from '../level-card/level-card';
     .gauge-tick:focus-visible {
       outline: 2px solid var(--oxblood);
       outline-offset: 2px;
+    }
+    .tick-lock {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
     .gauge-tick.is-active {
       background: var(--oxblood);
@@ -247,9 +242,6 @@ import { LevelCard, type Level } from '../level-card/level-card';
     @media (prefers-reduced-motion: reduce) {
       .gauge-panel {
         animation: none;
-      }
-      .gauge-thumb {
-        transition: none;
       }
     }
 
@@ -406,7 +398,6 @@ export class LevelSelector {
     this.destroyRef.onDestroy(() => this.observer?.disconnect());
   }
 
-  protected readonly displayPercent = computed(() => this.dragPercent() ?? this.stepPercent(this.activeIndex()));
 
   protected stepPercent(index: number): number {
     const max = this.levels().length - 1;
