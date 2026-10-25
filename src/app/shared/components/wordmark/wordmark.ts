@@ -38,7 +38,7 @@ const MINIMIZE_THRESHOLD = 64;
        display scaling and on a wide Mac window. */
     .wordmark {
       /* +1.8px on the font size makes the 2.25em logo 4px larger; the name, tagline and gaps scale with it. */
-      font-size: calc(clamp(1.05rem, 0.25rem + 1.1vw, 1.5rem) + 1.8px);
+      font-size: var(--wordmark-fs, calc(clamp(1.05rem, 0.25rem + 1.1vw, 1.5rem) + 1.8px));
       display: inline-flex;
       align-items: center;
       gap: var(--sp-2);

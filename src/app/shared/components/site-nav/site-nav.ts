@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink } from '@angular/router';
 import { filter, map, startWith } from 'rxjs';
@@ -16,8 +16,8 @@ import type { NavLink } from '../menu-dot/menu-dot';
  * three columns on one centre line: the brand on the left, the links in the
  * middle (Events, Experts, and My bookings once signed in), and the account
  * control with Book now on the right. Below 900px the links move into the
- * menu button's sheet; below 375px the brand shrinks to just the logo so the
- * logo, Book now and the menu button still fit at 320px.
+ * menu button's sheet; on narrow phones the brand (logo and name) is set a little
+ * smaller so it, Book now and the menu button still fit at 320px.
  */
 @Component({
   selector: 'app-site-nav',
@@ -25,7 +25,7 @@ import type { NavLink } from '../menu-dot/menu-dot';
   template: `
     <header class="bar">
       <div class="inner">
-        <app-wordmark class="brand" [collapse]="false" [compact]="narrow()" />
+        <app-wordmark class="brand" [collapse]="false" />
 
         <nav class="links" aria-label="Main">
           @for (link of links(); track link.label) {
@@ -89,6 +89,18 @@ import type { NavLink } from '../menu-dot/menu-dot';
       flex: none;
       display: flex;
       align-items: center;
+    }
+    /* Narrow phones: the logo and name are set smaller (the wordmark scales everything off
+       this one size) so they sit beside Book now and the menu button. */
+    @media (max-width: 374px) {
+      .brand {
+        --wordmark-fs: 15px;
+      }
+    }
+    @media (max-width: 339px) {
+      .brand {
+        --wordmark-fs: 12px;
+      }
     }
     .links {
       display: none;
@@ -172,7 +184,6 @@ import type { NavLink } from '../menu-dot/menu-dot';
 export class SiteNav {
   protected readonly auth = inject(AuthService);
   private readonly bookingModal = inject(BookingModalService);
-  private readonly destroyRef = inject(DestroyRef);
 
   private readonly router = inject(Router);
 
@@ -202,20 +213,6 @@ export class SiteNav {
     ];
     return all.filter((link) => link.fragment || link.route !== path);
   });
-
-  /** True below 375px, where the brand shows only its logo. */
-  protected readonly narrow = signal(false);
-
-  constructor() {
-    if (typeof window === 'undefined') {
-      return;
-    }
-    const query = window.matchMedia('(max-width: 374px)');
-    const update = () => this.narrow.set(query.matches);
-    update();
-    query.addEventListener('change', update);
-    this.destroyRef.onDestroy(() => query.removeEventListener('change', update));
-  }
 
   protected book(): void {
     this.bookingModal.open();
