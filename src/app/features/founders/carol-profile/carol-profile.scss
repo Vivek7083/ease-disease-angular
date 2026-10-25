@@ -55,15 +55,6 @@
   max-width: 46ch;
 }
 
-.carol-location {
-  margin-top: var(--sp-2);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: #000;
-}
-
 .founders-tabs {
   display: inline-flex;
   flex-wrap: wrap;
@@ -142,187 +133,61 @@ a.founders-tab:hover {
   object-position: center 70%;
 }
 
-/* ---------- about ---------- */
-.carol-about-copy {
+/* ---------- story ---------- */
+.section-heading {
+  margin-top: var(--sp-3);
+  max-width: 28ch;
+}
+
+.accent {
+  color: var(--oxblood);
+}
+
+/* The opening question, set apart with a burgundy rule. */
+.pull-quote {
+  margin: var(--sp-8) 0;
+  max-width: 36ch;
+  padding-left: var(--sp-5);
+  border-left: 3px solid var(--oxblood);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 500;
+  font-variation-settings: 'opsz' 16;
+  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.1rem);
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.story-copy p {
+  margin-top: var(--sp-4);
   max-width: 68ch;
   font-size: 1.15rem;
   line-height: var(--lh-body);
   color: var(--ink);
 }
 
-/* ---------- yellow highlighter mark + editorial pull-quote (same treatment
-   as the home hero's "It's time to listen" and close-quote sections) ---------- */
-.mark {
-  font-style: normal;
+.story-copy em {
   font-weight: 600;
-  background: linear-gradient(transparent 52%, var(--highlight-blue) 52%);
-  padding: 0 4px;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+  color: var(--oxblood);
 }
 
-.pull-quote {
-  margin: 0 auto;
-  max-width: 32ch;
-  text-align: center;
+.closing-quote {
+  margin: var(--sp-10) 0 0;
+  max-width: 34ch;
   font-family: var(--font-display);
   font-style: italic;
-  font-weight: 500;
-  font-variation-settings: 'opsz' 16;
-  font-size: clamp(1.4rem, 1.05rem + 2vw, 2.1rem);
-  line-height: 1.5;
+  font-size: clamp(1.3rem, 1rem + 1.6vw, 1.9rem);
+  line-height: 1.45;
   color: var(--ink);
 }
 
-.carol-quote {
-  padding-block: clamp(var(--sp-6), 3vw, var(--sp-10));
+.closing-quote .accent {
+  font-style: normal;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
-/* ---------- featured post ---------- */
-.carol-featured {
-  padding-block: clamp(calc(var(--sp-10) * 0.1), 0.5vw, calc(var(--sp-16) * 0.1));
-}
-
-.featured-card {
-  margin-top: var(--sp-6);
-  display: grid;
-  gap: var(--sp-3);
-  padding: var(--sp-4);
-  background: var(--surface-card-light);
-  border: 1px solid var(--rule-on-light);
-  border-radius: var(--r-lg);
-  box-shadow: var(--shadow-soft);
-}
-
-@media (min-width: 700px) {
-  .featured-card {
-    grid-template-columns: 220px 1fr;
-    gap: var(--sp-6);
-    align-items: center;
-    padding: var(--sp-4);
-  }
-}
-
-.featured-illustration {
-  width: min(100%, 220px);
-  height: auto;
-  margin-inline: auto;
-  display: block;
-}
-
-.featured-org {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: #000;
-}
-
-.featured-copy h3 {
-  margin-top: var(--sp-2);
-  font-size: var(--fs-display-s);
-}
-
-.featured-subtitle {
-  margin-top: var(--sp-1);
-  font-style: italic;
-  color: var(--text-quiet-light);
-}
-
-.featured-description {
-  margin-top: var(--sp-4);
-  color: var(--text-quiet-light);
-  line-height: var(--lh-body);
-  max-width: 56ch;
-}
-
-/* ---------- experience timeline ---------- */
-.section-heading {
-  margin-top: var(--sp-3);
-  max-width: 28ch;
-}
-
-.timeline {
-  position: relative;
-  margin-top: var(--sp-10);
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-8);
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 5px;
-  top: 6px;
-  bottom: 6px;
-  width: 1.5px;
-  background: linear-gradient(180deg, var(--terracotta), transparent);
-  opacity: 0.4;
-}
-
-.timeline-entry {
-  position: relative;
-  padding-left: var(--sp-8);
-}
-
-.timeline-dot {
-  position: absolute;
-  left: 0;
-  top: 6px;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--gradient-ember);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ivory) 70%, transparent);
-}
-
-.timeline-card h3 {
-  font-size: var(--fs-display-xs, 1.15rem);
-}
-
-.timeline-org {
-  margin-top: var(--sp-1);
-  font-weight: 500;
-  color: #000;
-}
-
-.timeline-meta {
-  margin-top: var(--sp-1);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
-  color: var(--text-quiet-light);
-}
-
-.timeline-detail {
-  margin-top: var(--sp-3);
-  color: var(--text-quiet-light);
-  line-height: var(--lh-body);
-  max-width: 56ch;
-}
-
-.skill-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-2);
-  list-style: none;
-  padding: 0;
-  margin-top: var(--sp-3);
-}
-
-.skill-chips li {
-  padding: 4px var(--sp-3);
-  border-radius: var(--r-pill);
-  background: color-mix(in oklab, var(--olive) 12%, var(--parchment));
-  color: #000;
-  font-size: 0.78rem;
-  font-family: var(--font-mono);
-}
-
-/* ---------- certifications ---------- */
+/* ---------- credentials ---------- */
 .cert-grid {
   margin-top: var(--sp-10);
   list-style: none;
@@ -355,50 +220,11 @@ a.founders-tab:hover {
   stroke-linejoin: round;
 }
 
-.cert-card h3 {
+.cert-card p {
   margin-top: var(--sp-3);
   font-size: 1.05rem;
-}
-
-.cert-issuer {
-  margin-top: var(--sp-1);
-  color: var(--text-quiet-light);
-}
-
-.cert-issued {
-  margin-top: var(--sp-1);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  color: #000;
-}
-
-.cert-card-more {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: var(--text-quiet-light);
-  font-style: italic;
-  background: color-mix(in oklab, var(--honey) 10%, var(--parchment));
-  border-style: dashed;
-}
-
-/* ---------- skills ---------- */
-.skill-group {
-  margin-top: var(--sp-8);
-}
-
-.skill-group h3 {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: var(--ls-eyebrow);
-  text-transform: uppercase;
-  color: var(--text-quiet-light);
-}
-
-.skill-chips-large li {
-  font-size: 0.86rem;
-  padding: 6px var(--sp-4);
+  line-height: var(--lh-body);
+  color: var(--ink);
 }
 
 /* ---------- close ---------- */
@@ -415,10 +241,4 @@ a.founders-tab:hover {
 .carol-close-inner app-cta-pill {
   display: inline-block;
   margin-top: var(--sp-8);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .timeline::before {
-    opacity: 0.4;
-  }
 }

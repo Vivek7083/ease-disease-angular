@@ -200,10 +200,10 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 | S5 section order | 12, 11 | Done, committed `d504a27` |
 | S6 dividers and rhythm | 4, 8, 11 | Dividers done, committed `ad2f9fd`; item 11 spacing not retuned |
 | S7 MacBook spacing | 3, 18 | Needs screen details |
-| S8 lock icon (mobile) | 7 | BUILT 2026-10-24, awaiting your manual check |
+| S8 lock icon (mobile) | 7 | Done, committed `d2cc2ef` (your commit, labelled "S7" in its message; it is the S8 lock-icon work) |
 | S9 philosophy cards | 9, 18 | Waiting for answers |
 | S10 compare on mobile | 17 | Needs a decision |
-| S11 Carol page | 15, 19 | Waiting for answers |
+| S11 Carol page | 15, 19 | BUILT 2026-10-25, awaiting your manual check |
 | S12 typography | 18 | Waiting for answers |
 | S13 navbar Community | 2 | Waiting for answers |
 
@@ -231,3 +231,5 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S6 as built (answers: vine plus the existing dividers, no vine before the footer, Home and Events, burgundy stem and olive leaves):** the vine (`<app-section-transition variant="vine">`) is back between Home sections wherever there was no divider: quote/root map, transform/results, results/packages, packages/compare, compare/testimonials, community/experts, experts/events. The existing curtain (root map/philosophy), dots (philosophy/transform) and wave (testimonials/community) stay. No vine between hero and quote, and none before the footer. Events page: vine between the intro and Upcoming, and between Upcoming and Past events. The vine's colours come from the restored tokens (burgundy stem, olive leaves). **Not done:** item 11's "same padding and margin between sections" is not retuned; sections still share `.scene` padding, but several have their own overrides. Tell me where gaps look uneven and I will fix those specifically.
 
 **S8 as built (answers: lock on the tick and the card, filled circle as the marker):** phones only (the `gauge-mobile` markup is hidden from 900px up; desktop untouched). In `level-selector.ts` the triangle (`.gauge-thumb`, its CSS and the unused `displayPercent`) is removed; dragging and tapping the track still work. A tick whose package has `locked: true` shows a lock icon instead of its number and its aria-label says "(locked)"; the card keeps its own "Locked" badge. Today only package 2, "Digest with Ease", is locked (the code has two packages, not three). The thin line above the ticks stays. 167 tests pass.
+
+**S11 as built (answers: hero, story, quote, credentials, CTA; LinkedIn icon only; headline from the new copy; keep eyebrow, tabs and CTA):** `carol-profile.ts/.html/.scss` rewritten. Hero: "Meet the founders", "Carol", headline "Certified Functional Nutritionist and Healthcare Management Professional", LinkedIn icon only (no Instagram, no location), the Carol/Deepa tabs, portrait (still `carol.jpg`). Story: label "About Carol", heading "A **Deeper Understanding** of Healthcare" (burgundy phrase), the opening question as a burgundy-ruled quote, the two paragraphs (the two starred phrases are italic and burgundy), the closing quote with "HEALTH OR DIS-EASE" burgundy and kept together on one line. Credentials: heading "Credentials behind the **practice**", the six credentials exactly as written, one card each. Closing CTA unchanged. Removed: old about text, "Health isn't random" quote, featured certificate post, experience timeline, skills chips, "+3 more" card. `images/illustrations/carol-certificate.png` is no longer used by any page. 167 tests pass.
