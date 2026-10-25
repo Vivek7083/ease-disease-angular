@@ -199,12 +199,12 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 | S4 experts | 1, 14, 16 | Done, committed `9c78613` |
 | S5 section order | 12, 11 | Done, committed `d504a27` |
 | S6 dividers and rhythm | 4, 8, 11 | Dividers done, committed `ad2f9fd`; item 11 spacing not retuned |
-| S7 MacBook spacing | 3, 18 | Needs screen details |
+| S7 MacBook spacing | 3, 18 | FIRST PASS BUILT 2026-10-25, awaiting your check on a real MacBook |
 | S8 lock icon (mobile) | 7 | Done, committed `d2cc2ef` (your commit, labelled "S7" in its message; it is the S8 lock-icon work) |
 | S9 philosophy cards | 9, 18 | Done, committed `367efcf` |
 | S10 compare on mobile | 17 | Done, committed `eca3977` |
 | S11 Carol page | 15, 19 | Done, committed `9e82d10` |
-| S12 typography | 18 | BUILT 2026-10-25, awaiting your manual check; some notes still open |
+| S12 typography | 18 | Done, committed `91b6dab`; some notes still open |
 | S13 navbar Community | 2 | Done, committed `bdaded5` |
 
 **S1 as built (answers: exact old hex, old CTA gradient, blue only for text highlights, ivory on burgundy):**
@@ -241,3 +241,5 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S10 as built (answers: top 5 plus "See all", the first five as they are):** `approach-compare.ts` only, phones and tablets (the pair rows are hidden from 900px; the two panels on large screens are unchanged). The rows show the first 5 pairs; a "See all 12 differences" button (aria-expanded, controls the list) reveals the other 7 (the 12th is the functional-only "Holistic Approach"), and "Show fewer differences" collapses them and keeps the reader in place. 167 tests pass.
 
 **S12 as built (answers: your burgundy table, underline under E.A.S.E in "Transform with E.A.S.E", testimonials styling only, 36 to 56px headings):** (1) New token `--fs-heading: clamp(36px,5vw,56px)`; `.t-display` (all section headings and the page h1s Carol, Deepa, Events) and the Philosophy and Transform titles use it. The hero headline keeps its own size, and the root-map heading stays small (it sits in a compact lead). (2) Global `.accent` (burgundy) in `styles.scss`. Burgundy words applied: hero "Your Body", root map "Telling You", Transform "E.A.S.E" (burgundy with a 3px burgundy underline), Results "YOU transform" (its subtext paragraph is removed), Packages "First Step.", Testimonials "Real Change.", Community "Discover", Events invite "gather", Events page "gathered", Deepa "healing starts from within" and "your soul awakens". (3) Transform container side padding 18px to 20px (+2px; I read "increase"). **Not done and why:** hero/container "+2px" paddings elsewhere (unclear which), text-case audit (headings are Title Case, buttons mixed: "BOOK YOUR CONSULTATION" vs "Book a consultation"), the desktop gap between packages (`.gauge-stack-card` margins of 40vh and 16vh), and the root-map heading size. 167 tests pass.
+
+**S7 first pass (answers: 13-inch MacBook about 1440 to 1470 wide, Safari and Chrome both, "too much empty space between sections"):** I measured every section on Home at 1440x900 (headless Edge; I cannot run Safari). The biggest outlier was the seam between "Our Philosophy" and "Transform with E.A.S.E": about 270px from the last card to the next section's label, against 100 to 190px for the other seams, because both components add their own 72px top and 96px bottom padding on top of the section padding. Fix, only inside `@media (min-width: 1280px) and (max-width: 1728px)` (13, 14 and 16 inch MacBook widths): `.phil` padding-block 32px 24px, `.tl` padding-block 24px. Seam is now about 150px. 1920px is unchanged (measured). Not done: Safari-only differences (100vh, sticky, backdrop-filter) are untested; the pinned root-map section has a long scroll track (about 2000px) which is deliberate; other seams were not changed. 167 tests pass.

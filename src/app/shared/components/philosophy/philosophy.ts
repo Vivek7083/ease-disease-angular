@@ -255,6 +255,15 @@ export interface PhilosophyPoint {
         font-size: 17px;
       }
     }
+
+    /* MacBook-width screens (13/14/16 inch, about 1280 to 1728px): the section already
+       has its own padding above and below, so the extra 72px and 96px made the gap to the
+       next section far larger than every other seam on the page. */
+    @media (min-width: 1280px) and (max-width: 1728px) {
+      .phil {
+        padding-block: 32px 24px;
+      }
+    }
   `,
 })
 export class Philosophy {

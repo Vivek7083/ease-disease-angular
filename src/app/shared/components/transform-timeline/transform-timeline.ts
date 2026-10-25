@@ -234,6 +234,14 @@ export interface TimelineStep {
         width: 24px;
       }
     }
+
+    /* MacBook-width screens (about 1280 to 1728px): same as the philosophy section, the
+       section's own padding is enough, so the extra 72px and 96px are dropped. */
+    @media (min-width: 1280px) and (max-width: 1728px) {
+      .tl {
+        padding-block: 24px;
+      }
+    }
   `,
 })
 export class TransformTimeline {
