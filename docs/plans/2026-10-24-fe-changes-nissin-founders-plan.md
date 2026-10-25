@@ -201,11 +201,11 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 | S6 dividers and rhythm | 4, 8, 11 | Dividers done, committed `ad2f9fd`; item 11 spacing not retuned |
 | S7 MacBook spacing | 3, 18 | Needs screen details |
 | S8 lock icon (mobile) | 7 | Done, committed `d2cc2ef` (your commit, labelled "S7" in its message; it is the S8 lock-icon work) |
-| S9 philosophy cards | 9, 18 | Waiting for answers |
+| S9 philosophy cards | 9, 18 | BUILT 2026-10-25, awaiting your manual check |
 | S10 compare on mobile | 17 | Needs a decision |
 | S11 Carol page | 15, 19 | Done, committed `9e82d10` |
 | S12 typography | 18 | Waiting for answers |
-| S13 navbar Community | 2 | BUILT 2026-10-25, awaiting your manual check |
+| S13 navbar Community | 2 | Done, committed `bdaded5` |
 
 **S1 as built (answers: exact old hex, old CTA gradient, blue only for text highlights, ivory on burgundy):**
 - `colors.css`: `--oxblood-deep #2B0A0F`, `--oxblood #5A1220`, `--olive #4A5726`, `--terracotta #C06B4A`, `--ember-a #B33A1E`, `--ember-b #E8853A`, `--honey #F2C14E`, `--text-quiet-dark #E4D6CC`, `--rule-on-dark #7A3A3F`. `--highlight-blue` unchanged. `--surface-card-light` left white (not asked).
@@ -235,3 +235,5 @@ S12 typography   (last, because heading colour needs S1, and sizes need S5/S6)
 **S11 as built (answers: hero, story, quote, credentials, CTA; LinkedIn icon only; headline from the new copy; keep eyebrow, tabs and CTA):** `carol-profile.ts/.html/.scss` rewritten. Hero: "Meet the founders", "Carol", headline "Certified Functional Nutritionist and Healthcare Management Professional", LinkedIn icon only (no Instagram, no location), the Carol/Deepa tabs, portrait (still `carol.jpg`). Story: label "About Carol", heading "A **Deeper Understanding** of Healthcare" (burgundy phrase), the opening question as a burgundy-ruled quote, the two paragraphs (the two starred phrases are italic and burgundy), the closing quote with "HEALTH OR DIS-EASE" burgundy and kept together on one line. Credentials: heading "Credentials behind the **practice**", the six credentials exactly as written, one card each. Closing CTA unchanged. Removed: old about text, "Health isn't random" quote, featured certificate post, experience timeline, skills chips, "+3 more" card. `images/illustrations/carol-certificate.png` is no longer used by any page. 167 tests pass.
 
 **S13 as built (answers: Home `#community` section, navbar and footer):** `site-nav.ts` link list is now Home (not on Home), Events, **Community** (`/` + fragment `community`), Experts, My bookings (signed in). The phone menu sheet shows the same list, so it has Community too. `site-footer.ts` Explore list has "Community" between Packages and Meet the experts. Clicking Community from the Events page lands on the Community section on Home. 167 tests pass.
+
+**S9 as built (answers: vertical stack of wide cards, text only, same cards on phones, three short lines then the formula):** `philosophy.ts` only. The four points are numbered text cards (01 to 04 in burgundy, title, body) in one column on every width: number beside the text from 761px, stacked on phones. The pictures are no longer shown (`PhilosophyPoint` no longer has image fields; the image files and the `image` fields in `home.ts` are still there, unused). The intro is three short centred lines each with a small burgundy diamond, then the formula and the faith line, wording unchanged. Also done here from item 18: the heading is "Our **Philosophy**" with the capital P and burgundy. Not done: the old pinned deck and carousel dead code in `home.ts`/`home.scss`/`home.html` is still there. 167 tests pass.

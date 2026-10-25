@@ -1,27 +1,26 @@
-import { NgOptimizedImage } from '@angular/common';
 import { Component, input } from '@angular/core';
 import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
 
 export interface PhilosophyPoint {
   readonly title: string;
   readonly body: string;
-  readonly image: string;
-  readonly imageAlt: string;
 }
 
-/** "Our philosophy": every point visible as an alternating image/text row, no carousel or pinned deck. */
+/** "Our philosophy": a short intro, then every point as a numbered card in a plain vertical stack - no carousel, no pinned deck. */
 @Component({
   selector: 'app-philosophy',
-  imports: [NgOptimizedImage, ScrollRevealDirective],
+  imports: [ScrollRevealDirective],
   template: `
     <div class="phil">
       <header class="phil-head">
         <span class="phil-eyebrow">Root-cause, not symptoms</span>
-        <h2 class="phil-title" id="hook-heading">Our philosophy</h2>
+        <h2 class="phil-title" id="hook-heading">Our <span class="accent">Philosophy</span></h2>
         <div class="phil-intro">
-          <p>Every thought you think sends a message to your body - to heal, to grow, or to remain stuck.</p>
-          <p>For every dis-ease, there is a cause. When you remove the cause, the effect cannot remain.</p>
-          <p>With the right knowledge and choices - nutrition, lifestyle, and mindset - you can support your body’s natural ability to heal.</p>
+          <ul class="phil-lines">
+            <li>Every thought you think sends a message to your body - to heal, to grow, or to remain stuck.</li>
+            <li>For every dis-ease, there is a cause. When you remove the cause, the effect cannot remain.</li>
+            <li>With the right knowledge and choices - nutrition, lifestyle, and mindset - you can support your body’s natural ability to heal.</li>
+          </ul>
           <p class="phil-formula">
             <!-- &ngsp; keeps the spaces: Angular drops whitespace-only text between elements. -->
             <!-- The reveal sits on the inner span: .reveal sets a transform that would undo the centring on the <p>. -->
@@ -31,14 +30,11 @@ export interface PhilosophyPoint {
         </div>
       </header>
 
-      <div class="phil-rows">
+      <div class="phil-cards">
         @for (point of points(); track point.title; let i = $index) {
-          <article class="phil-row reveal" [appScrollReveal]="0" [revealRepeat]="true">
-            <div class="phil-media">
-              <img [ngSrc]="point.image" fill [alt]="point.imageAlt" />
-            </div>
+          <article class="phil-card reveal" [appScrollReveal]="0" [revealRepeat]="true">
+            <span class="phil-num" aria-hidden="true">{{ '0' + (i + 1) }}</span>
             <div class="phil-copy">
-              <span class="phil-num">{{ '0' + (i + 1) }}</span>
               <h3>{{ point.title }}</h3>
               <p>{{ point.body }}</p>
             </div>
@@ -85,10 +81,36 @@ export interface PhilosophyPoint {
       margin: 14px 0 0;
       color: #000;
     }
-    /* Intro text under the heading; the formula line is a little larger, in the heading font. */
+    .accent {
+      color: var(--oxblood);
+    }
+
+    /* Intro: three short lines, each set off by a small diamond marker. */
     .phil-intro {
       max-width: 640px;
       margin: 28px auto 0;
+    }
+    .phil-lines {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 22px;
+    }
+    .phil-lines li {
+      font-family: var(--font-body);
+      font-size: 18px;
+      line-height: 1.6;
+      color: #000;
+    }
+    .phil-lines li::before {
+      content: '';
+      display: block;
+      width: 7px;
+      height: 7px;
+      margin: 0 auto 10px;
+      background: var(--oxblood);
+      transform: rotate(45deg);
     }
     .phil-intro p {
       font-family: var(--font-body);
@@ -97,25 +119,11 @@ export interface PhilosophyPoint {
       color: #000;
       margin: 0 0 12px;
     }
-    .phil-intro .phil-formula {
-      font-family: var(--font-display);
-      font-size: clamp(22px, 2.4vw, 28px);
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-      margin: 26px 0 10px;
-    }
     .phil-intro .phil-faith {
       font-style: italic;
       margin-bottom: 0;
     }
-    @media (min-width: 761px) {
-      /* One line, centred even where it is a little wider than the 640px text column. */
-      .phil-intro .phil-formula {
-        white-space: nowrap;
-        margin-inline: -40px;
-      }
-    }
-    /* Make the formula pop */
+    /* Make the formula pop; one line where there is room, centred even where it is wider than the text column. */
     .phil-intro .phil-formula {
       position: relative;
       left: 50%;
@@ -152,6 +160,11 @@ export interface PhilosophyPoint {
       background-image: linear-gradient(transparent 56%, var(--highlight-blue) 56%);
       padding: 0 0.08em;
     }
+    @media (min-width: 761px) {
+      .phil-intro .phil-formula {
+        white-space: nowrap;
+      }
+    }
     @media (max-width: 760px) {
       .phil-intro .phil-formula {
         line-height: 1.35;
@@ -161,72 +174,60 @@ export interface PhilosophyPoint {
       }
     }
 
-    .phil-row {
+    /* The four points: wide numbered cards in one column. */
+    .phil-cards {
       display: grid;
-      gap: 64px;
-      align-items: center;
-      padding: 40px 0;
+      gap: 20px;
     }
-    /* Scrolling back up plays the reveal in reverse: the row fades out and sinks
+    .phil-card {
+      display: grid;
+      grid-template-columns: 96px minmax(0, 1fr);
+      gap: 28px;
+      align-items: start;
+      padding: 36px 40px;
+      background: var(--surface-card-light);
+      border: 1px solid var(--rule-on-light);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow-soft);
+    }
+    /* Scrolling back up plays the reveal in reverse: the card fades out and sinks
        back down. The global .reveal-repeat drops the rise to avoid a flicker at
-       the top edge, but the directive only rewinds rows leaving through the
+       the top edge, but the directive only rewinds cards leaving through the
        bottom, where sinking further down is safe, so the rise can stay. */
-    .phil-row.reveal-repeat {
+    .phil-card.reveal-repeat {
       transform: translateY(28px);
     }
-    .phil-row.reveal-repeat.is-visible {
+    .phil-card.reveal-repeat.is-visible {
       transform: none;
     }
     @media (prefers-reduced-motion: reduce) {
-      .phil-row.reveal-repeat {
+      .phil-card.reveal-repeat {
         transform: none;
       }
     }
-    .phil-row + .phil-row {
-      border-top: 1px solid #efe6da;
-    }
-    /* Pictures stay small (340px) so the text gets the room; sides swap every row. */
-    .phil-row:nth-child(odd) {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 340px);
-    }
-    .phil-row:nth-child(even) {
-      grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
-    }
-    .phil-row:nth-child(odd) .phil-media {
-      order: 2;
-    }
-    .phil-media {
-      position: relative;
-      aspect-ratio: 16 / 10;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid rgba(33, 56, 72, 0.12);
-    }
-    .phil-media img {
-      object-fit: cover;
-    }
     .phil-num {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      color: #000;
+      font-family: var(--font-display);
+      font-size: clamp(44px, 5vw, 64px);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: var(--oxblood);
     }
-    .phil-row h3 {
+    .phil-card h3 {
       font-family: var(--font-display);
       font-weight: 400;
       font-size: clamp(26px, 2.6vw, 34px);
       line-height: 1.2;
       letter-spacing: -0.02em;
-      margin: 10px 0 14px;
+      margin: 0 0 12px;
       color: #000;
     }
-    .phil-row p {
+    .phil-card p {
       font-family: var(--font-body);
       font-size: 18px;
       line-height: 1.6;
       margin: 0;
       color: #000;
-      max-width: 46ch;
+      max-width: 62ch;
     }
 
     @media (max-width: 760px) {
@@ -234,31 +235,23 @@ export interface PhilosophyPoint {
         padding: 56px 18px 72px;
       }
       .phil-head {
-        margin-bottom: 24px;
+        margin-bottom: 32px;
       }
       .phil-intro {
         margin-top: 20px;
       }
-      .phil-intro p {
+      .phil-lines li {
         font-size: 17px;
       }
-      .phil-row,
-      .phil-row:nth-child(odd),
-      .phil-row:nth-child(even) {
+      .phil-card {
         grid-template-columns: 1fr;
-        gap: 20px;
-        padding: 32px 0;
+        gap: 12px;
+        padding: 24px 22px;
       }
-      .phil-row:nth-child(odd) .phil-media {
-        order: 0;
+      .phil-num {
+        font-size: 40px;
       }
-      .phil-media {
-        max-width: 240px;
-      }
-      .phil-row h3 {
-        margin: 8px 0 10px;
-      }
-      .phil-row p {
+      .phil-card p {
         font-size: 17px;
       }
     }
