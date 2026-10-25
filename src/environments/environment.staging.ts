@@ -1,7 +1,8 @@
 import type { Environment } from './environment.model';
 
 export const environment: Environment = {
-  apiBaseUrl: 'https://api-staging.easedisease.in',
+  // Same origin: Firebase Hosting forwards /v1/** to the API (see firebase.json), so the browser makes no cross-origin call.
+  apiBaseUrl: '',
   firebase: {
     apiKey: 'AIzaSyDdVO70vy9PuuwNjwcyfZTNEbercOL_T-8',
     authDomain: 'ease-disease-staging.firebaseapp.com',
