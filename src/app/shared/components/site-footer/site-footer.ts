@@ -257,6 +257,7 @@ export class SiteFooter {
     { label: 'Why root-cause care', href: '#hook', fragment: 'hook' },
     { label: 'Conditions we support', href: '#root-map', fragment: 'root-map' },
     { label: 'Packages', href: '#programme', fragment: 'programme' },
+    { label: 'Community', href: '#community', fragment: 'community' },
     { label: 'Meet the experts', href: '#experts', fragment: 'experts' },
     { label: 'Events & retreats', href: '/events', route: '/events' },
     { label: 'Book now', href: '#', book: true },

@@ -188,14 +188,15 @@ export class SiteNav {
   /**
    * The links for the page you are on: the one that points at this page is left
    * out, and everywhere except Home a "Home" link comes first. So on Events you
-   * see Home and Experts, on Privacy you see Home, Events and Experts. Experts
-   * is a section of Home, so it always stays.
+   * see Home, Community and Experts, on Privacy you see Home, Events, Community and Experts. Community
+   * and Experts are sections of Home, so they always stay.
    */
   protected readonly links = computed<readonly NavLink[]>(() => {
     const path = this.path();
     const all: NavLink[] = [
       { label: 'Home', route: '/' },
       { label: 'Events', route: '/events' },
+      { label: 'Community', route: '/', fragment: 'community' },
       { label: 'Experts', route: '/', fragment: 'experts' },
       ...(this.auth.user() ? [{ label: 'My bookings', route: '/my-bookings' }] : []),
     ];
