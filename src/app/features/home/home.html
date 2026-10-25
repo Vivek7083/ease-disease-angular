@@ -5,7 +5,7 @@
       <div class="scene-inner hero-grid">
         <div class="hero-copy">
           <h1 id="hero-heading" class="hero-headline">
-            Your Body Is<br />
+            <span class="accent">Your Body</span> Is<br />
             <em>Speaking.</em><br />
             <span class="hero-headline-sub">It’s Time to <span class="mark">Listen.</span></span>
           </h1>
@@ -42,8 +42,6 @@
       }
     </p>
   </div>
-
-  <app-section-transition variant="vine" />
 
   <!-- ============ THE ROOT MAP - diseases & categories, as an interactive
        symptom → condition → root-cause trace. Sits right after the hero and
@@ -116,7 +114,7 @@
     <app-transform-timeline [steps]="treatTimelineSteps" />
   </section>
 
-  <app-section-transition variant="vine" />
+  <app-section-transition variant="leaves" />
 
   <!-- ============ RESULTS - how you feel once the work is done, plus the large
        client quote (PRD §4 + §5). Plain stacked flow with a light
@@ -128,13 +126,13 @@
     </div>
   </section>
 
-  <app-section-transition variant="vine" />
+  <app-section-transition variant="nodes" />
 
   <!-- ============ PROGRAMME - packages, picked by depth ============ -->
   <section class="scene programme" id="programme" appCanvasStop from="var(--canvas-descent-to)" to="var(--canvas-team-from)" aria-labelledby="programme-heading">
     <div class="scene-inner">
       <app-eyebrow-label text="Your Journey Starts Here." />
-      <h2 id="programme-heading" class="t-display">Take the First Step.</h2>
+      <h2 id="programme-heading" class="t-display">Take the <span class="accent">First Step.</span></h2>
       <p class="t-body lede">
         Every transformation begins with a conversation. Let's understand what your body is telling you, explore your concerns, and discover the right next steps for you.
       </p>
@@ -163,7 +161,7 @@
     </div>
   </section>
 
-  <app-section-transition variant="vine" />
+  <app-section-transition variant="wave" />
 
   <!-- ============ TESTIMONIALS - a real client message shown as it was
        received, a WhatsApp thread, rather than a styled pull-quote. Same
@@ -175,14 +173,14 @@
     </div>
   </section>
 
-  <app-section-transition variant="wave" />
+  <app-section-transition variant="sprout" />
 
   <!-- ============ THE E.A.S.E. COMMUNITY - events, expert-led sessions and the WhatsApp group ============ -->
   <section class="scene community" id="community" appCanvasStop from="var(--canvas-results-to)" to="var(--canvas-results-to)" aria-labelledby="community-heading">
     <div class="scene-inner">
       <div class="community-intro reveal" [appScrollReveal]="0">
         <app-eyebrow-label text="The E.A.S.E. Community" />
-        <h2 id="community-heading" class="t-display">Learn, Connect, and Discover</h2>
+        <h2 id="community-heading" class="t-display">Learn, Connect, and <span class="accent">Discover</span></h2>
         <p class="t-body lede">
           Explore upcoming events, expert-led sessions, and wellness experiences designed to deepen your understanding of health, introduce new perspectives, and inspire more informed choices for your well-being.
         </p>
@@ -200,7 +198,7 @@
     </div>
   </section>
 
-  <app-section-transition variant="vine" />
+  <app-section-transition variant="leaves" />
 
   <!-- ============ TEAM - meet the experts ============ -->
   <section class="scene team" id="experts" appCanvasStop from="var(--canvas-team-from)" to="var(--canvas-team-to)" aria-labelledby="team-heading">

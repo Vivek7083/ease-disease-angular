@@ -47,7 +47,7 @@
   <section class="deepa-section deepa-books">
     <div class="deepa-inner">
       <app-eyebrow-label text="An author" />
-      <h2 class="t-display section-heading">One book, one idea: healing starts from within.</h2>
+      <h2 class="t-display section-heading">One book, one idea: <span class="accent">healing starts from within</span>.</h2>
 
       <article class="book-feature reveal" [appScrollReveal]="0">
         <div class="book-cover">
@@ -71,7 +71,7 @@
   <section class="deepa-section deepa-programmes">
     <div class="deepa-inner">
       <app-eyebrow-label text="Programmes" />
-      <h2 class="t-display section-heading">The Magic begins when your soul awakens.</h2>
+      <h2 class="t-display section-heading">The Magic begins when <span class="accent">your soul awakens</span>.</h2>
 
       <div class="programme-grid">
         @for (programme of programmes; track programme.name; let i = $index) {

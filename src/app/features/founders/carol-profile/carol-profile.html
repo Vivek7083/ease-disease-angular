@@ -11,7 +11,6 @@
           <app-eyebrow-label text="Meet the founders" />
           <h1 class="t-display">Carol</h1>
           <p class="carol-headline">{{ headline }}</p>
-          <p class="carol-location">{{ location }}</p>
           <app-social-links [links]="socials" />
         </div>
 
@@ -29,113 +28,53 @@
     </div>
   </header>
 
-  <!-- ============ ABOUT ============ -->
-  <section class="carol-section carol-about">
+  <!-- ============ STORY ============ -->
+  <section class="carol-section carol-story">
     <div class="carol-inner">
-      <p class="carol-about-copy reveal" [appScrollReveal]="0">{{ about }}</p>
+      <div class="reveal" [appScrollReveal]="0">
+        <app-eyebrow-label text="About Carol" />
+        <h2 class="t-display section-heading">A <span class="accent">Deeper Understanding</span> of Healthcare</h2>
+      </div>
+
+      <p class="pull-quote reveal" [appScrollReveal]="0">What if we stopped waiting for disease to take hold before we started prioritising our health?</p>
+
+      <div class="story-copy reveal" [appScrollReveal]="0">
+        <p>
+          I’m Carol Ribeiro, a Certified Functional Nutritionist and Healthcare Management Professional. With
+          <em>5+ years of experience in the healthcare industry</em>, I developed a deeper curiosity about what shapes
+          our health beyond conventional patient care. This led me to Functional Nutrition and the interconnected
+          roles of nutrition, digestion, lifestyle, and environment in our well-being.
+        </p>
+        <p>
+          As a co-founder of Ease Disease, a preventive health care platform, I believe prevention is an investment,
+          not an expense. My vision is to help people build the foundations for <em>longer, healthier, more fulfilling lives.</em>
+        </p>
+      </div>
+
+      <blockquote class="closing-quote reveal" [appScrollReveal]="0">
+        “Your food and environment provide information to your body, influencing how your genes express themselves in
+        <span class="accent">HEALTH OR DIS-EASE</span>.”
+      </blockquote>
     </div>
   </section>
 
-  <!-- ============ QUOTE ============ -->
-  <section class="carol-section carol-quote">
+  <!-- ============ CREDENTIALS ============ -->
+  <section class="carol-section carol-credentials">
     <div class="carol-inner">
-      <p class="pull-quote reveal" [appScrollReveal]="0">Health isn't random - there's always a <span class="mark">root cause</span> waiting to be found.</p>
-    </div>
-  </section>
-
-  <!-- ============ FEATURED POST / CERTIFICATE ============ -->
-  <section class="carol-section carol-featured">
-    <div class="carol-inner">
-      <app-eyebrow-label text="A recent moment" />
-      <article class="featured-card reveal" [appScrollReveal]="0">
-        <img
-          ngSrc="images/illustrations/carol-certificate.png"
-          class="featured-illustration"
-          width="800"
-          height="616"
-          alt=""
-          aria-hidden="true"
-        />
-        <div class="featured-copy">
-          <span class="featured-org">{{ featuredPost.org }}</span>
-          <h3>{{ featuredPost.title }}</h3>
-          <p class="featured-subtitle">{{ featuredPost.subtitle }}</p>
-          <p class="featured-description">{{ featuredPost.description }}</p>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ============ EXPERIENCE ============ -->
-  <section class="carol-section carol-experience">
-    <div class="carol-inner">
-      <app-eyebrow-label text="Experience" />
-      <h2 class="t-display section-heading">A clinical eye, brought to nutrition.</h2>
-
-      <ol class="timeline">
-        @for (entry of experience; track entry.title + entry.period; let i = $index) {
-          <li class="timeline-entry reveal" [appScrollReveal]="i * 90">
-            <span class="timeline-dot" aria-hidden="true"></span>
-            <div class="timeline-card">
-              <h3>{{ entry.title }}</h3>
-              <p class="timeline-org">{{ entry.org }}</p>
-              <p class="timeline-meta">{{ entry.period }} · {{ entry.location }}</p>
-              @if (entry.detail) {
-                <p class="timeline-detail">{{ entry.detail }}</p>
-              }
-              @if (entry.skills; as skills) {
-                <ul class="skill-chips">
-                  @for (skill of skills; track skill) {
-                    <li>{{ skill }}</li>
-                  }
-                </ul>
-              }
-            </div>
-          </li>
-        }
-      </ol>
-    </div>
-  </section>
-
-  <!-- ============ CERTIFICATIONS ============ -->
-  <section class="carol-section carol-certifications">
-    <div class="carol-inner">
-      <app-eyebrow-label text="Certifications" />
-      <h2 class="t-display section-heading">Credentials behind the practice.</h2>
+      <app-eyebrow-label text="Credentials" />
+      <h2 class="t-display section-heading">Credentials behind the <span class="accent">practice</span></h2>
 
       <ul class="cert-grid">
-        @for (cert of certifications; track cert.name; let i = $index) {
+        @for (credential of credentials; track credential; let i = $index) {
           <li class="cert-card reveal" [appScrollReveal]="i * 90">
             <svg class="cert-icon" viewBox="0 0 20 20" aria-hidden="true">
               <rect x="3" y="3" width="14" height="14" rx="2" />
               <path d="M7 10l2 2 4-4" />
             </svg>
-            <h3>{{ cert.name }}</h3>
-            <p class="cert-issuer">{{ cert.issuer }}</p>
-            <p class="cert-issued">{{ cert.issued }}</p>
+            <p>{{ credential }}</p>
           </li>
         }
-        <li class="cert-card cert-card-more reveal" [appScrollReveal]="certifications.length * 90">
-          <p>+ 3 more credentials, from hospital operations to entrepreneurship.</p>
-        </li>
       </ul>
-    </div>
-  </section>
-
-  <!-- ============ SKILLS ============ -->
-  <section class="carol-section carol-skills">
-    <div class="carol-inner">
-      <app-eyebrow-label text="Skills" />
-      @for (group of skillGroups; track group.label; let i = $index) {
-        <div class="skill-group reveal" [appScrollReveal]="i * 90">
-          <h3>{{ group.label }}</h3>
-          <ul class="skill-chips skill-chips-large">
-            @for (skill of group.skills; track skill) {
-              <li>{{ skill }}</li>
-            }
-          </ul>
-        </div>
-      }
     </div>
   </section>
 

@@ -227,7 +227,7 @@ const NOTES_STEP = 0.14;
            scrolling back up un-pins them in reverse. -->
       <header class="rm-head">
         <app-eyebrow-label text="The bigger picture" />
-        <h2 id="root-map-heading" class="root-map-heading">What Your Body May Be Telling You</h2>
+        <h2 id="root-map-heading" class="root-map-heading">What Your Body May Be <span class="accent">Telling You</span></h2>
         <p class="rm-sub">You may have questions about recurring symptoms, changes in your well-being, or why you still don't feel your best. It can be frustrating when you don't know what to do next.</p>
       </header>
       <div class="rm-pin" #deskPin [style.height.vh]="deskPinVh">
@@ -290,7 +290,7 @@ const NOTES_STEP = 0.14;
            for a heading to sit beside anything anyway. -->
       <div class="root-map-lead">
         <app-eyebrow-label text="The bigger picture" />
-        <h2 id="root-map-heading" class="root-map-heading">What Your Body May Be Telling You</h2>
+        <h2 id="root-map-heading" class="root-map-heading">What Your Body May Be <span class="accent">Telling You</span></h2>
         <p class="root-map-intro">You may have questions about recurring symptoms, changes in your well-being, or why you still don't feel your best. It can be frustrating when you don't know what to do next.</p>
       </div>
       <ng-container [ngTemplateOutlet]="mapTpl" />

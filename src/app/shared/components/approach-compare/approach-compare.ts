@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
 import { ScrollRevealDirective } from '../../../core/directives/scroll-reveal';
 
 /** Conventional medicine's side of the comparison, in the order it is shown. */
@@ -39,7 +39,8 @@ const FUNCTIONAL: readonly string[] = [
  * and flat (a white card, hollow markers) and the functional side deep navy
  * and lifted (blue ticks), with a "vs" badge where they meet.
  *
- * Small screens: the same lists read point by point instead. Each point is one
+ * Small screens: the same lists read point by point instead (the first five,
+ * then a "See all" button for the rest). Each point is one
  * row, in the order the two lists are given: the conventional line, a small
  * arrow, then the functional line it is set against. Rows come in one at a
  * time as they scroll into view: the conventional line, the arrow drawing
@@ -80,8 +81,8 @@ const FUNCTIONAL: readonly string[] = [
     </div>
 
     <div class="points">
-      <ol class="rows">
-        @for (item of conventional; track item; let i = $index) {
+      <ol class="rows" id="compare-rows">
+        @for (item of visibleConventional(); track item; let i = $index) {
           <li class="pair" [appScrollReveal]="0">
             <span class="num" aria-hidden="true">{{ i + 1 }}</span>
             <div class="pair-body">
@@ -102,7 +103,7 @@ const FUNCTIONAL: readonly string[] = [
             </div>
           </li>
         }
-        @for (item of extra; track item) {
+        @for (item of visibleExtra(); track item) {
           <li class="pair pair--last" [appScrollReveal]="0">
             <span class="num num--tick" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M5.5 10.5l3 3 6-7" /></svg></span>
             <div class="pair-body">
@@ -117,6 +118,11 @@ const FUNCTIONAL: readonly string[] = [
           </li>
         }
       </ol>
+      <div class="more">
+        <button type="button" class="more-btn" [attr.aria-expanded]="showAll()" aria-controls="compare-rows" (click)="toggleAll($event)">
+          {{ showAll() ? 'Show fewer differences' : 'See all ' + total + ' differences' }}
+        </button>
+      </div>
     </div>
   `,
   styles: `
@@ -452,6 +458,28 @@ const FUNCTIONAL: readonly string[] = [
       transition-delay: 0ms;
     }
 
+    /* Phones show the first few points; this button reveals the rest. */
+    .more {
+      display: flex;
+      justify-content: center;
+      margin-top: var(--sp-6);
+    }
+    .more-btn {
+      min-height: var(--tap-min);
+      padding: 0 var(--sp-6);
+      border-radius: var(--r-pill);
+      border: 1px solid color-mix(in oklab, var(--oxblood) 40%, transparent);
+      background: transparent;
+      color: #000;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      cursor: pointer;
+    }
+    .more-btn:focus-visible {
+      outline: 2px solid var(--oxblood);
+      outline-offset: 3px;
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .item,
       .conv,
@@ -473,4 +501,24 @@ export class ApproachCompare {
   protected readonly functional = FUNCTIONAL;
   /** Functional points with no conventional line set against them (the lists are 11 and 12 long). */
   protected readonly extra = FUNCTIONAL.slice(CONVENTIONAL.length);
+
+  /** Phones: how many pairs show before "See all". */
+  private static readonly INITIAL_PAIRS = 5;
+  protected readonly total = FUNCTIONAL.length;
+
+  protected readonly showAll = signal(false);
+  protected readonly visibleConventional = computed(() =>
+    this.showAll() ? this.conventional : this.conventional.slice(0, ApproachCompare.INITIAL_PAIRS),
+  );
+  protected readonly visibleExtra = computed(() => (this.showAll() ? this.extra : []));
+
+  protected toggleAll(event: Event): void {
+    const button = event.currentTarget as HTMLElement;
+    const wasOpen = this.showAll();
+    this.showAll.set(!wasOpen);
+    if (wasOpen) {
+      // Collapsing shortens the page under the reader - keep the button, and the reader, in place.
+      requestAnimationFrame(() => button.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+    }
+  }
 }

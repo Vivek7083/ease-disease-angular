@@ -1,6 +1,7 @@
 :root{
 --fs-display-xl:clamp(40px,calc(16px + 6.1vw),104px); /* @kind font */
 --fs-display-l:clamp(35px,calc(18.7px + 4.18vw),79px); /* @kind font */
+--fs-heading:clamp(36px,5vw,56px); /* @kind font - every section heading */
 --fs-display-m:clamp(26px,calc(18px + 2.1vw),48px); /* @kind font */
 --fs-display-s:clamp(22px,calc(18px + 1vw),32px); /* @kind font */
 --fs-body-l:clamp(18px,calc(16.5px + .38vw),22px); /* @kind font */
@@ -24,5 +25,5 @@
 --body-min-size:24px; /* @kind other */
 }
 .t-eyebrow{font-family:var(--font-mono);font-size:var(--fs-eyebrow);letter-spacing:var(--ls-eyebrow);text-transform:uppercase;line-height:var(--lh-eyebrow)}
-.t-display{font-family:var(--font-display);font-size:var(--fs-display-l);line-height:var(--lh-display);letter-spacing:var(--ls-display);font-weight:var(--wt-display);text-wrap:balance}
+.t-display{font-family:var(--font-display);font-size:var(--fs-heading);line-height:var(--lh-display);letter-spacing:var(--ls-display);font-weight:var(--wt-display);text-wrap:balance}
 .t-body{font-family:var(--font-body);font-size:var(--fs-body-m);line-height:var(--lh-body);max-width:var(--measure-body);text-wrap:pretty}

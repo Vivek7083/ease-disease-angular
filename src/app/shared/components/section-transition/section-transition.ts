@@ -11,13 +11,15 @@ import { Component, DestroyRef, ElementRef, afterNextRender, inject, input, sign
  *  - wave     soft tinted ripples rise up from below
  *  - dots     a row of dots lights up in a quick left-to-right sweep
  *  - curtain  a hairline opens from the centre, a honey diamond lands
+ *  - leaves   five small leaves fan out from the middle, centre first
+ *  - nodes    a thin rail draws between three dots, like the root map
  *
  * Purely decorative (aria-hidden). The seam is only 56px tall and pulls
  * itself 20px into the padding of the sections either side, so it adds
  * almost nothing to the gap between them. With reduced motion the finished
  * state is shown straight away.
  */
-export type SectionTransitionVariant = 'sprout' | 'vine' | 'wave' | 'dots' | 'curtain';
+export type SectionTransitionVariant = 'sprout' | 'vine' | 'wave' | 'dots' | 'curtain' | 'leaves' | 'nodes';
 
 @Component({
   selector: 'app-section-transition',
@@ -53,6 +55,23 @@ export type SectionTransitionVariant = 'sprout' | 'vine' | 'wave' | 'dots' | 'cu
             <span class="dot" [class.dot-mid]="i === 3" [style.--i]="i" [style.--n]="i > 3 ? i - 3 : 3 - i"></span>
           }
         </div>
+      }
+      @case ('leaves') {
+        <svg class="v v-leaves" viewBox="0 0 190 56" aria-hidden="true">
+          <g transform="translate(95 51) rotate(-142) scale(1.5)"><path class="leaf" style="--d: 700ms" d="M0 0C4-10 15-13 24-8C19 2 8 6 0 0Z" /></g>
+          <g transform="translate(95 51) rotate(-107) scale(1.5)"><path class="leaf" style="--d: 500ms" d="M0 0C4-10 15-13 24-8C19 2 8 6 0 0Z" /></g>
+          <g transform="translate(95 51) rotate(-72) scale(1.5)"><path class="leaf" style="--d: 300ms" d="M0 0C4-10 15-13 24-8C19 2 8 6 0 0Z" /></g>
+          <g transform="translate(95 51) rotate(-37) scale(1.5)"><path class="leaf" style="--d: 500ms" d="M0 0C4-10 15-13 24-8C19 2 8 6 0 0Z" /></g>
+          <g transform="translate(95 51) rotate(-2) scale(1.5)"><path class="leaf" style="--d: 700ms" d="M0 0C4-10 15-13 24-8C19 2 8 6 0 0Z" /></g>
+        </svg>
+      }
+      @case ('nodes') {
+        <svg class="v v-nodes" viewBox="0 0 240 56" aria-hidden="true">
+          <path class="rail" pathLength="1" d="M20 28H220" />
+          <circle class="node" style="--d: 600ms" cx="20" cy="28" r="4.5" />
+          <circle class="node node-mid" style="--d: 300ms" cx="120" cy="28" r="6" />
+          <circle class="node" style="--d: 600ms" cx="220" cy="28" r="4.5" />
+        </svg>
       }
       @case ('curtain') {
         <div class="v v-curtain" aria-hidden="true">
@@ -142,6 +161,49 @@ export type SectionTransitionVariant = 'sprout' | 'vine' | 'wave' | 'dots' | 'cu
     .v-vine .leaf {
       transform-origin: 0% 100%;
       transition-delay: var(--d, 600ms);
+    }
+
+    /* ---------- leaves ---------- */
+    .v-leaves {
+      width: 190px;
+      overflow: visible;
+    }
+    .v-leaves .leaf {
+      transform-origin: 0% 100%;
+      transition-delay: var(--d, 400ms);
+    }
+
+    /* ---------- nodes ---------- */
+    .v-nodes {
+      width: min(86%, 300px);
+      overflow: visible;
+    }
+    .rail {
+      fill: none;
+      stroke: color-mix(in oklab, var(--oxblood) 55%, transparent);
+      stroke-width: 1.4;
+      stroke-linecap: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 900ms var(--ease-out-soft);
+    }
+    :host(.is-active) .rail {
+      stroke-dashoffset: 0;
+    }
+    .node {
+      fill: var(--olive);
+      transform: scale(0);
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1) var(--d, 400ms);
+    }
+    .node-mid {
+      fill: var(--honey);
+      stroke: var(--oxblood);
+      stroke-width: 1.5;
+    }
+    :host(.is-active) .node {
+      transform: scale(1);
     }
 
     /* ---------- wave ---------- */
@@ -243,6 +305,8 @@ export type SectionTransitionVariant = 'sprout' | 'vine' | 'wave' | 'dots' | 'cu
 
     @media (prefers-reduced-motion: reduce) {
       .stem,
+      .rail,
+      .node,
       .leaf,
       .bud,
       .w,
