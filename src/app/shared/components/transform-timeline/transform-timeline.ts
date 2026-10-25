@@ -17,7 +17,7 @@ export interface TimelineStep {
     <div class="tl">
       <header class="tl-head">
         <span class="tl-eyebrow">Built with you, not just for you</span>
-        <h2 class="tl-title" id="treat-heading">Transform with E.A.S.E</h2>
+        <h2 class="tl-title" id="treat-heading">Transform with <span class="tl-ease">E.A.S.E</span></h2>
         <p class="tl-sub">Physically, mentally and emotionally.</p>
       </header>
 
@@ -43,7 +43,7 @@ export interface TimelineStep {
     .tl {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 72px 18px 96px;
+      padding: 72px 20px 96px;
     }
     .tl-head {
       text-align: center;
@@ -68,11 +68,18 @@ export interface TimelineStep {
     .tl-title {
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(36px, 5vw, 56px);
+      font-size: var(--fs-heading);
       line-height: 1.1;
       letter-spacing: -0.02em;
       margin: 14px 0 12px;
       color: #000;
+    }
+    /* The brand word: burgundy with a burgundy underline. */
+    .tl-ease {
+      color: var(--oxblood);
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 8px;
     }
     .tl-sub {
       font-family: var(--font-body);

@@ -75,7 +75,7 @@ export interface PhilosophyPoint {
     .phil-title {
       font-family: var(--font-display);
       font-weight: 400;
-      font-size: clamp(36px, 5vw, 56px);
+      font-size: var(--fs-heading);
       line-height: 1.1;
       letter-spacing: -0.02em;
       margin: 14px 0 0;

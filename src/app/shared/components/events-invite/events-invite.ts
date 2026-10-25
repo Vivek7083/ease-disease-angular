@@ -29,7 +29,7 @@ import { EyebrowLabel } from '../eyebrow-label/eyebrow-label';
 
       <div class="invite-copy">
         <app-eyebrow-label text="Events & retreats" />
-        <h2 id="events-invite-heading" class="t-display">Come gather with us.</h2>
+        <h2 id="events-invite-heading" class="t-display">Come <span class="accent">gather</span> with us.</h2>
         <p class="t-body invite-lede">
           Talks, workshops and retreats on gut health and whole-person healing - see what is coming and what we have hosted.
         </p>
